@@ -8,7 +8,7 @@
 | 05/31/2023 | 1 |0.5   |  1 |1 | 1 | 1 | Project pivot brainstorming and planning | 
 | 05/31/2023 | 1 |1.25   |  1 |1 | 1 | 1 | Project pivot meeting and proposal discussion| 
 | 06/01/2023 | 0.5 | 1| 0.75  | 0.75  |  1 | 2 | New proposal documentationm | 
-| 06/01/2023 | | | 1|  |  | | Buddy proposal documentation | 
-| 06/01/2023 | 1 | 1| 1| 1 |  1 | 1 | Buddy meeting and architecture discussion | 
-| 06/01/2023 | 2 | 2 | 2 | 2 | 2 | 2 | Architecture work divide | 
-| 06/01/2023 | | 2 | 2  |  |  | | Model set up | 
+| 06/10/2023 | 1 |1  | 1| 1 | 1 | 1| Buddy proposal documentation | 
+| 06/12/2023 | 1 | 1| 1| 1 |  1 | 1 | Buddy meeting and architecture discussion | 
+| 06/14/2023 | 2 | 2 | 2 | 2 | 2 | 2 | Architecture work divide | 
+| 06/16/2023 | | 2 | 2  |  |  | | Model set up | 
