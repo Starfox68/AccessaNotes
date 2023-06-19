@@ -6,10 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,12 +15,19 @@ import androidx.navigation.compose.rememberNavController
 import com.shaphr.accessanotes.ui.theme.AccessaNotesTheme
 import dagger.hilt.android.AndroidEntryPoint
 
-
+//sealed class idea came from this tutorial:
+//https://www.youtube.com/watch?v=hGg0HjcoP9w
+//UI screens with corresponding routes for navigation
 sealed class Destination(val route: String){
-    object HomeScreen: Destination("homeScreen")
+    object NoteRepositoryScreen: Destination("noteRepositoryScreen")
     object LiveRecordingScreen: Destination("liveRecordingScreen")
     object SessionStartAndEndScreen: Destination("sessionStartAndEndScreen")
-    object SingleNoteScreen: Destination("singleNoteScreen")
+    object SingleNoteScreen: Destination("singleNoteScreen/{noteID}") {
+        //create a new route with the given note ID
+        fun createRoute(noteID: Int): String {
+            return "singleNoteScreen/$noteID"
+        }
+    }
 }
 
 
@@ -37,6 +42,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    //main navigation controller
                     val navController = rememberNavController()
                     NavigationAppHost(navController = navController)
                 }
@@ -45,13 +51,20 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+//Functionality for navigating to different UI pages
 @Composable
 fun NavigationAppHost(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "homeScreen"){
-        composable(Destination.HomeScreen.route) { HomeScreen(navController) }
+    NavHost(navController = navController, startDestination = "noteRepositoryScreen") {
+        composable(Destination.NoteRepositoryScreen.route) { NoteRepositoryScreen(navController) }
         composable(Destination.LiveRecordingScreen.route) { LiveRecordingScreen(navController) }
-        composable(Destination.SessionStartAndEndScreen.route) { SessionStartAndEndScreen(navController) }
-        composable(Destination.SingleNoteScreen.route) { SingleNoteScreen(navController) }
+        composable(Destination.SessionStartAndEndScreen.route) { SessionStartAndEndScreen() }
+        composable(Destination.SingleNoteScreen.route) { navBackStackEntry ->
+            //get noteID from within the route
+            val noteID = navBackStackEntry.arguments?.getString("noteID")
+            if (noteID != null) {
+                SingleNoteScreen(noteID = noteID.toInt(), navController)
+            }
+        }
     }
 
 }

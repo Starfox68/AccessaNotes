@@ -10,17 +10,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 
-
+//UI screen for when a session is currently underway
 @Composable
 fun LiveRecordingScreen(navController: NavHostController){
+    //TODO
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Text(text = "Live Recording Screen")
-        Button(onClick = { navController.navigate(Destination.HomeScreen.route) }){
-            Text(text = "to homeScreen")
+        Button(onClick = { navController.navigate(Destination.NoteRepositoryScreen.route) }){
+            Text(text = "to noteRepositoryScreen")
         }
         Button(onClick = { navController.navigate(Destination.SessionStartAndEndScreen.route) }){
             Text(text = "to sessionStartAndEndScreen")
