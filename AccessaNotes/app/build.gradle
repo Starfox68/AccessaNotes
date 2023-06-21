@@ -20,6 +20,15 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+
+        buildFeatures {
+            buildConfig = true
+        }
+
+        // OpenAI API key must be set in local.properties
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+        buildConfigField "String", "OPENAI_API_KEY", "\"${properties.getProperty("OPENAI_API_KEY")}\""
     }
 
     buildTypes {
@@ -78,6 +87,11 @@ dependencies {
     // Dependency Injection
     implementation "com.google.dagger:hilt-android:2.46.1"
     kapt "com.google.dagger:hilt-compiler:2.46.1"
+
+    // OpenAI
+    implementation platform('com.aallam.openai:openai-client-bom:3.3.0')
+    implementation 'com.aallam.openai:openai-client'
+    runtimeOnly 'io.ktor:ktor-client-okhttp'
 }
 
 kapt {
