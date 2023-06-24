@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 fun SessionStartAndEndScreen(){
     Scaffold(
         //top settings navigation bar
-        topBar = { TopNav()},
+        topBar = { TopNav("TEST")},
         // TODO
         content = { padding ->
             Text(modifier = Modifier.padding(padding), text = "Start and End Session Screen")

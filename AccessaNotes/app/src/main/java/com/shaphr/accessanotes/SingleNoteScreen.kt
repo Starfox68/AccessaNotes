@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,11 +44,7 @@ fun topBar() {
     var dropdown1Expanded by remember { mutableStateOf(false) }
     var dropdown2Expanded by remember { mutableStateOf(false) }
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "Record Session") }
-            )
-        },
+        topBar = { TopNav("Record Session") },
         content = {
             Column(
                 modifier = Modifier
