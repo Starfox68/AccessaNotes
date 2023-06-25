@@ -1,4 +1,4 @@
-package com.shaphr.accessanotes
+package com.shaphr.accessanotes.ui.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
@@ -7,23 +7,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 
 //Top Navigation Bar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopNav() {
+fun TopNav(titleText: String) {
     TopAppBar(
-        title = { Text("Settings") },
-        colors = TopAppBarDefaults.smallTopAppBarColors(
-            containerColor = Color.Blue,
-            titleContentColor = Color.White,
-        ),
-        navigationIcon = {
+        title = { Text(titleText) },
+        actions = {
             IconButton(onClick = { /* TODO */ }){
-                Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
+                Icon(imageVector = Icons.Default.Settings, null)
             }
         }
     )

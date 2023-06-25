@@ -20,6 +20,15 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+
+        buildFeatures {
+            buildConfig = true
+        }
+
+        // OpenAI API key must be set in local.properties
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+        buildConfigField "String", "OPENAI_API_KEY", "\"${properties.getProperty("OPENAI_API_KEY")}\""
     }
 
     buildTypes {
@@ -53,14 +62,17 @@ dependencies {
     def nav_version = "2.5.3"
     implementation("androidx.navigation:navigation-compose:$nav_version")
 
-
+    // Core
     implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+    implementation 'androidx.activity:activity-ktx:1.7.2'
     implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.0')
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
 
     // Compose
     implementation 'androidx.activity:activity-compose:1.7.2'
     implementation platform('androidx.compose:compose-bom:2022.10.00')
+    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
     implementation 'androidx.compose.ui:ui'
     implementation 'androidx.compose.ui:ui-graphics'
     implementation 'androidx.compose.ui:ui-tooling-preview'
@@ -78,6 +90,11 @@ dependencies {
     // Dependency Injection
     implementation "com.google.dagger:hilt-android:2.46.1"
     kapt "com.google.dagger:hilt-compiler:2.46.1"
+
+    // OpenAI
+    implementation platform('com.aallam.openai:openai-client-bom:3.3.0')
+    implementation 'com.aallam.openai:openai-client'
+    runtimeOnly 'io.ktor:ktor-client-okhttp'
 }
 
 kapt {
