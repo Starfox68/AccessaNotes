@@ -1,4 +1,4 @@
-package com.shaphr.accessanotes
+package com.shaphr.accessanotes.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import com.shaphr.accessanotes.Destination
 
 //UI screen for when a session is currently underway
 

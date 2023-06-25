@@ -1,7 +1,13 @@
-package com.shaphr.accessanotes
+package com.shaphr.accessanotes.ui.screens
+
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,22 +25,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-
-//UI screen for viewing a single saved note
-
+import com.shaphr.accessanotes.ui.components.FloatingActionButton
+import com.shaphr.accessanotes.ui.components.TopNav
 
 @Composable
-fun SingleNoteScreen(noteID: Int, navController: NavHostController){
-    //TODO
-    topBar()
-    // Text(text = "This is note with ID: $noteID")
+fun SessionStartAndEndScreen(navController: NavHostController) {
+    SessionStartScreen()
     FloatingActionButton(navController)
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun topBar() {
+fun SessionStartScreen() {
     var dropdown1Expanded by remember { mutableStateOf(false) }
     var dropdown2Expanded by remember { mutableStateOf(false) }
     Scaffold(
@@ -107,25 +110,24 @@ fun topBar() {
                 Spacer(modifier = Modifier.height(16.dp))
 
 
-                    Button(
-                        onClick = { /* Handle button 1 click */ },
+                Button(
+                    onClick = { /* Handle button 1 click */ },
 
                     ) {
-                        Text("Upload Relevant Files")
-                    }
-
-                    Button(
-                        onClick = { /* Handle button 2 click */ },
-                    ) {
-                        Text("Start")
-                    }
+                    Text("Upload Relevant Files")
                 }
 
+                Button(
+                    onClick = { /* Handle button 2 click */ },
+                ) {
+                    Text("Start")
+                }
+            }
         }
     )
 }
 @Preview
 @Composable
-fun SingleNoteScreenPreview() {
-    SingleNoteScreen(noteID = 1, navController = rememberNavController())
+fun SessionStartAndEndScreenPreview() {
+    SessionStartAndEndScreen(navController = rememberNavController())
 }

@@ -1,4 +1,4 @@
-package com.shaphr.accessanotes
+package com.shaphr.accessanotes.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.shaphr.accessanotes.Destination
 
 //Floating Action Button for starting a new recording session
 @Composable

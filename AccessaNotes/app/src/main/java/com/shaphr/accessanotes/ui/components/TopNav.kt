@@ -1,4 +1,4 @@
-package com.shaphr.accessanotes
+package com.shaphr.accessanotes.ui.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
