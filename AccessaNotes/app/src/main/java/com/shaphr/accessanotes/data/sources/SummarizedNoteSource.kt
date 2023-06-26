@@ -14,8 +14,13 @@ class SummarizedNoteSource @Inject constructor(
 
     @OptIn(BetaOpenAI::class)
     suspend fun summarize(prompt: String) {
-        openAIAPIClient.summarize(prompt).collect { chunk ->
-            summarizedNotes.emit(chunk.choices.first().delta?.content.orEmpty())
+        var summarizedNote = ""
+        try {
+            openAIAPIClient.summarize(prompt).collect { chunk ->
+                summarizedNote += chunk.choices.first().delta?.content.orEmpty()
+            }
+        } finally {
+            summarizedNotes.emit(summarizedNote)
         }
     }
 }

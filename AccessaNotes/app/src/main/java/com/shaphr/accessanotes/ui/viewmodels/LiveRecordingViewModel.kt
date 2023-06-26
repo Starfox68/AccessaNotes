@@ -21,6 +21,9 @@ class LiveRecordingViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             liveRecordingRepository.summarizeRecording()
+        }
+
+        viewModelScope.launch {
             liveRecordingRepository.summarizedNotes.collect { summarizedNote ->
                 mutableNoteText.update {
                     it + listOf(summarizedNote)
