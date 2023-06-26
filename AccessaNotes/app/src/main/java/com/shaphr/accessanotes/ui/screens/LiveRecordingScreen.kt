@@ -22,20 +22,22 @@ import com.shaphr.accessanotes.ui.viewmodels.LiveRecordingViewModel
 
 @Composable
 fun LiveRecordingScreen(viewModel: LiveRecordingViewModel = hiltViewModel()) {
-    val content = viewModel.noteText.collectAsState().value
+    val summarizedContent = viewModel.noteText.collectAsState().value
     LiveRecordingScreenContent(
-        content = content,
+        summarizedContent = summarizedContent,
         onStartRecordingClick = viewModel::onStartRecording,
-        onStopRecordingClick = viewModel::onStopRecording
+        onStopRecordingClick = viewModel::onStopRecording,
+        onTextToSpeechClick = viewModel::onTextToSpeech
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LiveRecordingScreenContent(
-    content: List<String>,
+    summarizedContent: List<String>,
     onStartRecordingClick: () -> Unit,
     onStopRecordingClick: () -> Unit,
+    onTextToSpeechClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -51,7 +53,7 @@ fun LiveRecordingScreenContent(
                 Column (modifier = Modifier.height((config.current.screenHeightDp*0.35).dp)
                 ) {
                     TextField(
-                        value = content.joinToString(separator = ""),
+                        value = summarizedContent.joinToString(separator = ""),
                         onValueChange = { },
                         modifier = Modifier.fillMaxSize()
                     )
@@ -61,7 +63,7 @@ fun LiveRecordingScreenContent(
                 Column (modifier = Modifier.height((config.current.screenHeightDp*0.35).dp)
                 ) {
                     TextField(
-                        value = content.joinToString(separator = ""),
+                        value = summarizedContent.joinToString(separator = ""),
                         onValueChange = { },
                         modifier = Modifier.fillMaxSize()
                     )
@@ -72,7 +74,7 @@ fun LiveRecordingScreenContent(
             onClick = onStartRecordingClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp)
+                .padding(vertical = 4.dp)
         ) {
             Text(text = "Live Capture")
         }
@@ -81,9 +83,18 @@ fun LiveRecordingScreenContent(
             onClick = onStopRecordingClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp)
+                .padding(vertical = 4.dp)
         ) {
             Text(text = "Stop")
+        }
+
+        Button(
+            onClick = onTextToSpeechClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+        ) {
+            Text(text = "Read Summarized Notes")
         }
     }
 }
@@ -92,7 +103,7 @@ fun LiveRecordingScreenContent(
 @Composable
 fun LiveRecordingScreenPreview() {
     LiveRecordingScreenContent(
-        content = listOf(
+        summarizedContent = listOf(
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             "Suspendisse a quam sodales, pretium libero non, pharetra ligula.",
             "Duis ac semper erat",
@@ -101,5 +112,6 @@ fun LiveRecordingScreenPreview() {
         ),
         onStartRecordingClick = {},
         onStopRecordingClick = {},
+        onTextToSpeechClick = {}
     )
 }
