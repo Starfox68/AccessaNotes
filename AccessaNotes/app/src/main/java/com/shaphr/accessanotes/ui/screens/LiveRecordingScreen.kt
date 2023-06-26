@@ -3,6 +3,7 @@ package com.shaphr.accessanotes.ui.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -44,13 +46,24 @@ fun LiveRecordingScreenContent(
             modifier = Modifier.padding(16.dp)
         )
         LazyColumn {
-            content.forEachIndexed { index, text ->
-                item(index) {
+            val config = LocalConfiguration
+            item {
+                Column (modifier = Modifier.height((config.current.screenHeightDp*0.35).dp)
+                ) {
                     TextField(
-                        value = text,
+                        value = content.joinToString(separator = ""),
                         onValueChange = { },
-                        maxLines = 1,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+            item {
+                Column (modifier = Modifier.height((config.current.screenHeightDp*0.35).dp)
+                ) {
+                    TextField(
+                        value = content.joinToString(separator = ""),
+                        onValueChange = { },
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
             }
