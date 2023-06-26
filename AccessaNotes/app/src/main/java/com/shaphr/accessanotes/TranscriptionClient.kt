@@ -114,7 +114,7 @@ class TranscriptionClient @Inject constructor(
 
         val request = Request.Builder()
             .url("https://api.openai.com/v1/audio/transcriptions")
-            .addHeader("Authorization", "Bearer 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")
+            .addHeader("Authorization", "Bearer sk-INSERT_KEY_HERE")
             .post(requestBody)
             .build()
 
