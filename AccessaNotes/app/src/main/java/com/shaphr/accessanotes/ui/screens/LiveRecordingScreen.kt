@@ -22,11 +22,11 @@ import com.shaphr.accessanotes.ui.viewmodels.LiveRecordingViewModel
 
 @Composable
 fun LiveRecordingScreen(viewModel: LiveRecordingViewModel = hiltViewModel()) {
+    val transcribedText = viewModel.transcribedText.collectAsState().value
     val summarizedContent = viewModel.noteText.collectAsState().value
     LiveRecordingScreenContent(
+        transcribedText = transcribedText,
         summarizedContent = summarizedContent,
-        onStartRecordingClick = viewModel::onStartRecording,
-        onStopRecordingClick = viewModel::onStopRecording,
         onTextToSpeechClick = viewModel::onTextToSpeech
     )
 }
@@ -34,9 +34,8 @@ fun LiveRecordingScreen(viewModel: LiveRecordingViewModel = hiltViewModel()) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LiveRecordingScreenContent(
+    transcribedText: List<String>,
     summarizedContent: List<String>,
-    onStartRecordingClick: () -> Unit,
-    onStopRecordingClick: () -> Unit,
     onTextToSpeechClick: () -> Unit
 ) {
     Column(
@@ -47,21 +46,21 @@ fun LiveRecordingScreenContent(
             val config = LocalConfiguration
 
             item {
-                Column (modifier = Modifier.height((config.current.screenHeightDp*0.38).dp)
+                Column (modifier = Modifier.height((config.current.screenHeightDp*0.40).dp)
                 ) {
                     Text(
                         text = "Transcribed Text",
                         modifier = Modifier.padding(12.dp)
                     )
                     TextField(
-                        value = summarizedContent.joinToString(separator = ""), // TODO: Replace with transcribed text
+                        value = transcribedText.joinToString(separator = ""),
                         onValueChange = { },
                         modifier = Modifier.fillMaxSize()
                     )
                 }
             }
             item {
-                Column (modifier = Modifier.height((config.current.screenHeightDp*0.38).dp)
+                Column (modifier = Modifier.height((config.current.screenHeightDp*0.40).dp)
                 ) {
                     Text(
                         text = "Summarized Notes",
@@ -76,7 +75,7 @@ fun LiveRecordingScreenContent(
             }
         }
         Button(
-            onClick = onStartRecordingClick,
+            onClick = {},
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
@@ -85,7 +84,7 @@ fun LiveRecordingScreenContent(
         }
 
         Button(
-            onClick = onStopRecordingClick,
+            onClick = {},
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
@@ -108,6 +107,13 @@ fun LiveRecordingScreenContent(
 @Composable
 fun LiveRecordingScreenPreview() {
     LiveRecordingScreenContent(
+        transcribedText = listOf(
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "Suspendisse a quam sodales, pretium libero non, pharetra ligula.",
+            "Duis ac semper erat",
+            "Duis malesuada facilisis lorem, eget cursus massa fermentum at.",
+            "Morbi efficitur aliquam molestie."
+        ),
         summarizedContent = listOf(
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             "Suspendisse a quam sodales, pretium libero non, pharetra ligula.",
@@ -115,8 +121,6 @@ fun LiveRecordingScreenPreview() {
             "Duis malesuada facilisis lorem, eget cursus massa fermentum at.",
             "Morbi efficitur aliquam molestie."
         ),
-        onStartRecordingClick = {},
-        onStopRecordingClick = {},
         onTextToSpeechClick = {}
     )
 }
