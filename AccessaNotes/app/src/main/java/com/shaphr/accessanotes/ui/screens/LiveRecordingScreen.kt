@@ -43,25 +43,30 @@ fun LiveRecordingScreenContent(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Record Session",
-            modifier = Modifier.padding(16.dp)
-        )
         LazyColumn {
             val config = LocalConfiguration
+
             item {
-                Column (modifier = Modifier.height((config.current.screenHeightDp*0.35).dp)
+                Column (modifier = Modifier.height((config.current.screenHeightDp*0.38).dp)
                 ) {
+                    Text(
+                        text = "Transcribed Text",
+                        modifier = Modifier.padding(12.dp)
+                    )
                     TextField(
-                        value = summarizedContent.joinToString(separator = ""),
+                        value = summarizedContent.joinToString(separator = ""), // TODO: Replace with transcribed text
                         onValueChange = { },
                         modifier = Modifier.fillMaxSize()
                     )
                 }
             }
             item {
-                Column (modifier = Modifier.height((config.current.screenHeightDp*0.35).dp)
+                Column (modifier = Modifier.height((config.current.screenHeightDp*0.38).dp)
                 ) {
+                    Text(
+                        text = "Summarized Notes",
+                        modifier = Modifier.padding(12.dp)
+                    )
                     TextField(
                         value = summarizedContent.joinToString(separator = ""),
                         onValueChange = { },
