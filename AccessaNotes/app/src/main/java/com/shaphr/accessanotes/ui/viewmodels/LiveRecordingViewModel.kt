@@ -1,5 +1,10 @@
 package com.shaphr.accessanotes.ui.viewmodels
 
+import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.speech.tts.TextToSpeech
+import android.speech.tts.TextToSpeech.OnInitListener
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,7 +15,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
+
 
 @HiltViewModel
 class LiveRecordingViewModel @Inject constructor(
@@ -54,7 +61,19 @@ class LiveRecordingViewModel @Inject constructor(
         }
     }
 
-    fun onTextToSpeech() {
-        // TODO TextToSpeech
+    fun onTextToSpeech(text: String, context: Context) {
+        var status = -1
+        val tts = TextToSpeech(context) {it ->
+            status = it
+        }
+        Handler(Looper.getMainLooper()).postDelayed({
+                if (status == TextToSpeech.SUCCESS) {
+                    tts.language = Locale.ENGLISH
+                    tts.speak(text, TextToSpeech.QUEUE_ADD, null, "")
+                    println("bruh")
+                }
+            },
+            3000 // value in milliseconds
+        )
     }
 }
