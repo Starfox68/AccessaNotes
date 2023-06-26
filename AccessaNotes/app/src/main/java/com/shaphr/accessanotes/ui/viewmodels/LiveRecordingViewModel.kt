@@ -53,4 +53,8 @@ class LiveRecordingViewModel @Inject constructor(
             liveRecordingRepository.stopRecording()
         }
     }
+
+    fun onTextToSpeech() {
+        // TODO TextToSpeech
+    }
 }
