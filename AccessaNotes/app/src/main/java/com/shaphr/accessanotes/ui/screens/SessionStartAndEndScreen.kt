@@ -25,19 +25,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.shaphr.accessanotes.ui.components.FloatingActionButton
+import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.ui.components.TopNav
 
 @Composable
 fun SessionStartAndEndScreen(navController: NavHostController) {
-    SessionStartScreen()
-    FloatingActionButton(navController)
+    SessionStartScreen(
+        onStartClick = { navController.navigate(Destination.LiveRecordingScreen.route) }
+    )
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SessionStartScreen() {
+fun SessionStartScreen(
+    onStartClick: () -> Unit
+) {
     var dropdown1Expanded by remember { mutableStateOf(false) }
     var dropdown2Expanded by remember { mutableStateOf(false) }
     Scaffold(
@@ -118,7 +121,7 @@ fun SessionStartScreen() {
                 }
 
                 Button(
-                    onClick = { /* Handle button 2 click */ },
+                    onClick = onStartClick,
                 ) {
                     Text("Start")
                 }

@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
 fun NavigationAppHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "noteRepositoryScreen") {
         composable(Destination.NoteRepositoryScreen.route) { NoteRepositoryScreen(navController) }
-        composable(Destination.LiveRecordingScreen.route) { LiveRecordingScreen(navController) }
+        composable(Destination.LiveRecordingScreen.route) { LiveRecordingScreen() }
         composable(Destination.SessionStartAndEndScreen.route) { SessionStartAndEndScreen(navController) }
         composable(Destination.SingleNoteScreen.route) { navBackStackEntry ->
             //get noteID from within the route
