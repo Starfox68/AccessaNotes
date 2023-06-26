@@ -1,8 +1,12 @@
 package com.shaphr.accessanotes.ui.screens
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
@@ -11,6 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.shaphr.accessanotes.Destination
@@ -32,18 +39,17 @@ fun NoteRepositoryScreen(
             LazyColumn(modifier = Modifier.padding(padding)) {
                 notes.forEach { note ->
                     item(note.id) {
-                        Divider()
-                        ListItem(
-                            headlineText = { Text(note.title) },
-                            supportingText = { Text(note.date.toString()) },
-                            modifier = Modifier.clickable {
-                                navController.navigate(
-                                    Destination.SingleNoteScreen.createRoute(
-                                        note.id
-                                    )
-                                )
+//                        Divider()
+                        val paddingModifier = Modifier
+                            .padding(10.dp)
+                            .fillMaxWidth()
+                            .clickable { navController.navigate(Destination.SingleNoteScreen.createRoute(note.id)) }
+                        Card(shape = RoundedCornerShape(20.dp), modifier = paddingModifier) {
+                            Column(modifier = paddingModifier) {
+                                Text(note.title, color = Color.Black)
+                                Text(note.date.toString(), color = Color.Gray)
                             }
-                        )
+                        }
                     }
                 }
             }
