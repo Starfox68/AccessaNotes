@@ -2,9 +2,6 @@ package com.shaphr.accessanotes.ui.screens
 
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,17 +26,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.shaphr.accessanotes.TranscriptionClient
 import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.ui.components.TopNav
-import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun SessionStartAndEndScreen(navController: NavHostController) {
-    val context = LocalContext.current
     SessionStartScreen(
-        context = context,
-        onStartClick = { navController.navigate(Destination.LiveRecordingScreen.route) }
+        onStartClick = {
+            navController.navigate(Destination.LiveRecordingScreen.route)
+        }
     )
 }
 
@@ -47,12 +42,10 @@ fun SessionStartAndEndScreen(navController: NavHostController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionStartScreen(
-    context: Context,
     onStartClick: () -> Unit
 ) {
     var dropdown1Expanded by remember { mutableStateOf(false) }
     var dropdown2Expanded by remember { mutableStateOf(false) }
-    val transcriptClient = TranscriptionClient(context)  // Initialize the TranscriptionClient
     var sessionTitleText by remember { mutableStateOf(TextFieldValue("")) }
     var promptPurpose by remember { mutableStateOf(TextFieldValue("")) }
 
@@ -134,13 +127,7 @@ fun SessionStartScreen(
                 }
 
                 Button(
-                    onClick = {
-                        println("start clicked")
-                        transcriptClient.startRecording()
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            transcriptClient.stopRecording()
-                        }, 12000)
-                    },
+                    onClick = onStartClick,
                 ) {
                     Text("Start")
                 }

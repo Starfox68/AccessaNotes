@@ -1,9 +1,11 @@
 package com.shaphr.accessanotes.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shaphr.accessanotes.data.repositories.LiveRecordingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -18,6 +20,10 @@ class LiveRecordingViewModel @Inject constructor(
     private val mutableNoteText: MutableStateFlow<List<String>> = MutableStateFlow(emptyList())
     val noteText: StateFlow<List<String>> = mutableNoteText
 
+    private val mutableTranscribedText: MutableStateFlow<List<String>> =
+        MutableStateFlow(emptyList())
+    val transcribedText: StateFlow<List<String>> = mutableTranscribedText
+
     init {
         viewModelScope.launch {
             liveRecordingRepository.summarizeRecording()
@@ -25,18 +31,26 @@ class LiveRecordingViewModel @Inject constructor(
 
         viewModelScope.launch {
             liveRecordingRepository.summarizedNotes.collect { summarizedNote ->
+                Log.d("VIEW MODEL", summarizedNote)
                 mutableNoteText.update {
                     it + listOf(summarizedNote)
                 }
             }
         }
-    }
 
-    fun onStartRecording() {
-        // TODO Start Audio Capture
-    }
+        viewModelScope.launch {
+            liveRecordingRepository.recording.collect { transcribedText ->
+                Log.d("VIEW MODEL", transcribedText)
+                mutableTranscribedText.update {
+                    it + listOf(transcribedText)
+                }
+            }
+        }
 
-    fun onStopRecording() {
-        // TODO Stop Audio Capture
+        viewModelScope.launch {
+            liveRecordingRepository.startRecording()
+            delay(30000)
+            liveRecordingRepository.stopRecording()
+        }
     }
 }

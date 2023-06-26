@@ -53,15 +53,26 @@ package com.shaphr.accessanotes
 import android.content.Context
 import android.media.MediaPlayer
 import android.media.MediaRecorder
-import android.os.Handler
-import android.os.Looper
-import okhttp3.*
+import android.util.Log
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import ru.gildor.coroutines.okhttp.await
 import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
+class TranscriptionClient @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
+    val transcription: MutableSharedFlow<String> = MutableSharedFlow(replay = 1)
 
-
-class TranscriptionClient(private val context: Context) {
     private var mediaRecorder: MediaRecorder? = null
     private var mediaPlayer: MediaPlayer? = null
     private val filePath: String by lazy {
@@ -80,19 +91,17 @@ class TranscriptionClient(private val context: Context) {
         }
     }
 
-    fun stopRecording() {
+    suspend fun stopRecording() {
         println("Stopping recording...")
         mediaRecorder?.apply {
             stop()
-            Handler(Looper.getMainLooper()).postDelayed({
-                release()
-                mediaRecorder = null
-            }, 1000)
+            delay(1000)
+            release()
         }
         callWhisper()
     }
 
-    private fun callWhisper() {
+    private suspend fun callWhisper() {
         println("Calling Whisper API...")
         val audioFile = File(filePath)
 
@@ -105,31 +114,45 @@ class TranscriptionClient(private val context: Context) {
 
         val request = Request.Builder()
             .url("https://api.openai.com/v1/audio/transcriptions")
-            .addHeader("Authorization", "Bearer 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")
+            .addHeader("Authorization", "Bearer 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")
             .post(requestBody)
             .build()
 
         val client = OkHttpClient()
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: java.io.IOException) {
-                println("Error with calling Whisper")
-                // Handle failure
-                e.printStackTrace()
-            }
+        val response = client.newCall(request).await()
+        if (response.isSuccessful) {
+            println("Success with calling Whisper")
+            val resultText = response.body?.string() ?: ""
+            transcription.emit(resultText)
+            Log.d("TEST", resultText)
+            // Handle successful response
+        } else {
+            // Handle error response
+            println("Error with calling Whisper: status not 200")
+        }
 
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    println("Success with calling Whisper")
-                    val resultText = response.body?.string()
-                    println(resultText)
-                    // Handle successful response
-                } else {
-                    // Handle error response
-                    println("Error with calling Whisper: status not 200")
-                }
-            }
-        })
+//        client.newCall(request).enqueue(object : Callback {
+//            override fun onFailure(call: Call, e: java.io.IOException) {
+//                println("Error with calling Whisper")
+//                // Handle failure
+//                e.printStackTrace()
+//            }
+//
+//            override fun onResponse(call: Call, response: Response) {
+//                if (response.isSuccessful) {
+//                    println("Success with calling Whisper")
+//                    val resultText = response.body?.string() ?: ""
+//                    responseText = resultText
+//                    transcription.tryEmit(responseText)
+//                    Log.d("TEST", resultText)
+//                    // Handle successful response
+//                } else {
+//                    // Handle error response
+//                    println("Error with calling Whisper: status not 200")
+//                }
+//            }
+//        })
     }
 
     private fun playRecording() {
