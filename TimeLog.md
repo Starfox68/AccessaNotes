@@ -11,4 +11,4 @@
 | 06/10/2023 | 1 |1  | 1| 1 | 1 | 1| Buddy proposal documentation | 
 | 06/12/2023 | 1 | 1| 1| 1 |  1 | 1 | Buddy meeting and architecture discussion | 
 | 06/14/2023 | 2 | 2 | 2 | 2 | 2 | 2 | Architecture work divide | 
-| 06/16/2023 | | 2 | 2  |  |  | | Model set up | 
+| 06/16/2023 | 2| 2 | |  |  | | Model set up | 
