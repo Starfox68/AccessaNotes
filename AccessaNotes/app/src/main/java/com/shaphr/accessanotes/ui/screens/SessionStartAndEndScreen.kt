@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -43,6 +44,10 @@ fun SessionStartScreen(
 ) {
     var dropdown1Expanded by remember { mutableStateOf(false) }
     var dropdown2Expanded by remember { mutableStateOf(false) }
+
+    var sessionTitleText by remember { mutableStateOf(TextFieldValue("")) }
+    var promptPurpose by remember { mutableStateOf(TextFieldValue("")) }
+
     Scaffold(
         topBar = { TopNav("Record Session") },
         content = {
@@ -54,8 +59,8 @@ fun SessionStartScreen(
                 Spacer(modifier = Modifier.height(48.dp))
                 Text("Session Title:")
                 TextField(
-                    value = "",
-                    onValueChange = { },
+                    value = sessionTitleText,
+                    onValueChange = { newText -> sessionTitleText = newText  },
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("textField1")
@@ -65,8 +70,8 @@ fun SessionStartScreen(
 
                 Text("Prompt Purpose:")
                 TextField(
-                    value = "",
-                    onValueChange = { },
+                    value = promptPurpose,
+                    onValueChange = { newText -> promptPurpose = newText },
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 100.dp, max = 200.dp)
