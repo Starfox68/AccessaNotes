@@ -28,56 +28,55 @@ import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
 @Composable
 fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewModel()) {
     val note = viewModel.getNote(noteID)
-        Column(Modifier.fillMaxSize()) {
-            // Header
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .background(Color.LightGray)
-            ) {
-                // Back button
-                Icon(
-                    Icons.Default.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Color.Black,
-                    modifier = Modifier.padding(16.dp)
-                )
-                //Text
-                Text(
-                    text = note.title,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier
-                        .padding(16.dp)
+    Column(Modifier.fillMaxSize()) {
+        // Header
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .background(Color.LightGray)
+        ) {
+            // Back button
+            Icon(
+                Icons.Default.ArrowBack,
+                contentDescription = "Back",
+                tint = Color.Black,
+                modifier = Modifier.padding(16.dp)
+            )
+            //Text
+            Text(
+                text = note.title,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .padding(16.dp).align(Alignment.Center)
 
-                )
-                // Share icon
-                Icon(
-                    Icons.Default.Share,
-                    contentDescription = "Share",
-                    tint = Color.Black,
-                    modifier = Modifier
-                        .align(alignment = Alignment.TopEnd)
-                        .padding(16.dp)
-                )
-            }
-
-            // Body
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-                    .weight(1f)
-                    .padding(horizontal = 16.dp)
-                    .background(Color.White)
-            ) {
-                Text(
-                    text = note.content,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-            }
+            )
+            // Share icon
+            Icon(
+                Icons.Default.Share,
+                contentDescription = "Share",
+                tint = Color.Black,
+                modifier = Modifier
+                    .align(alignment = Alignment.TopEnd)
+                    .padding(16.dp)
+            )
         }
+
+        // Body
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .weight(1f)
+                .background(Color.White)
+        ) {
+            Text(
+                text = note.content,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 16.dp, start = 16.dp, end=16.dp)
+            )
+        }
+    }
 }
 
 @Preview
