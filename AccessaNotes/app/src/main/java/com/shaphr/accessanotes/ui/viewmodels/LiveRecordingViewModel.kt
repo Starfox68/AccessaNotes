@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shaphr.accessanotes.data.repositories.LiveRecordingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -55,7 +54,11 @@ class LiveRecordingViewModel @Inject constructor(
 
         viewModelScope.launch {
             liveRecordingRepository.startRecording()
-            delay(30000)
+        }
+    }
+
+    fun stopRecording() {
+        viewModelScope.launch {
             liveRecordingRepository.stopRecording()
         }
     }

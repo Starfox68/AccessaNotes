@@ -29,7 +29,8 @@ fun LiveRecordingScreen(viewModel: LiveRecordingViewModel = hiltViewModel()) {
     LiveRecordingScreenContent(
         transcribedText = transcribedText,
         summarizedContent = summarizedContent,
-        onTextToSpeechClick = viewModel::onTextToSpeech
+        onTextToSpeechClick = viewModel::onTextToSpeech,
+        onStopClick = viewModel::stopRecording
     )
 }
 
@@ -38,7 +39,8 @@ fun LiveRecordingScreen(viewModel: LiveRecordingViewModel = hiltViewModel()) {
 fun LiveRecordingScreenContent(
     transcribedText: List<String>,
     summarizedContent: List<String>,
-    onTextToSpeechClick: (String, Context) -> Unit
+    onTextToSpeechClick: (String, Context) -> Unit,
+    onStopClick: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -88,7 +90,7 @@ fun LiveRecordingScreenContent(
         }
 
         Button(
-            onClick = {},
+            onClick = { onStopClick() },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
@@ -127,6 +129,7 @@ fun LiveRecordingScreenPreview() {
             "Duis malesuada facilisis lorem, eget cursus massa fermentum at.",
             "Morbi efficitur aliquam molestie."
         ),
-        onTextToSpeechClick = { _, _ -> }
+        onTextToSpeechClick = { _, _ -> },
+        onStopClick = { }
     )
 }
