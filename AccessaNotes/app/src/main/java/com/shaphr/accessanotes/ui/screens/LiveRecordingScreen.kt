@@ -1,5 +1,6 @@
 package com.shaphr.accessanotes.ui.screens
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -36,8 +38,10 @@ fun LiveRecordingScreen(viewModel: LiveRecordingViewModel = hiltViewModel()) {
 fun LiveRecordingScreenContent(
     transcribedText: List<String>,
     summarizedContent: List<String>,
-    onTextToSpeechClick: () -> Unit
+    onTextToSpeechClick: (String, Context) -> Unit
 ) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -46,7 +50,7 @@ fun LiveRecordingScreenContent(
             val config = LocalConfiguration
 
             item {
-                Column (modifier = Modifier.height((config.current.screenHeightDp*0.40).dp)
+                Column (modifier = Modifier.height((config.current.screenHeightDp*0.35).dp)
                 ) {
                     Text(
                         text = "Transcribed Text",
@@ -60,7 +64,7 @@ fun LiveRecordingScreenContent(
                 }
             }
             item {
-                Column (modifier = Modifier.height((config.current.screenHeightDp*0.40).dp)
+                Column (modifier = Modifier.height((config.current.screenHeightDp*0.35).dp)
                 ) {
                     Text(
                         text = "Summarized Notes",
@@ -93,7 +97,9 @@ fun LiveRecordingScreenContent(
         }
 
         Button(
-            onClick = onTextToSpeechClick,
+            onClick = {
+                onTextToSpeechClick(summarizedContent.joinToString(separator = ""), context)
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
@@ -121,6 +127,6 @@ fun LiveRecordingScreenPreview() {
             "Duis malesuada facilisis lorem, eget cursus massa fermentum at.",
             "Morbi efficitur aliquam molestie."
         ),
-        onTextToSpeechClick = {}
+        onTextToSpeechClick = { _, _ -> }
     )
 }
