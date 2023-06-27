@@ -70,7 +70,9 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
     implementation 'org.java-websocket:Java-WebSocket:1.5.2'
     implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+    implementation 'ru.gildor.coroutines:kotlin-coroutines-okhttp:1.0'
     implementation 'com.neovisionaries:nv-websocket-client:2.14'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0'
 
     // Compose
     implementation 'androidx.activity:activity-compose:1.7.2'

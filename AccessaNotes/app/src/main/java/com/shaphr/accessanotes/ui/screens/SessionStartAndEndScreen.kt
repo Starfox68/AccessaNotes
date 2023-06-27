@@ -2,9 +2,6 @@ package com.shaphr.accessanotes.ui.screens
 
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,19 +25,26 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.shaphr.accessanotes.TranscriptionClient
 import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.ui.components.TopNav
-import androidx.compose.ui.platform.LocalContext
+import com.shaphr.accessanotes.ui.viewmodels.StartAndEndScreenViewModel
 
 @Composable
-fun SessionStartAndEndScreen(navController: NavHostController) {
-    val context = LocalContext.current
+fun SessionStartAndEndScreen(navController: NavHostController, viewModel: StartAndEndScreenViewModel = hiltViewModel()) {
+    val canStart = viewModel.canStart.collectAsState().value
+    val title = viewModel.title.collectAsState().value
+
     SessionStartScreen(
-        context = context,
-        onStartClick = { navController.navigate(Destination.LiveRecordingScreen.route) }
+        onStartClick = {
+            navController.navigate(Destination.LiveRecordingScreen.route)
+        },
+        canStart = canStart,
+        title = title,
+        setName = viewModel::setTitle
+
     )
 }
 
@@ -47,13 +52,13 @@ fun SessionStartAndEndScreen(navController: NavHostController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionStartScreen(
-    context: Context,
-    onStartClick: () -> Unit
+    onStartClick: () -> Unit,
+    canStart: Boolean,
+    title: String,
+    setName: (String) -> Unit
 ) {
     var dropdown1Expanded by remember { mutableStateOf(false) }
     var dropdown2Expanded by remember { mutableStateOf(false) }
-    val transcriptClient = TranscriptionClient(context)  // Initialize the TranscriptionClient
-    var sessionTitleText by remember { mutableStateOf(TextFieldValue("")) }
     var promptPurpose by remember { mutableStateOf(TextFieldValue("")) }
 
     Scaffold(
@@ -66,13 +71,7 @@ fun SessionStartScreen(
             ) {
                 Spacer(modifier = Modifier.height(48.dp))
                 Text("Session Title:")
-                TextField(
-                    value = sessionTitleText,
-                    onValueChange = { newText -> sessionTitleText = newText  },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("textField1")
-                )
+                ShowSessionTitle(title, setName)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -133,19 +132,33 @@ fun SessionStartScreen(
                     Text("Upload Relevant Files")
                 }
 
-                Button(
-                    onClick = {
-                        println("start clicked")
-                        transcriptClient.startRecording()
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            transcriptClient.stopRecording()
-                        }, 12000)
-                    },
-                ) {
-                    Text("Start")
-                }
+                ShowStartButton(canStart, onStartClick)
             }
         }
+    )
+}
+
+@Composable
+fun ShowStartButton(canStart: Boolean, onStartClick: () -> Unit){
+    Button(
+        onClick = onStartClick,
+        enabled = canStart
+    ) {
+        Text("Start")
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShowSessionTitle(title: String, setName: (String) -> Unit){
+    TextField(
+        value = title,
+        onValueChange = {
+            setName(it)
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("textField1")
     )
 }
 @Preview
