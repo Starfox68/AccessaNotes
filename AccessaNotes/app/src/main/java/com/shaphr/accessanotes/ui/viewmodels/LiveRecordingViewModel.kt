@@ -71,8 +71,9 @@ class LiveRecordingViewModel @Inject constructor(
         }
         Handler(Looper.getMainLooper()).postDelayed({
                 if (status == TextToSpeech.SUCCESS) {
-                    tts.language = Locale.ENGLISH
                     tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
+                } else {
+                    println("TTS failed, status: $status")
                 }
             },
             1000
