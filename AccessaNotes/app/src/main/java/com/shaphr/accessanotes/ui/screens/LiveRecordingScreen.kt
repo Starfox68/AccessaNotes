@@ -50,7 +50,7 @@ fun LiveRecordingScreenContent(
             val config = LocalConfiguration
 
             item {
-                Column (modifier = Modifier.height((config.current.screenHeightDp*0.40).dp)
+                Column (modifier = Modifier.height((config.current.screenHeightDp*0.35).dp)
                 ) {
                     Text(
                         text = "Transcribed Text",
@@ -64,7 +64,7 @@ fun LiveRecordingScreenContent(
                 }
             }
             item {
-                Column (modifier = Modifier.height((config.current.screenHeightDp*0.40).dp)
+                Column (modifier = Modifier.height((config.current.screenHeightDp*0.35).dp)
                 ) {
                     Text(
                         text = "Summarized Notes",

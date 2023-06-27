@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.speech.tts.TextToSpeech
-import android.speech.tts.TextToSpeech.OnInitListener
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -62,18 +61,18 @@ class LiveRecordingViewModel @Inject constructor(
     }
 
     fun onTextToSpeech(text: String, context: Context) {
+        // TODO: Clean up and likely move elsewhere
         var status = -1
-        val tts = TextToSpeech(context) {it ->
+        val tts = TextToSpeech(context) {
             status = it
         }
         Handler(Looper.getMainLooper()).postDelayed({
                 if (status == TextToSpeech.SUCCESS) {
                     tts.language = Locale.ENGLISH
-                    tts.speak(text, TextToSpeech.QUEUE_ADD, null, "")
-                    println("bruh")
+                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
                 }
             },
-            3000 // value in milliseconds
+            1000
         )
     }
 }
