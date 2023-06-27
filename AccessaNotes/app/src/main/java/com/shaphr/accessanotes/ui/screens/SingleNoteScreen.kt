@@ -43,6 +43,14 @@ fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewM
                     tint = Color.Black,
                     modifier = Modifier.padding(16.dp)
                 )
+                //Text
+                Text(
+                    text = note.title,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .padding(16.dp)
+
+                )
                 // Share icon
                 Icon(
                     Icons.Default.Share,
@@ -61,6 +69,7 @@ fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewM
                     .verticalScroll(rememberScrollState())
                     .weight(1f)
                     .padding(horizontal = 16.dp)
+                    .background(Color.White)
             ) {
                 Text(
                     text = note.content,
