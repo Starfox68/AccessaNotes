@@ -13,13 +13,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Locale
 import javax.inject.Inject
 
 
 @HiltViewModel
 class LiveRecordingViewModel @Inject constructor(
-    private val liveRecordingRepository: LiveRecordingRepository,
+    private val liveRecordingRepository: LiveRecordingRepository
 ) : ViewModel() {
 
     private val mutableNoteText: MutableStateFlow<List<String>> = MutableStateFlow(emptyList())
@@ -29,11 +28,10 @@ class LiveRecordingViewModel @Inject constructor(
         MutableStateFlow(emptyList())
     val transcribedText: StateFlow<List<String>> = mutableTranscribedText
 
-    init {
-        viewModelScope.launch {
-            liveRecordingRepository.summarizeRecording()
-        }
+    // only initialized as an emergency default in case of failure, is  overwritten each time
+    private var prompt: String = "Summarize the text"
 
+    init {
         viewModelScope.launch {
             liveRecordingRepository.summarizedNotes.collect { summarizedNote ->
                 Log.d("VIEW MODEL", summarizedNote)
@@ -45,7 +43,7 @@ class LiveRecordingViewModel @Inject constructor(
 
         viewModelScope.launch {
             liveRecordingRepository.recording.collect { transcribedText ->
-                Log.d("VIEW MODEL", transcribedText)
+                Log.d("VIEW MODEL", "Transcribed text: $transcribedText")
                 mutableTranscribedText.update {
                     it + listOf(transcribedText)
                 }
@@ -57,9 +55,20 @@ class LiveRecordingViewModel @Inject constructor(
         }
     }
 
+    fun updatePrompt(prompt: String) {
+        if (prompt.isNotEmpty()) {
+            this.prompt = prompt
+        }
+    }
+
     fun stopRecording() {
         viewModelScope.launch {
             liveRecordingRepository.stopRecording()
+        }
+        viewModelScope.launch {
+            Log.d("VIEW MODEL", "Summarizing recording...")
+            Log.d("VIEW MODEL", "The prompt used was $prompt")
+            liveRecordingRepository.summarizeRecording(prompt)
         }
     }
 

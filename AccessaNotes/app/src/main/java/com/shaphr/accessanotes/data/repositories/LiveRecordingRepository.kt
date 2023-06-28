@@ -18,9 +18,9 @@ class LiveRecordingRepository @Inject constructor(
     // Recorded text to summarize
     val recording: MutableSharedFlow<String> = transcriptionClient.transcription
 
-    suspend fun summarizeRecording() {
+    suspend fun summarizeRecording(prompt: String) {
         recording.collect {
-            summarizedNoteSource.summarize(it)
+            summarizedNoteSource.summarize(prompt, it)
         }
     }
 

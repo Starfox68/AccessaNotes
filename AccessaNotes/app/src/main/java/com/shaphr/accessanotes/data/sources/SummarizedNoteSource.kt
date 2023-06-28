@@ -13,8 +13,8 @@ class SummarizedNoteSource @Inject constructor(
     val summarizedNotes: MutableSharedFlow<String> = MutableSharedFlow()
 
     @OptIn(BetaOpenAI::class)
-    suspend fun summarize(prompt: String) {
-        openAIAPIClient.summarize(prompt).collect { chunk ->
+    suspend fun summarize(prompt: String, transcript: String) {
+        openAIAPIClient.summarize(prompt, transcript).collect { chunk ->
             summarizedNotes.emit(chunk.choices.first().delta?.content.orEmpty())
         }
     }

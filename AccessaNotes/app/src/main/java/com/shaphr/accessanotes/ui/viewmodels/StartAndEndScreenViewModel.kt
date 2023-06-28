@@ -17,6 +17,10 @@ class StartAndEndScreenViewModel : ViewModel() {
 
     init { }
 
+    fun setPrompt(text: String) {
+        mutablePrompt.value = text
+    }
+
     fun setTitle(text: String) {
         mutableTitle.value = text
         mutableStart.value = title.value.isNotEmpty()

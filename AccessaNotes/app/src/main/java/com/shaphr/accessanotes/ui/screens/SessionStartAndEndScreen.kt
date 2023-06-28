@@ -36,15 +36,21 @@ import com.shaphr.accessanotes.ui.viewmodels.StartAndEndScreenViewModel
 fun SessionStartAndEndScreen(navController: NavHostController, viewModel: StartAndEndScreenViewModel = hiltViewModel()) {
     val canStart = viewModel.canStart.collectAsState().value
     val title = viewModel.title.collectAsState().value
+    var prompt = viewModel.prompt.collectAsState().value
 
     SessionStartScreen(
         onStartClick = {
-            navController.navigate(Destination.LiveRecordingScreen.route)
+            println("Clicked Start")
+            if (prompt.isBlank()) {
+                println("Prompt was blank, using default")
+                prompt = "Summarize the following transcript as nested bullet points, capturing the main ideas"
+            }
+            navController.navigate(Destination.LiveRecordingScreen.createRoute(prompt))
         },
         canStart = canStart,
         title = title,
-        setName = viewModel::setTitle
-
+        setName = viewModel::setTitle,
+        setPrompt = viewModel::setPrompt,
     )
 }
 
@@ -55,7 +61,8 @@ fun SessionStartScreen(
     onStartClick: () -> Unit,
     canStart: Boolean,
     title: String,
-    setName: (String) -> Unit
+    setName: (String) -> Unit,
+    setPrompt: (String) -> Unit
 ) {
     var dropdown1Expanded by remember { mutableStateOf(false) }
     var dropdown2Expanded by remember { mutableStateOf(false) }
@@ -78,7 +85,10 @@ fun SessionStartScreen(
                 Text("Prompt Purpose:")
                 TextField(
                     value = promptPurpose,
-                    onValueChange = { newText -> promptPurpose = newText },
+                    onValueChange = { newText ->
+                        promptPurpose = newText
+                        setPrompt(promptPurpose.text)
+                                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 100.dp, max = 200.dp)

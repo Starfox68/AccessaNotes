@@ -20,10 +20,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavBackStackEntry
 import com.shaphr.accessanotes.ui.viewmodels.LiveRecordingViewModel
 
 @Composable
-fun LiveRecordingScreen(viewModel: LiveRecordingViewModel = hiltViewModel()) {
+fun LiveRecordingScreen(
+    navBackStackEntry: NavBackStackEntry,
+    viewModel: LiveRecordingViewModel = hiltViewModel()
+) {
+    val arguments = navBackStackEntry.arguments
+    val prompt = arguments?.getString("prompt") ?: ""
+    viewModel.updatePrompt(prompt)
+
     val transcribedText = viewModel.transcribedText.collectAsState().value
     val summarizedContent = viewModel.noteText.collectAsState().value
     LiveRecordingScreenContent(

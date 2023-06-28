@@ -16,16 +16,15 @@ class OpenAIAPIClient @Inject constructor() {
     private val modelName: String = "gpt-3.5-turbo"
     private val token = BuildConfig.OPENAI_API_KEY // Value needs to be set in local.properties
     private val openAIClient = OpenAI(token)
-    private val instruction = "Summarize the given text into notes using nested bullet points:\n"
 
     @OptIn(BetaOpenAI::class)
-    fun summarize(prompt: String): Flow<ChatCompletionChunk> {
+    fun summarize(prompt: String, transcript: String): Flow<ChatCompletionChunk> {
         val request = ChatCompletionRequest(
             model = ModelId(modelName),
             messages = listOf(
                 ChatMessage(
                     role = ChatRole.User,
-                    content = instruction + prompt
+                    content = prompt + "\n\n" + transcript
                 )
             )
         )

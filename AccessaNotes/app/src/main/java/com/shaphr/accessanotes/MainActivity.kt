@@ -29,7 +29,12 @@ import dagger.hilt.android.AndroidEntryPoint
 //UI screens with corresponding routes for navigation
 sealed class Destination(val route: String){
     object NoteRepositoryScreen: Destination("noteRepositoryScreen")
-    object LiveRecordingScreen: Destination("liveRecordingScreen")
+    object LiveRecordingScreen : Destination("liveRecordingScreen/{prompt}") {
+        // create a new route with the given prompt
+        fun createRoute(prompt: String): String {
+            return "liveRecordingScreen/$prompt"
+        }
+    }
     object SessionStartAndEndScreen: Destination("sessionStartAndEndScreen")
     object SingleNoteScreen: Destination("singleNoteScreen/{noteID}") {
         //create a new route with the given note ID
@@ -89,7 +94,9 @@ class MainActivity : ComponentActivity() {
 fun NavigationAppHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "noteRepositoryScreen") {
         composable(Destination.NoteRepositoryScreen.route) { NoteRepositoryScreen(navController) }
-        composable(Destination.LiveRecordingScreen.route) { LiveRecordingScreen() }
+        composable(Destination.LiveRecordingScreen.route) { navBackStackEntry ->
+            LiveRecordingScreen(navBackStackEntry)
+        }
         composable(Destination.SessionStartAndEndScreen.route) { SessionStartAndEndScreen(navController) }
         composable(Destination.SingleNoteScreen.route) { navBackStackEntry ->
             //get noteID from within the route
@@ -99,5 +106,4 @@ fun NavigationAppHost(navController: NavHostController) {
             }
         }
     }
-
 }
