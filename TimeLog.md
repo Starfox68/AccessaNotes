@@ -14,3 +14,6 @@
 | 06/16/2023 | 2| 2 | |  |  | | Model set up | 
 | 06/19/2023 | 2| 2 | 2 | 2 | 2 | 2 | Group Integration Meeting #1 | 
 | 06/26/2023 | 2| 2 | 2 | 2 | 2 | 2 | Group Integration Meeting #2 |
+| 06/19/2023 | | | | 6.5 | | | Navigation and UI pages |
+| 06/23/2023 | | | | 1.5 | | | UI Styling |
+| 06/26/2023 | | | | 1.5 | | | ViewModel and Form Validation |
