@@ -12,3 +12,5 @@
 | 06/12/2023 | 1 | 1| 1| 1 |  1 | 1 | Buddy meeting and architecture discussion | 
 | 06/14/2023 | 2 | 2 | 2 | 2 | 2 | 2 | Architecture work divide | 
 | 06/16/2023 | 2| 2 | |  |  | | Model set up | 
+| 06/19/2023 | 2| 2 | 2 | 2 | 2 | 2 | Group Integration Meeting #1 | 
+| 06/26/2023 | 2| 2 | 2 | 2 | 2 | 2 | Group Integration Meeting #2 |
