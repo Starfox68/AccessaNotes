@@ -14,6 +14,9 @@
 | 06/16/2023 | 2| 2 | |  |  | | Model set up | 
 | 06/19/2023 | 2| 2 | 2 | 2 | 2 | 2 | Group Integration Meeting #1 |
 | 06/19/2023 | | | | 6.5 | | | Navigation and UI pages |
+| 06/23/2023 | 3 | | | | | | | Implement Repositories / Models |
 | 06/23/2023 | | | | 1.5 | | | UI Styling |
+| 06/24/2023 | 4 | | | | | | | Implement View Models + connect to UI
+| 06/26/2023 | 3 | | | | | | | Connected local API interfaces with model |
 | 06/26/2023 | 2| 2 | 2 | 2 | 2 | 2 | Group Integration Meeting #2 |
 | 06/26/2023 | | | | 1.5 | | | ViewModel and Form Validation |
