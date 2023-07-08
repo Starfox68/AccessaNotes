@@ -9,27 +9,29 @@ import javax.inject.Singleton
 
 @Singleton
 class TextToSpeechClient @Inject constructor(@ApplicationContext private val context: Context) {
-    var tts: TextToSpeech? = null
-
-    init {
-        tts = TextToSpeech(context) {
-            if (it == TextToSpeech.SUCCESS) {
-                tts?.language = Locale.ENGLISH
-                println("Created TTS engine")
-            } else {
-                println("TTS init failed, status $it")
-            }
+    private var tts: TextToSpeech = TextToSpeech(context) {
+        if (it == TextToSpeech.SUCCESS) {
+            println("Created TTS engine")
+        } else {
+            println("TTS init failed, status $it")
         }
     }
 
-    fun speak(text: String) {
-        val tts = tts
-        tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
+    init {
+        tts.language = Locale.ENGLISH
+    }
 
-        if (tts == null || !tts.isSpeaking) {
-            println("TTS failed, not speaking")
+    fun speak(text: String) {
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
+
+        if (tts.isSpeaking) {
+            println("TTS speaking: $text")
         } else {
-            println("Speaking")
+            println("TTS failed, not speaking")
         }
+    }
+
+    fun stop() {
+        tts.stop()
     }
 }
