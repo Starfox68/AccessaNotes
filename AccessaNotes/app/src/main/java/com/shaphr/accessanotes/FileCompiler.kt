@@ -16,12 +16,11 @@ import java.io.IOException
 
 class FileCompiler {
 
-    fun toPDF(title: String, text: String) {
+    fun toPDF(title: String, text: String): PdfDocument {
         val doc = PdfDocument()
-        val pageInfo: PageInfo = PageInfo.Builder(684, 792, 1).create()
-        val page: Page = doc.startPage(pageInfo)
+        val page = doc.startPage(PageInfo.Builder(684, 792, 1).create())
 
-        val canvas: Canvas = page.canvas
+        val canvas = page.canvas
         val titlePaint = TextPaint()
         val bodyPaint = TextPaint()
 
@@ -40,7 +39,10 @@ class FileCompiler {
         sb.build().draw(canvas)
 
         doc.finishPage(page)
+        return doc
+    }
 
+    fun writePDF(doc: PdfDocument) {
         val filePath = "${Environment.getExternalStorageDirectory()}/Download"
         val file = File(filePath, "test.pdf")
 
@@ -51,7 +53,5 @@ class FileCompiler {
             println("Writing file failed")
             e.printStackTrace()
         }
-
-        doc.close()
     }
 }
