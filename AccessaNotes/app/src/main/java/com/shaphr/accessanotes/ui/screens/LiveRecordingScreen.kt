@@ -1,6 +1,5 @@
 package com.shaphr.accessanotes.ui.screens
 
-import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +15,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,11 +45,9 @@ fun LiveRecordingScreen(
 fun LiveRecordingScreenContent(
     transcribedText: List<String>,
     summarizedContent: List<String>,
-    onTextToSpeechClick: (String, Context) -> Unit,
+    onTextToSpeechClick: (String) -> Unit,
     onStopClick: () -> Unit
 ) {
-    val context = LocalContext.current
-
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -108,7 +104,7 @@ fun LiveRecordingScreenContent(
 
         Button(
             onClick = {
-                onTextToSpeechClick(summarizedContent.joinToString(separator = ""), context)
+                onTextToSpeechClick(summarizedContent.joinToString(separator = ""))
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -137,7 +133,7 @@ fun LiveRecordingScreenPreview() {
             "Duis malesuada facilisis lorem, eget cursus massa fermentum at.",
             "Morbi efficitur aliquam molestie."
         ),
-        onTextToSpeechClick = { _, _ -> },
+        onTextToSpeechClick = { },
         onStopClick = { }
     )
 }
