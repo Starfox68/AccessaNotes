@@ -1,6 +1,5 @@
 package com.shaphr.accessanotes.ui.viewmodels
 
-import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -29,6 +28,9 @@ class LiveRecordingViewModel @Inject constructor(
 
     // only initialized as an emergency default in case of failure, is  overwritten each time
     private var prompt: String = "Summarize the text"
+
+    // Track if tts currently speaking
+    var isSpeaking = false
 
     init {
         viewModelScope.launch {
@@ -72,6 +74,12 @@ class LiveRecordingViewModel @Inject constructor(
     }
 
     fun onTextToSpeech(text: String) {
-        textToSpeechClient.speak(text)
+        if (!isSpeaking) {
+            textToSpeechClient.speak(text)
+        } else {
+            textToSpeechClient.stop()
+        }
+
+        isSpeaking = !isSpeaking
     }
 }

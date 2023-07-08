@@ -12,6 +12,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -46,8 +50,11 @@ fun LiveRecordingScreenContent(
     transcribedText: List<String>,
     summarizedContent: List<String>,
     onTextToSpeechClick: (String) -> Unit,
-    onStopClick: () -> Unit
+    onStopClick: () -> Unit,
+    viewModel: LiveRecordingViewModel = hiltViewModel()
 ) {
+    var ttsButtonText by remember { mutableStateOf("Read Summarized Notes") }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -105,12 +112,18 @@ fun LiveRecordingScreenContent(
         Button(
             onClick = {
                 onTextToSpeechClick(summarizedContent.joinToString(separator = ""))
+                ttsButtonText =
+                    if (viewModel.isSpeaking) {
+                        "Stop Reading"
+                    } else {
+                        "Read Summarized Notes"
+                    }
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         ) {
-            Text(text = "Read Summarized Notes")
+            Text(text = ttsButtonText)
         }
     }
 }

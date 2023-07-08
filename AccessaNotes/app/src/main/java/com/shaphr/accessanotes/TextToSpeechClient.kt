@@ -32,6 +32,7 @@ class TextToSpeechClient @Inject constructor(@ApplicationContext private val con
     }
 
     fun stop() {
+        println("TTS stopped speaking")
         tts.stop()
     }
 }
