@@ -1,12 +1,9 @@
 package com.shaphr.accessanotes.ui.viewmodels
 
-import android.content.Context
-import android.os.Handler
-import android.os.Looper
-import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shaphr.accessanotes.TextToSpeechClient
 import com.shaphr.accessanotes.data.repositories.LiveRecordingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LiveRecordingViewModel @Inject constructor(
-    private val liveRecordingRepository: LiveRecordingRepository
+    private val liveRecordingRepository: LiveRecordingRepository,
+    private val textToSpeechClient: TextToSpeechClient
 ) : ViewModel() {
 
     private val mutableNoteText: MutableStateFlow<List<String>> = MutableStateFlow(emptyList())
@@ -30,6 +28,9 @@ class LiveRecordingViewModel @Inject constructor(
 
     // only initialized as an emergency default in case of failure, is  overwritten each time
     private var prompt: String = "Summarize the text"
+
+    // Track if tts currently speaking
+    var isSpeaking = false
 
     init {
         viewModelScope.launch {
@@ -67,25 +68,18 @@ class LiveRecordingViewModel @Inject constructor(
         }
         viewModelScope.launch {
             Log.d("VIEW MODEL", "Summarizing recording...")
-            Log.d("VIEW MODEL", "The prompt used was $prompt")
+            Log.d("VIEW MODEL", "The prompt used was: $prompt")
             liveRecordingRepository.summarizeRecording(prompt)
         }
     }
 
-    fun onTextToSpeech(text: String, context: Context) {
-        // TODO: Clean up and likely move elsewhere
-        var status = -1
-        val tts = TextToSpeech(context) {
-            status = it
+    fun onTextToSpeech(text: String) {
+        if (!isSpeaking) {
+            textToSpeechClient.speak(text)
+        } else {
+            textToSpeechClient.stop()
         }
-        Handler(Looper.getMainLooper()).postDelayed({
-                if (status == TextToSpeech.SUCCESS) {
-                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
-                } else {
-                    println("TTS failed, status: $status")
-                }
-            },
-            1000
-        )
+
+        isSpeaking = !isSpeaking
     }
 }

@@ -1,6 +1,5 @@
 package com.shaphr.accessanotes.ui.screens
 
-import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,10 +12,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,10 +49,11 @@ fun LiveRecordingScreen(
 fun LiveRecordingScreenContent(
     transcribedText: List<String>,
     summarizedContent: List<String>,
-    onTextToSpeechClick: (String, Context) -> Unit,
-    onStopClick: () -> Unit
+    onTextToSpeechClick: (String) -> Unit,
+    onStopClick: () -> Unit,
+    viewModel: LiveRecordingViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
+    var ttsButtonText by remember { mutableStateOf("Read Summarized Notes") }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -108,13 +111,19 @@ fun LiveRecordingScreenContent(
 
         Button(
             onClick = {
-                onTextToSpeechClick(summarizedContent.joinToString(separator = ""), context)
+                onTextToSpeechClick(summarizedContent.joinToString(separator = ""))
+                ttsButtonText =
+                    if (viewModel.isSpeaking) {
+                        "Stop Reading"
+                    } else {
+                        "Read Summarized Notes"
+                    }
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         ) {
-            Text(text = "Read Summarized Notes")
+            Text(text = ttsButtonText)
         }
     }
 }
@@ -137,7 +146,7 @@ fun LiveRecordingScreenPreview() {
             "Duis malesuada facilisis lorem, eget cursus massa fermentum at.",
             "Morbi efficitur aliquam molestie."
         ),
-        onTextToSpeechClick = { _, _ -> },
+        onTextToSpeechClick = { },
         onStopClick = { }
     )
 }
