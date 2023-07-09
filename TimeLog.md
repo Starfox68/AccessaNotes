@@ -17,11 +17,15 @@
 | 06/20/2023 | | | | | 1.5 | | Initial OpenAI API Client + API Key Config |
 | 06/23/2023 | 3 | | | | | | Implement Repositories / Models |
 | 06/23/2023 | | | | 1.5 | | | UI Styling |
+| 06/23/2023 | | | | | | 3.5 | Initial Transcription Client (Real-Time with Deepgram) |
 | 06/24/2023 | 4 | | | | | | Implement View Models + connect to UI |
 | 06/25/2023 | | | | | 1 | | Streaming OpenAI API Client |
+| 06/25/2023 | | | | | | 2.5 | Transcription Client (Post-Recording with Whisper) |
+| 06/25/2023 | | | | | | 2 | Communicating with Deepgram Devs for support |
 | 06/26/2023 | 3 | | | | | | Connected local API interfaces with model |
 | 06/26/2023 | 2 | 2 | 2 | 2 | 2 | 2 | Group Integration Meeting #2 |
 | 06/26/2023 | | | | 1.5 | | | ViewModel and Form Validation |
 | 06/26/2023 | | | | | 5 | | Integrate OpenAI API Output and Update UI |
 | 06/27/2023 | | | | | 4 | | Text-to-Speech |
+| 06/27/2023 | | | | | | 1 | Integrating user Prompt input with OpenAI API call |
 | 06/27/2023 | 2 | 2 | 2 | 2 | 2 | 2 | Midterm Presentation Meeting/Practice |
