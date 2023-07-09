@@ -1,6 +1,7 @@
 package com.shaphr.accessanotes
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
@@ -12,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -21,8 +23,10 @@ import com.shaphr.accessanotes.ui.screens.LiveRecordingScreen
 import com.shaphr.accessanotes.ui.screens.NoteRepositoryScreen
 import com.shaphr.accessanotes.ui.screens.SessionStartAndEndScreen
 import com.shaphr.accessanotes.ui.screens.SingleNoteScreen
+import com.shaphr.accessanotes.ui.screens.Test
 import com.shaphr.accessanotes.ui.theme.AccessaNotesTheme
 import dagger.hilt.android.AndroidEntryPoint
+
 
 //sealed class idea came from this tutorial:
 //https://www.youtube.com/watch?v=hGg0HjcoP9w
@@ -92,7 +96,8 @@ class MainActivity : ComponentActivity() {
 //Functionality for navigating to different UI pages
 @Composable
 fun NavigationAppHost(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "noteRepositoryScreen") {
+    NavHost(navController = navController, startDestination = "test") {
+        composable("test") { LocalContext.current.startActivity(Intent(LocalContext.current, Test::class.java)) }
         composable(Destination.NoteRepositoryScreen.route) { NoteRepositoryScreen(navController) }
         composable(Destination.LiveRecordingScreen.route) { navBackStackEntry ->
             LiveRecordingScreen(navBackStackEntry)

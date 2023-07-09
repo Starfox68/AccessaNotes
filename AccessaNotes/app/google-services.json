@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "784056008793",
+    "project_id": "accessanotes-5eddf",
+    "storage_bucket": "accessanotes-5eddf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:784056008793:android:a15d4c132167db1fdb3148",
+        "android_client_info": {
+          "package_name": "com.shaphr.accessanotes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "784056008793-2obkl4o87qdh4ooijchfta35gc9nb1qm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3gXgp6PU7_mIvVzpXfKPTbe5_DxqsLiM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "784056008793-2obkl4o87qdh4ooijchfta35gc9nb1qm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
