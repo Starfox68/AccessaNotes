@@ -41,15 +41,20 @@ fun SessionStartAndEndScreen(navController: NavHostController, viewModel: StartA
     val canStart = viewModel.canStart.collectAsState().value
     val title = viewModel.title.collectAsState().value
     var prompt = viewModel.prompt.collectAsState().value
+    var fileText = viewModel.fileText.collectAsState().value
 
     SessionStartScreen(
         onStartClick = {
             println("Clicked Start")
-            println("File text: ${viewModel.fileText.value}")
+            println("File text: $fileText")
             if (prompt.isBlank()) {
                 println("Prompt was blank, using default")
                 prompt = "Summarize the following transcript as nested bullet points, capturing the main ideas"
             }
+            if (!fileText.isBlank()) {
+                prompt += "\n\nBut before the transcript also use this text which gives some more context to improve your summary and incorporate it with same formatting:\n $fileText"
+            }
+            fileText = ""
             navController.navigate(Destination.LiveRecordingScreen.createRoute(prompt))
         },
         canStart = canStart,

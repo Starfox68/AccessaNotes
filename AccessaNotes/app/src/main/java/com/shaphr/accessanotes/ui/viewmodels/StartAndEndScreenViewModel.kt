@@ -18,7 +18,8 @@ class StartAndEndScreenViewModel(application: Application) : AndroidViewModel(ap
     private val mutableStart: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val canStart: StateFlow<Boolean> = mutableStart
 
-    val fileText = mutableStateOf("")
+    private val mutableFileText: MutableStateFlow<String> = MutableStateFlow("")
+    val fileText: StateFlow<String> = mutableFileText
 
     init { }
 
@@ -31,7 +32,7 @@ class StartAndEndScreenViewModel(application: Application) : AndroidViewModel(ap
                 // read from .txt file
                 val text = inputStream?.bufferedReader()?.use { it.readText() }
                 if (text != null) {
-                    fileText.value = text
+                    mutableFileText.value = text
                 }
             }
             // add cases for other file types here
