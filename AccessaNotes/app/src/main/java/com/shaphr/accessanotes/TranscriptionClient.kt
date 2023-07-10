@@ -3,7 +3,6 @@ package com.shaphr.accessanotes
 import android.content.Context
 import android.media.MediaPlayer
 import android.media.MediaRecorder
-import android.util.Log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -101,7 +100,9 @@ class TranscriptionClient @Inject constructor(
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // FOR STREAMING REAL-TIME AUDIO AND LIVE TRANSCRIPTION (PENDING MEETING WITH DEEPGRAM DEVS)
-
+//
+/// UPDATED ATTEMPT
+//
 //import android.Manifest
 //import android.content.Context
 //import android.content.pm.PackageManager
@@ -112,12 +113,17 @@ class TranscriptionClient @Inject constructor(
 //import androidx.core.app.ActivityCompat
 //import com.neovisionaries.ws.client.WebSocket
 //import com.neovisionaries.ws.client.WebSocketAdapter
+//import com.neovisionaries.ws.client.WebSocketException
 //import com.neovisionaries.ws.client.WebSocketFactory
 //import com.neovisionaries.ws.client.WebSocketFrame
+//import kotlinx.coroutines.flow.MutableSharedFlow
 //import java.nio.ByteBuffer
 //import java.nio.ByteOrder
 //
-//class TranscriptionClient(private val context: Context) {
+//@Singleton
+//class TranscriptionClient @Inject constructor (@ApplicationContext private val context: Context) {
+//    val transcription: MutableSharedFlow<String> = MutableSharedFlow(replay = 1)
+//
 //    private var audioRecord: AudioRecord? = null
 //    private val bufferSize: Int
 //    private val buffer: ShortArray
@@ -128,7 +134,7 @@ class TranscriptionClient @Inject constructor(
 //        val channelConfig = AudioFormat.CHANNEL_IN_MONO
 //        val audioFormat = AudioFormat.ENCODING_PCM_16BIT
 //
-//        bufferSize = AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat)
+//        bufferSize = Math.max(sampleRateInHz / 50, AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat))
 //        buffer = ShortArray(bufferSize)
 //
 //        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
@@ -137,13 +143,15 @@ class TranscriptionClient @Inject constructor(
 //        audioRecord = AudioRecord(MediaRecorder.AudioSource.MIC, sampleRateInHz, channelConfig, audioFormat, bufferSize)
 //    }
 //
-//    fun startRecording() {
+//     fun startRecording() {
 //        println("Starting recording...")
 //        audioRecord?.startRecording()
 //
 //        Thread {
 //            try {
-//                webSocket = WebSocketFactory().createSocket("wss://api.deepgram.com/v1/listen?model=nova&version=latest&punctuate=true&numerals=true&smart_format=true&interim_results=false&token=97b0346515cef2ffbc1f77ade14bf26a18c5c632")
+//                webSocket = WebSocketFactory().createSocket("wss://api.deepgram.com/v1/listen?encoding=linear16&sample_rate=44100&model=nova&version=latest&punctuate=true&numerals=true&smart_format=true&interim_results=false")
+//                webSocket?.addHeader("Authorization", "Token 97b0346515cef2ffbc1f77ade14bf26a18c5c632")
+//
 //                webSocket?.addListener(object : WebSocketAdapter() {
 //                    override fun onConnected(websocket: WebSocket?, headers: Map<String, List<String>>?) {
 //                        println("Connected to Deepgram WebSocket")
@@ -159,39 +167,57 @@ class TranscriptionClient @Inject constructor(
 //                        }
 //                    }
 //
+//                    override fun onTextMessageError(
+//                        websocket: WebSocket?,
+//                        cause: WebSocketException?,
+//                        data: ByteArray?
+//                    ) {
+//                        super.onTextMessageError(websocket, cause, data)
+//                        println("Error sending audio data: ${cause?.message}")
+//                    }
+//
+//                    override fun onError(websocket: WebSocket?, cause: WebSocketException?) {
+//                        super.onError(websocket, cause)
+//                        println("Error on WebSocket: ${cause?.message}")
+//                    }
+//
 //                    override fun onTextMessage(websocket: WebSocket?, text: String?) {
-//                        // Handle the received transcript
 //                        println("Received transcript: $text")
-//                        val transcript = parseTranscript(text)
-//                        // do something with the transcript...
+//                        if (text != null) {
+//                            transcription.tryEmit(text)
+//                        }
+//                        // do something with the transcript later...
 //                    }
 //
 //                    override fun onDisconnected(websocket: WebSocket?, serverCloseFrame: WebSocketFrame?, clientCloseFrame: WebSocketFrame?, closedByServer: Boolean) {
-//                        // Handle WebSocket disconnection...
+//                        println("Disconnected from Deepgram WebSocket. Server Close Frame: ${serverCloseFrame?.closeCode} ${serverCloseFrame?.closeReason}")
+//                    }
+//
+//                    override fun onCloseFrame(websocket: WebSocket?, frame: WebSocketFrame) {
+//                        super.onCloseFrame(websocket, frame)
+//                        println("Received Close Frame: ${frame?.closeCode} ${frame?.closeReason}")
 //                    }
 //                })
 //
 //                webSocket?.connect()
 //            } catch (e: Exception) {
 //                e.printStackTrace()
+//                println("Error connecting to Deepgram WebSocket: ${e.message}")
 //            }
 //        }.start()
 //    }
 //
 //    fun stopRecording() {
 //        println("Stopping recording...")
+//        webSocket?.sendClose(1000, "Recording stopped")
+//
 //        audioRecord?.stop()
 //        audioRecord?.release()
 //        audioRecord = null
 //
 //        // Close WebSocket when you're finished
-//        webSocket?.disconnect()
+//        webSocket?.disconnect(1000, "Recording done")
 //        webSocket = null
-//    }
-//
-//    private fun parseTranscript(text: String?): String {
-//        // Parse the transcript from the text
-//        return text ?: ""
 //    }
 //
 //    private fun ShortArray.toByteArray(): ByteArray {
@@ -201,3 +227,4 @@ class TranscriptionClient @Inject constructor(
 //        return byteBuffer.array()
 //    }
 //}
+//
