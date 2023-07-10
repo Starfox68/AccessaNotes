@@ -2,6 +2,9 @@ package com.shaphr.accessanotes.ui.screens
 
 
 import android.annotation.SuppressLint
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +45,7 @@ fun SessionStartAndEndScreen(navController: NavHostController, viewModel: StartA
     SessionStartScreen(
         onStartClick = {
             println("Clicked Start")
+            println("File text: ${viewModel.fileText.value}")
             if (prompt.isBlank()) {
                 println("Prompt was blank, using default")
                 prompt = "Summarize the following transcript as nested bullet points, capturing the main ideas"
@@ -51,6 +56,7 @@ fun SessionStartAndEndScreen(navController: NavHostController, viewModel: StartA
         title = title,
         setName = viewModel::setTitle,
         setPrompt = viewModel::setPrompt,
+        viewModel = viewModel
     )
 }
 
@@ -62,7 +68,8 @@ fun SessionStartScreen(
     canStart: Boolean,
     title: String,
     setName: (String) -> Unit,
-    setPrompt: (String) -> Unit
+    setPrompt: (String) -> Unit,
+    viewModel: StartAndEndScreenViewModel
 ) {
     var dropdown1Expanded by remember { mutableStateOf(false) }
     var dropdown2Expanded by remember { mutableStateOf(false) }
@@ -135,17 +142,35 @@ fun SessionStartScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
 
-                Button(
-                    onClick = { /* Handle button 1 click */ },
-
-                    ) {
-                    Text("Upload Relevant Files")
-                }
+                ShowUploadButton(viewModel)
 
                 ShowStartButton(canStart, onStartClick)
             }
         }
     )
+}
+
+@Composable
+fun ShowUploadButton(viewModel: StartAndEndScreenViewModel) {
+    val rememberLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let { viewModel.readFile(it) }
+    }
+
+    var clickState by remember { mutableStateOf(false) }
+
+    Button(
+        onClick = {
+            clickState = !clickState
+        }
+    ) {
+        Text("Upload Relevant Files")
+    }
+
+    LaunchedEffect(clickState) {
+        if (clickState) {
+            rememberLauncher.launch("text/*") // replace with "*/*" to allow all file types
+        }
+    }
 }
 
 @Composable

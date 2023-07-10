@@ -1,10 +1,13 @@
 package com.shaphr.accessanotes.ui.viewmodels
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.net.Uri
+import androidx.lifecycle.AndroidViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import androidx.compose.runtime.mutableStateOf
 
-class StartAndEndScreenViewModel : ViewModel() {
+class StartAndEndScreenViewModel(application: Application) : AndroidViewModel(application) {
 
     private val mutableTitle: MutableStateFlow<String> = MutableStateFlow("")
     val title: StateFlow<String> = mutableTitle
@@ -15,7 +18,25 @@ class StartAndEndScreenViewModel : ViewModel() {
     private val mutableStart: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val canStart: StateFlow<Boolean> = mutableStart
 
+    val fileText = mutableStateOf("")
+
     init { }
+
+    fun readFile(uri: Uri) {
+        val mimeType = getApplication<Application>().contentResolver.getType(uri)
+        val inputStream = getApplication<Application>().contentResolver.openInputStream(uri)
+
+        when (mimeType) {
+            "text/plain" -> {
+                // read from .txt file
+                val text = inputStream?.bufferedReader()?.use { it.readText() }
+                if (text != null) {
+                    fileText.value = text
+                }
+            }
+            // add cases for other file types here
+        }
+    }
 
     fun setPrompt(text: String) {
         mutablePrompt.value = text
