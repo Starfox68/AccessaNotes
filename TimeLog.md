@@ -29,6 +29,7 @@
 | 06/26/2023 | | 0.5 | | 1.5 | | | ViewModel and Form Validation |
 | 06/26/2023 | | | | | 5 | | Integrate OpenAI API Output and Update UI |
 | 06/27/2023 | | | | | 4 | | Text-to-Speech |
+| 06/27/2023 | | 2 | | | | | DB connection testing |
 | 06/27/2023 | | | | | | 1 | Integrating user Prompt input with OpenAI API call |
 | 06/27/2023 | 2 | 2 | 2 | 2 | 2 | 2 | Midterm Presentation Meeting/Practice |
 | 07/05/2023 | 1 | 1 | 1 | 1 | 1 | 1 | Team Sync Meeting |
