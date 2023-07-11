@@ -29,3 +29,8 @@
 | 06/27/2023 | | | | | 4 | | Text-to-Speech |
 | 06/27/2023 | | | | | | 1 | Integrating user Prompt input with OpenAI API call |
 | 06/27/2023 | 2 | 2 | 2 | 2 | 2 | 2 | Midterm Presentation Meeting/Practice |
+| 07/05/2023 | 1 | 1 | 1 | 1 | 1 | 1 | Team Sync Meeting |
+| 07/07/2023 | | | | | 3 | | Text-to-Speech Clean-Up and Stop/Restart Function + UI |
+| 07/08/2023 | | | | | 2 | | File Compiler Write to PDF |
+| 07/10/2023 | | | | | 1 | | File Compiler Dynamic Size PDF |
+| 07/11/2023 | 1 | 1 | 1 | 1 | 1 | 1 | Team Sync Meeting |
