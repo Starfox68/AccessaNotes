@@ -39,3 +39,4 @@
 | 07/08/2023 | | | | 12 | | | Firebase Integration + Google sign-in |
 | 07/10/2023 | | | | | 1 | | File Compiler Dynamic Size PDF |
 | 07/11/2023 | 1 | 1 | 1 | 1 | 1 | 1 | Team Sync Meeting |
+| 07/12/2023 | 0 | 0 | 0 | 0 | 2 | 0 | Design Pattern Examples |
