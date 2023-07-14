@@ -45,7 +45,7 @@ fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewM
             )
             //Text
             Text(
-                text = note.title,
+                text = note!!.title,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .padding(16.dp).align(Alignment.Center)
@@ -71,7 +71,7 @@ fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewM
                 .background(Color.White)
         ) {
             Text(
-                text = note.content,
+                text = note!!.content,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 16.dp, start = 16.dp, end=16.dp)
             )
