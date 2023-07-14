@@ -11,11 +11,11 @@ import java.util.*
     tableName = "Note",
 )
 data class Note(
+    @PrimaryKey(autoGenerate = true) var id: Int = 0,
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "content") val content: String,
     @ColumnInfo(name = "date") val notifyAt: Long = Date().time,
 //    @ColumnInfo(name = "folderId") val folderId: Long?,
-    @ColumnInfo(name = "createdAt") val createdAt: Long = Date().time,
-    @ColumnInfo(name = "updatedAt") val updatedAt: Long = Date().time,
-    @PrimaryKey(autoGenerate = true) var id: Long = 0,
+//    @ColumnInfo(name = "createdAt") val createdAt: Long = Date().time,
+//    @ColumnInfo(name = "updatedAt") val updatedAt: Long = Date().time,
 ) : Serializable

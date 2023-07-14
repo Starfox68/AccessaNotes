@@ -1,7 +1,7 @@
 package com.shaphr.accessanotes.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
-import com.shaphr.accessanotes.data.models.Note
+import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.data.repositories.NotesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
