@@ -102,6 +102,9 @@ dependencies {
     implementation platform('com.aallam.openai:openai-client-bom:3.3.0')
     implementation 'com.aallam.openai:openai-client'
     runtimeOnly 'io.ktor:ktor-client-okhttp'
+
+    // Google login
+    implementation 'com.google.android.gms:play-services-auth:20.6.0'
 }
 
 kapt {
