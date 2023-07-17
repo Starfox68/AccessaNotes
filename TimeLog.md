@@ -39,7 +39,8 @@
 | 07/08/2023 | | | | 12 | | | Firebase Integration + Google sign-in |
 | 07/10/2023 | | | | | 1 | | File Compiler Dynamic Size PDF |
 | 07/10/2023 | 2 | 2 | | |  |  | Architecture Style pip and filter |
+| 07/10/2023 | | 7 | | |  |  | DB integration with NoteRepo and testing |
 | 07/11/2023 | 1 | 1 | 1 | 1 | 1 | 1 | Team report Meeting |
 | 07/12/2023 |  |  |  |  | 2 |  | Design Pattern Examples |
 | 07/12/2023 |  |  3 |  |  | |  | DB interface integrations |
-| 07/10/2023 | | 7 | | |  |  | DB integration with NoteRepo and testing |
+| 07/12/2023 |  |  |  |  | 0.5 |  | Text-to-Speech on Single Note Screen |
