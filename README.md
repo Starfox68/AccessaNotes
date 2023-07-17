@@ -9,4 +9,4 @@ To make API calls to OpenAI, we need an API key that cannot be pushed to the rep
 The same key is currently used for both note transcription and summarization
 
 ### References
-Google SignIn: https://betterprogramming.pub/jetpack-compose-theming-shapes-3f3cc8df7e5c
+Google SignIn: https://hadiyarajesh.medium.com/integrate-google-sign-in-with-jetpack-compose-ui-9f52776542ab
