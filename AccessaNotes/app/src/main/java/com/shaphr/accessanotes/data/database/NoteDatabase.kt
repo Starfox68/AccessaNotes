@@ -6,6 +6,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(entities = [Note::class], version = 18)
+@TypeConverters(Converters::class)
 abstract class NoteDatabase : RoomDatabase() {
     abstract fun getNoteDataAccess(): NoteDataAccess
     companion object {
