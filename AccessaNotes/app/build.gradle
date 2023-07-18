@@ -25,6 +25,12 @@ android {
             buildConfig = true
         }
 
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation":
+                                      "$projectDir/schemas".toString()]
+            }
+        }
         // OpenAI API key must be set in local.properties
         Properties properties = new Properties()
         properties.load(project.rootProject.file("local.properties").newDataInputStream())
@@ -63,8 +69,9 @@ dependencies {
     // Room components
     def room_version = "2.5.2"
     implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
 
     // navigation dependencies
     def nav_version = "2.5.3"
