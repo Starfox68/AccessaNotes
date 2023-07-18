@@ -52,3 +52,5 @@
 | 07/15/2023 |  |  | 1.5 |  | |  | Google Auth |
 | 07/16/2023 |  |  | 4 |  | |  | Sign In UI |
 | 07/17/2023 |  |  | 2 |  | |  | Sign In UI |
+| 07/17/2023 |  | 3 | |  | |  | DB Dependency adjustment and testing |
+| 07/18/2023 |  | 5 | |  | |  | Testing insert and fully integrating Room |
