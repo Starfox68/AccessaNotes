@@ -24,14 +24,17 @@
 | 06/25/2023 | | 3 | | | | | DB interface creation|
 | 06/25/2023 | | | | | | 2.5 | Transcription Client (Post-Recording with Whisper) |
 | 06/25/2023 | | | | | | 2 | Communicating with Deepgram Devs for support |
+| 06/25/2023 | | | 3 | | |  | Added Note Repository Screen |
 | 06/26/2023 | 3 | 0.5 | | | | | Connected local API interfaces with model |
 | 06/26/2023 | 2 | 2 | 2 | 2 | 2 | 2 | Group Integration Meeting #2 |
 | 06/26/2023 | | 0.5 | | 1.5 | | | ViewModel and Form Validation |
 | 06/26/2023 | | | | | 5 | | Integrate OpenAI API Output and Update UI |
+| 06/26/2023 | | | 4 | | |  | Added Single Note Screen |
 | 06/27/2023 | | | | | 4 | | Text-to-Speech |
 | 06/27/2023 | | 2 | | | | | DB connection testing |
 | 06/27/2023 | | | | | | 1 | Integrating user Prompt input with OpenAI API call |
 | 06/27/2023 | 2 | 2 | 2 | 2 | 2 | 2 | Midterm Presentation Meeting/Practice |
+| 06/27/2023 | | | 3 | | |  | UI Changes in existing screens |
 | 07/05/2023 | 1 | 1 | 1 | 1 | 1 | 1 | Team Sync Meeting |
 | 07/05/2023 | 0 | 0 | 0 | 0 | 2 | 0 | Architecture Style Examples |
 | 07/07/2023 | | | | | 3 | | Text-to-Speech Clean-Up and Stop/Restart Function + UI |
@@ -44,3 +47,8 @@
 | 07/12/2023 |  |  |  |  | 2 |  | Design Pattern Examples |
 | 07/12/2023 |  |  3 |  |  | |  | DB interface integrations |
 | 07/12/2023 |  |  |  |  | 0.5 |  | Text-to-Speech on Single Note Screen |
+| 07/13/2023 |  |  | 4 |  | |  | Google Auth |
+| 07/14/2023 |  |  | 2 |  | |  | Google Auth |
+| 07/15/2023 |  |  | 1.5 |  | |  | Google Auth |
+| 07/16/2023 |  |  | 4 |  | |  | Sign In UI |
+| 07/17/2023 |  |  | 2 |  | |  | Sign In UI |
