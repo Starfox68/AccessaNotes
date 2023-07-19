@@ -11,9 +11,12 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Scaffold
@@ -21,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
@@ -30,18 +34,19 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.ui.viewmodels.CameraScreenViewModel
+import com.shaphr.accessanotes.ui.viewmodels.ImageOption
 
 @Composable
 fun CameraScreen() {
     val viewModel: CameraScreenViewModel = hiltViewModel()
-    CameraScreenContent(
+    CameraCaptureScreen(
         onPhotoTaken = viewModel::onPhotoTaken
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CameraScreenContent(
+fun CameraCaptureScreen(
     onPhotoTaken: (Bitmap) -> Unit
 ) {
     val context = LocalContext.current
@@ -101,10 +106,32 @@ fun CameraScreenContent(
     }
 }
 
+@Composable
+fun ImagePreviewScreen(
+    image: ImageBitmap,
+    onOptionSelect: (ImageOption) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Image(bitmap = image, contentDescription = null)
+        Button(onClick = { onOptionSelect(ImageOption.IMAGE) }) {
+            Text("Image")
+        }
+        Button(onClick = { onOptionSelect(ImageOption.DIAGRAM) }) {
+
+        }
+        Button(onClick = { onOptionSelect(ImageOption.NOTES) }) {
+
+        }
+        Button(onClick = { onOptionSelect(ImageOption.TRANSCRIPT) }) {
+
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun PreviewCameraScreen() {
-    CameraScreenContent(
+    CameraCaptureScreen(
         onPhotoTaken = {}
     )
 }
