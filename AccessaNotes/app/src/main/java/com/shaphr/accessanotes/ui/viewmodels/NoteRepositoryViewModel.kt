@@ -21,5 +21,8 @@ class NoteRepositoryViewModel @Inject constructor(
             mutableNotes.value = notes
         }
     }
-    fun getNote(id: Int) = notes.value.firstOrNull { it.id == id }
+    fun getNote(id: Int) = notes.value.firstOrNull {
+
+        it.id == id
+    }
 }

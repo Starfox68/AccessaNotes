@@ -12,6 +12,7 @@ import androidx.room.TypeConverter
 @Entity(
     tableName = "Note",
 )
+
 data class Note(
     @ColumnInfo(name = "title") val title: String = "",
     @ColumnInfo(name = "content") val content: String = "",

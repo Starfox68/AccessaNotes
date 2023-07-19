@@ -30,9 +30,9 @@ class NotesRepository @Inject constructor(private val application: Application) 
             Note("Test Note 2", "This is a test note. I am writing a bunch of text here so that when we do our demonstration you guys have something to look at. I am trying to make it seem like there's a lot of text here but if you look too closely you will see that I'm actually repeating myself. I actually feel like I do that quite a bit anyway, but I'm just happy to be here", LocalDate.now()),
             Note("Test Note 3", "Test Content!", LocalDate.now())
         )
-        for (note in notes) {
-            setNote(note)
-        }
+//        for (note in notes) {
+//            setNote(note)
+//        }
         return dao.getNotes()
     }
 
