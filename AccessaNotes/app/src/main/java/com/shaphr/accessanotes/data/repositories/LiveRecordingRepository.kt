@@ -3,7 +3,9 @@ package com.shaphr.accessanotes.data.repositories
 import com.shaphr.accessanotes.TranscriptionClient
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.data.sources.SummarizedNoteSource
+import com.shaphr.accessanotes.data.sources.TextRecognizerSource
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.merge
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -12,7 +14,8 @@ import javax.inject.Singleton
 @Singleton
 class LiveRecordingRepository @Inject constructor(
     private val summarizedNoteSource: SummarizedNoteSource,
-    private val transcriptionClient: TranscriptionClient
+    private val transcriptionClient: TranscriptionClient,
+    private val textRecognizerSource: TextRecognizerSource
 ) {
     // Final summarized note text
     val summarizedNotesFlow: MutableSharedFlow<String> = summarizedNoteSource.summarizedNotes
@@ -41,7 +44,13 @@ class LiveRecordingRepository @Inject constructor(
         }
     }
 
-    fun startRecording() = transcriptionClient.startRecording()
+    suspend fun startRecording() {
+        transcriptionClient.startRecording()
+
+        merge(summarizedNoteSource.summarizedNotes, textRecognizerSource.imageTextFlow).collect {
+            summarizedNotesFlow.emit(it)
+        }
+    }
 
     suspend fun stopRecording() {
         transcriptionClient.stopRecording()

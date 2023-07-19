@@ -1,5 +1,6 @@
 package com.shaphr.accessanotes.ui.screens
 
+import android.Manifest
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,16 +35,22 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.ui.viewmodels.LiveRecordingViewModel
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun LiveRecordingScreen(
     navBackStackEntry: NavBackStackEntry,
     navController: NavHostController,
     viewModel: LiveRecordingViewModel = hiltViewModel()
 ) {
+    val cameraPermissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
+
     val arguments = navBackStackEntry.arguments
     val prompt = arguments?.getString("prompt") ?: ""
     viewModel.updatePrompt(prompt)
@@ -56,11 +63,15 @@ fun LiveRecordingScreen(
         navController = navController,
         transcribedText = transcribedText,
         summarizedContent = summarizedContent,
+        isSpeaking = viewModel.isSpeaking,
         onTextToSpeechClick = viewModel::onTextToSpeech,
         onStopClick = viewModel::stopRecording,
         onSaveClick = { viewModel.onSave(navController) },
         canStop = canStop,
-        canListen = canListen
+        canListen = canListen,
+        hasCameraPermission = cameraPermissionState.status.isGranted,
+        onCameraPermissionRequest = cameraPermissionState::launchPermissionRequest,
+        onCameraClick = { navController.navigate(Destination.CameraScreen.route) }
     )
 }
 
@@ -70,12 +81,15 @@ fun LiveRecordingScreenContent(
     navController: NavHostController,
     transcribedText: List<String>,
     summarizedContent: List<String>,
+    isSpeaking: Boolean,
     onTextToSpeechClick: (String) -> Unit,
     onStopClick: () -> Unit,
     onSaveClick: () -> Unit,
     canStop: Boolean,
     canListen: Boolean,
-    viewModel: LiveRecordingViewModel = hiltViewModel()
+    hasCameraPermission: Boolean,
+    onCameraPermissionRequest: () -> Unit,
+    onCameraClick: () -> Unit,
 ) {
     var ttsButtonText by remember { mutableStateOf("Read Summarized Notes") }
     val config = LocalConfiguration
@@ -86,7 +100,8 @@ fun LiveRecordingScreenContent(
             LazyColumn(modifier = Modifier.padding(padding)) {
 
                 item {
-                    Column (modifier = Modifier.height((config.current.screenHeightDp*0.35).dp)
+                    Column(
+                        modifier = Modifier.height((config.current.screenHeightDp * 0.35).dp)
                     ) {
                         Text(
                             text = "Transcribed Text",
@@ -100,7 +115,8 @@ fun LiveRecordingScreenContent(
                     }
                 }
                 item {
-                    Column (modifier = Modifier.height((config.current.screenHeightDp*0.35).dp)
+                    Column(
+                        modifier = Modifier.height((config.current.screenHeightDp * 0.35).dp)
                     ) {
                         Text(
                             text = "Summarized Notes",
@@ -115,30 +131,37 @@ fun LiveRecordingScreenContent(
                 }
 
 
-                item{
-                    OutlinedButton(onClick = { }) {
+                item {
+                    OutlinedButton(onClick = {
+                        if (hasCameraPermission) {
+                            onCameraClick()
+                        } else {
+                            onCameraPermissionRequest()
+                        }
+                    }) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.camera_icon),
                             contentDescription = "Camera Icon",
                             modifier = Modifier.size(ButtonDefaults.IconSize)
                         )
-                        Spacer (modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                         Text(text = "Add Image")
                     }
-                    OutlinedButton(onClick = { onStopClick() }, enabled = canStop
+                    OutlinedButton(
+                        onClick = { onStopClick() }, enabled = canStop
                     ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.stop_icon),
                             contentDescription = "Stop Icon",
                             modifier = Modifier.size(ButtonDefaults.IconSize)
                         )
-                        Spacer (modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                         Text(text = "Stop Recording")
                     }
                     OutlinedButton(enabled = canListen, onClick = {
                         onTextToSpeechClick(summarizedContent.joinToString(separator = ""))
                         ttsButtonText =
-                            if (viewModel.isSpeaking) {
+                            if (isSpeaking) {
                                 "Stop Reading"
                             } else {
                                 "Read Summarized Notes"
@@ -149,7 +172,7 @@ fun LiveRecordingScreenContent(
                             contentDescription = "Voice Icon",
                             modifier = Modifier.size(ButtonDefaults.IconSize)
                         )
-                        Spacer (modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                         Text(text = ttsButtonText)
                     }
                 }
@@ -199,8 +222,12 @@ fun LiveRecordingScreenPreview() {
         ),
         onTextToSpeechClick = { },
         onStopClick = { },
+        isSpeaking = false,
         onSaveClick = { },
         canStop = true,
-        canListen = false
+        canListen = false,
+        hasCameraPermission = true,
+        onCameraPermissionRequest = {},
+        onCameraClick = {}
     )
 }

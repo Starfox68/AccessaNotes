@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">AccessaNotes</string>
+    <string name="camera_screen_take_picture">Take Picture</string>
 </resources>
