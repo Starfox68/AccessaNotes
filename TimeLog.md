@@ -55,3 +55,5 @@
 | 07/17/2023 |  | 3 | |  | |  | DB Dependency adjustment and testing |
 | 07/18/2023 |  | 5 | |  | |  | Testing insert and fully integrating Room |
 | 07/18/2023 | 5 | | | | | | Implement basic camera image capture + text recognition |
+| 07/19/2023 | 2 |  2 | 2 | 2 |2 | 2 | Team meet up |
+| 07/20/2023 |  | 1 |  |  | |  | DB merge and fixes |
