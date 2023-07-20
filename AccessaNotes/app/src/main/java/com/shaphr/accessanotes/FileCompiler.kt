@@ -40,7 +40,7 @@ class FileCompiler {
         }
     }
 
-    fun toPDF(title: String, text: List<String>) {
+    private fun getPDFPaints(): Triple<TextPaint, TextPaint, TextPaint> {
         val titlePaint = TextPaint()
         titlePaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         titlePaint.textSize = titleSize.toFloat()
@@ -55,6 +55,28 @@ class FileCompiler {
         disclaimerPaint.textSize = disclaimerSize.toFloat()
         disclaimerPaint.textAlign = Paint.Align.CENTER
 
+        return Triple(titlePaint, bodyPaint, disclaimerPaint)
+    }
+
+    private fun makePDFPage(
+        doc: PdfDocument,
+        nextPageNum: Int,
+        disclaimerLayout: StaticLayout
+    ): PdfDocument.Page {
+        val page = doc.startPage(PageInfo.Builder(pageWidth, pageHeight, nextPageNum).create())
+        val canvas = page.canvas
+
+        // Draw disclaimer
+        canvas.translate(pageWidth / 2F, 0.4F * margins)
+        disclaimerLayout.draw(canvas)
+        canvas.translate(-pageWidth / 2F, -0.4F * margins)
+
+        return page
+    }
+
+    fun toPDF(title: String, text: List<String>) {
+        val (titlePaint, bodyPaint, disclaimerPaint) = getPDFPaints()
+
         val disclaimerLayout = StaticLayout.Builder.obtain(
             disclaimer, 0, disclaimer.length, disclaimerPaint, pageWidth - 2 * margins
         ).setLineSpacing(2F, 1F).build()
@@ -65,14 +87,12 @@ class FileCompiler {
         }
 
         val doc = PdfDocument()
-        var page = doc.startPage(PageInfo.Builder(pageWidth, pageHeight, 1).create())
-        var canvas = page.canvas
-        var nextPageNum = 2
+        var nextPageNum = 1
 
-        // Draw disclaimer
-        canvas.translate(pageWidth / 2F, 0.4F * margins)
-        disclaimerLayout.draw(canvas)
-        canvas.translate(-pageWidth / 2F, -0.4F * margins)
+        var page = makePDFPage(doc, nextPageNum, disclaimerLayout)
+        var canvas = page.canvas
+        nextPageNum += 1
+
         // Draw title at centre of canvas
         canvas.drawText(title, pageWidth / 2F, 1.5F * margins, titlePaint)
 
@@ -82,17 +102,12 @@ class FileCompiler {
         bodyLayouts.forEach {
             if (curHeight + it.height >= pageHeight - 1 * margins) {
                 doc.finishPage(page)
-
-                page = doc.startPage(PageInfo.Builder(pageWidth, pageHeight, nextPageNum).create())
+                page = makePDFPage(doc, nextPageNum, disclaimerLayout)
                 canvas = page.canvas
                 nextPageNum += 1
 
-                canvas.translate(pageWidth / 2F, 0.4F * margins)
-                disclaimerLayout.draw(canvas)
-                canvas.translate(-pageWidth / 2F, -0.4F * margins)
-
-                canvas.translate(1F * margins, 1F * margins)
-                curHeight = 0F
+                canvas.translate(1F * margins, 1.2F * margins)
+                curHeight = 0.2F
             }
 
             it.draw(canvas)
