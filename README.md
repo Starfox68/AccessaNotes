@@ -7,3 +7,6 @@ To make API calls to OpenAI, we need an API key that cannot be pushed to the rep
 * Add to ```local.properties``` the following line : ```OPENAI_API_KEY=<YOUR_KEY>``` (no spaces)
 
 The same key is currently used for both note transcription and summarization
+
+### References
+Google SignIn: https://hadiyarajesh.medium.com/integrate-google-sign-in-with-jetpack-compose-ui-9f52776542ab
