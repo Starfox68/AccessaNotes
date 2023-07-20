@@ -92,7 +92,7 @@ fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewM
 
             Button(
                 onClick = {
-                    viewModel.onTextToSpeech(note.content)
+                    viewModel.onTextToSpeech(note?.content ?: "default")
                     ttsButtonText = if (viewModel.isSpeaking) {
                         "Stop Reading"
                     } else {

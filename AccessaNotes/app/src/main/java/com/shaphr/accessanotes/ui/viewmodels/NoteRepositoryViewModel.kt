@@ -17,8 +17,24 @@ class NoteRepositoryViewModel @Inject constructor(
 
     private val mutableNotes = MutableStateFlow<List<Note>>(emptyList())
     val notes: StateFlow<List<Note>> = mutableNotes
+
     // Track if tts currently speaking
     var isSpeaking = false
+    init {
+        notesRepository.getNotes().observeForever { notes ->
+            mutableNotes.value = notes
+        }
+    }
+    fun onTextToSpeech(text: String) {
+        if (!isSpeaking) {
+            textToSpeechClient.speak(text)
+        } else {
+            textToSpeechClient.stop()
+        }
 
-    fun getNote(id: Int) = notesRepository.getNotes().first { it.id == id }
+        isSpeaking = !isSpeaking
+    }
+    fun getNote(id: Int) = notes.value.firstOrNull {
+        it.id == id
+    }
 }
