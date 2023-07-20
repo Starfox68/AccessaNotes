@@ -17,6 +17,8 @@ class FileCompiler {
     private val pageWidth = (9.5 * psPerInch).toInt()
     private val margins = 1 * psPerInch
     private val filePath = "${Environment.getExternalStorageDirectory()}/Download"
+    private val disclaimer = "This notes document was generated with AccessaNotes from an audio " +
+            "recording using AI. Information may be inaccurate. Use at your own caution."
 
     fun getPDF(title: String, text: String): PdfDocument {
         val titlePaint = TextPaint()
@@ -28,8 +30,16 @@ class FileCompiler {
         bodyPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
         bodyPaint.textSize = 16F
 
+        val disclaimerPaint = TextPaint()
+        disclaimerPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.ITALIC)
+        disclaimerPaint.textSize = 14F
+        disclaimerPaint.textAlign = Paint.Align.CENTER
+
         val layout = StaticLayout.Builder.obtain(
             text, 0, text.length, bodyPaint, pageWidth - 2 * margins
+        ).setLineSpacing(2F, 1F).build()
+        val disclaimerLayout = StaticLayout.Builder.obtain(
+            disclaimer, 0, disclaimer.length, disclaimerPaint, pageWidth - 2 * margins
         ).setLineSpacing(2F, 1F).build()
 
         val doc = PdfDocument()
@@ -41,6 +51,10 @@ class FileCompiler {
         )
         val canvas = page.canvas
 
+        // Draw disclaimer
+        canvas.translate(canvas.width / 2F, 0.4F * margins)
+        disclaimerLayout.draw(canvas)
+        canvas.translate(-canvas.width / 2F, -0.4F * margins)
         // Draw title at centre of canvas
         canvas.drawText(title, canvas.width / 2F, 1.5F * margins, titlePaint)
         // Draw text below title
