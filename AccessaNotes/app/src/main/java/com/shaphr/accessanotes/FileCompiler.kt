@@ -20,7 +20,19 @@ class FileCompiler {
     private val disclaimer = "This notes document was generated with AccessaNotes from an audio " +
             "recording using AI. Information may be inaccurate. Use at your own caution."
 
-    fun getPDF(title: String, text: String): PdfDocument {
+    private fun writePDF(doc: PdfDocument, name: String) {
+        val file = File(filePath, "$name.pdf")
+
+        try {
+            println("Writing PDF file to $filePath")
+            doc.writeTo(FileOutputStream(file))
+        } catch (e: IOException) {
+            println("Writing PDF file failed")
+            e.printStackTrace()
+        }
+    }
+
+    fun toPDF(title: String, text: String) {
         val titlePaint = TextPaint()
         titlePaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         titlePaint.textSize = 24F
@@ -62,18 +74,6 @@ class FileCompiler {
         layout.draw(canvas)
 
         doc.finishPage(page)
-        return doc
-    }
-
-    fun writePDF(doc: PdfDocument, title: String) {
-        val file = File(filePath, "$title.pdf")
-
-        try {
-            println("Writing file to $filePath")
-            doc.writeTo(FileOutputStream(file))
-        } catch (e: IOException) {
-            println("Writing file failed")
-            e.printStackTrace()
-        }
+        writePDF(doc, title)
     }
 }
