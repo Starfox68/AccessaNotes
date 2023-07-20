@@ -76,4 +76,16 @@ class FileCompiler {
         doc.finishPage(page)
         writePDF(doc, title)
     }
+
+    fun toTXT(title: String, text: String) {
+        val file = File(filePath, "$title.txt")
+
+        try {
+            println("Writing TXT file to $filePath")
+            file.writeText("$disclaimer\n\n"+ "$title\n\n" + text)
+        } catch (e: IOException) {
+            println("Writing TXT file failed")
+            e.printStackTrace()
+        }
+    }
 }
