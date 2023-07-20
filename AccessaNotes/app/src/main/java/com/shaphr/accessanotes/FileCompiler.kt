@@ -7,18 +7,25 @@ import android.graphics.pdf.PdfDocument.PageInfo
 import android.os.Environment
 import android.text.StaticLayout
 import android.text.TextPaint
+import org.apache.poi.wp.usermodel.HeaderFooterType
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment
+import org.apache.poi.xwpf.usermodel.XWPFDocument
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
 
 class FileCompiler {
-    private val psPerInch = 72
-    private val pageWidth = (9.5 * psPerInch).toInt()
-    private val margins = 1 * psPerInch
     private val filePath = "${Environment.getExternalStorageDirectory()}/Download"
     private val disclaimer = "This notes document was generated with AccessaNotes from an audio " +
             "recording using AI. Information may be inaccurate. Use at your own caution."
+    private val titleSize = 24
+    private val bodySize = 16
+    private val disclaimerSize = 14
+    private val psPerInch = 72
+    private val pageWidth = (9.5 * psPerInch).toInt()
+    private val margins = 1 * psPerInch
+
 
     private fun writePDF(doc: PdfDocument, name: String) {
         val file = File(filePath, "$name.pdf")
@@ -35,16 +42,16 @@ class FileCompiler {
     fun toPDF(title: String, text: String) {
         val titlePaint = TextPaint()
         titlePaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-        titlePaint.textSize = 24F
+        titlePaint.textSize = titleSize.toFloat()
         titlePaint.textAlign = Paint.Align.CENTER
 
         val bodyPaint = TextPaint()
         bodyPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-        bodyPaint.textSize = 16F
+        bodyPaint.textSize = bodySize.toFloat()
 
         val disclaimerPaint = TextPaint()
         disclaimerPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.ITALIC)
-        disclaimerPaint.textSize = 14F
+        disclaimerPaint.textSize = disclaimerSize.toFloat()
         disclaimerPaint.textAlign = Paint.Align.CENTER
 
         val layout = StaticLayout.Builder.obtain(
@@ -85,6 +92,39 @@ class FileCompiler {
             file.writeText("$disclaimer\n\n"+ "$title\n\n" + text)
         } catch (e: IOException) {
             println("Writing TXT file failed")
+            e.printStackTrace()
+        }
+    }
+
+    fun toDOCX(title: String, text: String) {
+        val doc = XWPFDocument()
+
+        // Disclaimer
+        val header = doc.createHeader(HeaderFooterType.DEFAULT)
+        val headerRun = header.createParagraph().createRun()
+        headerRun.fontSize = disclaimerSize
+        headerRun.isItalic = true
+        headerRun.setText(disclaimer)
+
+        // Title
+        val titleParagraph = doc.createParagraph()
+        titleParagraph.alignment = ParagraphAlignment.CENTER
+        val titleRun = titleParagraph.createRun()
+        titleRun.fontSize = titleSize
+        titleRun.isBold = true
+        titleRun.setText(title)
+
+        // Body text
+        val bodyRun = doc.createParagraph().createRun()
+        bodyRun.fontSize = bodySize
+        bodyRun.setText(text)
+
+        val file = File(filePath, "$title.docx")
+        try {
+            println("Writing DOCX file to $filePath")
+            doc.write(FileOutputStream(file))
+        } catch (e: IOException) {
+            println("Writing DOCX file failed")
             e.printStackTrace()
         }
     }
