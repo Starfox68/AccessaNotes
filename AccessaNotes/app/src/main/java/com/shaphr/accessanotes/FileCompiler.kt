@@ -17,13 +17,14 @@ import java.io.IOException
 
 class FileCompiler {
     private val filePath = "${Environment.getExternalStorageDirectory()}/Download"
-    private val disclaimer = "This notes document was generated with AccessaNotes from an audio " +
-            "recording using AI. Information may be inaccurate. Use at your own caution."
+    private val disclaimer = "This notes document was generated through AccessaNotes from an " +
+            "audio recording using AI. Information may be inaccurate. Use at your own caution."
     private val titleSize = 24
     private val bodySize = 16
     private val disclaimerSize = 14
     private val psPerInch = 72
     private val pageWidth = (9.5 * psPerInch).toInt()
+    private val pageHeight = 11 * psPerInch
     private val margins = 1 * psPerInch
 
 
@@ -62,27 +63,41 @@ class FileCompiler {
                 it, 0, it.length, bodyPaint, pageWidth - 2 * margins
             ).setLineSpacing(2F, 1F).build()
         }
-        val height = bodyLayouts.sumOf { it.height } + (bodyLayouts.size - 1) * bodyPaint.textSize
 
         val doc = PdfDocument()
-        val page = doc.startPage(
-            PageInfo.Builder(
-                pageWidth, (height + 2.5 * margins + titlePaint.textSize).toInt(), 1
-            ).create()
-        )
-        val canvas = page.canvas
+        var page = doc.startPage(PageInfo.Builder(pageWidth, pageHeight, 1).create())
+        var canvas = page.canvas
+        var nextPageNum = 2
 
         // Draw disclaimer
-        canvas.translate(canvas.width / 2F, 0.4F * margins)
+        canvas.translate(pageWidth / 2F, 0.4F * margins)
         disclaimerLayout.draw(canvas)
-        canvas.translate(-canvas.width / 2F, -0.4F * margins)
+        canvas.translate(-pageWidth / 2F, -0.4F * margins)
         // Draw title at centre of canvas
-        canvas.drawText(title, canvas.width / 2F, 1.5F * margins, titlePaint)
+        canvas.drawText(title, pageWidth / 2F, 1.5F * margins, titlePaint)
+
         // Draw text below title
         canvas.translate(1F * margins, 1.5F * margins + titlePaint.textSize)
+        var curHeight = 1.5F * margins + titlePaint.textSize
         bodyLayouts.forEach {
+            if (curHeight + it.height >= pageHeight - 1 * margins) {
+                doc.finishPage(page)
+
+                page = doc.startPage(PageInfo.Builder(pageWidth, pageHeight, nextPageNum).create())
+                canvas = page.canvas
+                nextPageNum += 1
+
+                canvas.translate(pageWidth / 2F, 0.4F * margins)
+                disclaimerLayout.draw(canvas)
+                canvas.translate(-pageWidth / 2F, -0.4F * margins)
+
+                canvas.translate(1F * margins, 1F * margins)
+                curHeight = 0F
+            }
+
             it.draw(canvas)
             canvas.translate(0F, it.height + bodyPaint.textSize)
+            curHeight += it.height + bodyPaint.textSize
         }
 
         doc.finishPage(page)
