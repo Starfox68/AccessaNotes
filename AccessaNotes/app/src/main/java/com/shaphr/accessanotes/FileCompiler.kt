@@ -39,7 +39,7 @@ class FileCompiler {
         }
     }
 
-    fun toPDF(title: String, text: String) {
+    fun toPDF(title: String, text: List<String>) {
         val titlePaint = TextPaint()
         titlePaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         titlePaint.textSize = titleSize.toFloat()
@@ -54,18 +54,20 @@ class FileCompiler {
         disclaimerPaint.textSize = disclaimerSize.toFloat()
         disclaimerPaint.textAlign = Paint.Align.CENTER
 
-        val layout = StaticLayout.Builder.obtain(
-            text, 0, text.length, bodyPaint, pageWidth - 2 * margins
-        ).setLineSpacing(2F, 1F).build()
         val disclaimerLayout = StaticLayout.Builder.obtain(
             disclaimer, 0, disclaimer.length, disclaimerPaint, pageWidth - 2 * margins
         ).setLineSpacing(2F, 1F).build()
+        val bodyLayouts = text.map {
+            StaticLayout.Builder.obtain(
+                it, 0, it.length, bodyPaint, pageWidth - 2 * margins
+            ).setLineSpacing(2F, 1F).build()
+        }
+        val height = bodyLayouts.sumOf { it.height } + (bodyLayouts.size - 1) * bodyPaint.textSize
 
         val doc = PdfDocument()
         val page = doc.startPage(
             PageInfo.Builder(
-                pageWidth, (layout.height + 2.5 * margins + titlePaint.textSize).toInt(),
-                1
+                pageWidth, (height + 2.5 * margins + titlePaint.textSize).toInt(), 1
             ).create()
         )
         val canvas = page.canvas
@@ -78,25 +80,28 @@ class FileCompiler {
         canvas.drawText(title, canvas.width / 2F, 1.5F * margins, titlePaint)
         // Draw text below title
         canvas.translate(1F * margins, 1.5F * margins + titlePaint.textSize)
-        layout.draw(canvas)
+        bodyLayouts.forEach {
+            it.draw(canvas)
+            canvas.translate(0F, it.height + bodyPaint.textSize)
+        }
 
         doc.finishPage(page)
         writePDF(doc, title)
     }
 
-    fun toTXT(title: String, text: String) {
+    fun toTXT(title: String, text: List<String>) {
         val file = File(filePath, "$title.txt")
 
         try {
             println("Writing TXT file to $filePath")
-            file.writeText("$disclaimer\n\n"+ "$title\n\n" + text)
+            file.writeText((listOf(disclaimer, title) + text).joinToString(separator = "\n\n"))
         } catch (e: IOException) {
             println("Writing TXT file failed")
             e.printStackTrace()
         }
     }
 
-    fun toDOCX(title: String, text: String) {
+    fun toDOCX(title: String, text: List<String>) {
         val doc = XWPFDocument()
 
         // Disclaimer
@@ -115,9 +120,11 @@ class FileCompiler {
         titleRun.setText(title)
 
         // Body text
-        val bodyRun = doc.createParagraph().createRun()
-        bodyRun.fontSize = bodySize
-        bodyRun.setText(text)
+        text.forEach {
+            val bodyRun = doc.createParagraph().createRun()
+            bodyRun.fontSize = bodySize
+            bodyRun.setText(it)
+        }
 
         val file = File(filePath, "$title.docx")
         try {
