@@ -44,6 +44,7 @@
 | 07/10/2023 | 2 | 2 | | |  |  | Architecture Style pipe and filter |
 | 07/10/2023 | | 7 | | |  |  | DB integration with NoteRepo and testing |
 | 07/11/2023 | 1 | 1 | 1 | 1 | 1 | 1 | Team report Meeting |
+| 07/12/2023 |  |  | 2 | 2 |  |  | Architecture Style Examples |
 | 07/12/2023 | 2 |  |  |  | 2 |  | Design Pattern Examples |
 | 07/12/2023 |  |  3 |  |  | |  | DB interface integrations |
 | 07/12/2023 |  |  |  |  | 0.5 |  | Text-to-Speech on Single Note Screen |
@@ -56,4 +57,7 @@
 | 07/18/2023 |  | 5 | |  | |  | Testing insert and fully integrating Room |
 | 07/18/2023 | 5 | | | | | | Implement basic camera image capture + text recognition |
 | 07/19/2023 | 2 |  2 | 2 | 2 |2 | 2 | Team meet up |
+| 07/19/2023 |  |  | 2 | 2 |  |  | Design Pattern Examples |
 | 07/20/2023 |  | 1 |  |  | |  | DB merge and fixes |
+| 07/20/2023 |  |  |  | 1 | |  | UI styling |
+| 07/21/2023 |  |  |  | 4 | |  | Bottom Nav Bar + UI Styling |
