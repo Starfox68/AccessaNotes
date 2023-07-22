@@ -1,5 +1,6 @@
 package com.shaphr.accessanotes.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,6 +9,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Build
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -64,20 +70,27 @@ fun NoteRepositoryScreen(
             FloatingActionButton(navController)
         },
         bottomBar = {
-
-            val selectedItem = remember { mutableStateOf(0) }
-
-            val items = listOf("Songs", "Artists", "Playlists")
+            val selectedItem = remember { mutableStateOf("All Notes") }
 
             NavigationBar {
-                items.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Filled.Favorite, contentDescription = item) },
-                        label = { Text(item) },
-                        selected = selectedItem.value == index,
-                        onClick = { selectedItem.value = index }
-                    )
-                }
+                NavigationBarItem(
+                    icon = {Icon(Icons.Outlined.Home, contentDescription = "All Notes")},
+                    label = {Text("All Notes")},
+                    selected = selectedItem.value == "All Notes",
+                    onClick = { selectedItem.value = "All Notes" }
+                )
+                NavigationBarItem(
+                    icon = {Icon(Icons.Outlined.Add, contentDescription = "New Session")},
+                    label = {Text("New Session")},
+                    selected = selectedItem.value == "New Session",
+                    onClick = { selectedItem.value = "New Session" }
+                )
+                NavigationBarItem(
+                    icon = {Icon(Icons.Outlined.AccountCircle, contentDescription = "Account")},
+                    label = {Text("Account")},
+                    selected = selectedItem.value == "Account",
+                    onClick = { selectedItem.value = "Account" }
+                )
             }
         }
     )
