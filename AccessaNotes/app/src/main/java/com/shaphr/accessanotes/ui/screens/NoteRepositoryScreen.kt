@@ -96,7 +96,7 @@ fun NoteRepositoryScreen(
 ////                                    )
 ////                                )
 //                            }
-                        Card(shape = RoundedCornerShape(3.dp), modifier = paddingModifier, elevation = CardDefaults.cardElevation(10.dp), border = BorderStroke(2.dp, Color.Black)) {
+                        Card(shape = RoundedCornerShape(3.dp), modifier = paddingModifier, elevation = CardDefaults.cardElevation(10.dp), ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Column(modifier = Modifier.padding(10.dp,0.dp,0.dp,0.dp)) {
                                 Text(note.title, color = Color.Black)
