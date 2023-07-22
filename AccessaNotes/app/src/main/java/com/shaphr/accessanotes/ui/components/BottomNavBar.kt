@@ -13,23 +13,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.shaphr.accessanotes.Destination
 
 @Composable
-fun StyleIcons(icon: String, curScreen: String){
-    val mod = Modifier
-        .defaultMinSize(40.dp, 40.dp)
+fun StyleIcons(iconName: String){
+    val mod = Modifier.defaultMinSize(40.dp, 40.dp)
 
-    return when(icon){
-        "Home" -> Icon(Icons.Outlined.Home, contentDescription = icon, mod)
-        "Add" -> Icon(Icons.Outlined.Add, contentDescription = icon, mod)
-        "AccountCircle" -> Icon(Icons.Outlined.AccountCircle, contentDescription = icon, mod)
-        else -> return
+    var shape = Icons.Outlined.Home
+    if (iconName == "Add"){
+        shape = Icons.Outlined.Add
+    }else if (iconName == "AccountCircle"){
+        shape = Icons.Outlined.AccountCircle
     }
-}
 
+    return Icon(shape, contentDescription = iconName, mod, Color.Black)
+}
 
 //Bottom Navigation Bar
 @Composable
@@ -40,19 +41,19 @@ fun BottomNavBar(navController: NavController) {
 
     NavigationBar(modifier = Modifier.defaultMinSize(50.dp, 90.dp)) {
         NavigationBarItem(
-            icon = { StyleIcons("Home", curScreen)},
+            icon = { StyleIcons("Home")},
             label = {Text("All Notes")},
             selected = selectedItem.value == Destination.NoteRepositoryScreen.route,
             onClick = { navController.navigate(Destination.NoteRepositoryScreen.route) }
         )
         NavigationBarItem(
-            icon = { StyleIcons("Add", curScreen)},
+            icon = { StyleIcons("Add")},
             label = {Text("New Session")},
             selected = selectedItem.value == Destination.SessionStartAndEndScreen.route,
             onClick = { navController.navigate(Destination.SessionStartAndEndScreen.route)}
         )
         NavigationBarItem(
-            icon = { StyleIcons("AccountCircle", curScreen)},
+            icon = { StyleIcons("AccountCircle")},
             label = {Text("Account")},
             selected = selectedItem.value == Destination.AccountScreen.route,
             onClick = { navController.navigate(Destination.AccountScreen.route) }

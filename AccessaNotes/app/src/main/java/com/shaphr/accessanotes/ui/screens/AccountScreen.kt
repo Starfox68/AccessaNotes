@@ -1,7 +1,6 @@
 package com.shaphr.accessanotes.ui.screens
 
 import android.annotation.SuppressLint
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
