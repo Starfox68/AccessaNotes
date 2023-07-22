@@ -59,6 +59,7 @@ fun SessionStartAndEndScreen(navController: NavHostController, viewModel: StartA
     SessionStartScreen(
         onStartClick = {
             val mediaPlayer = MediaPlayer.create(context, R.raw.recording_started)
+            mediaPlayer.setVolume(1F,1F)
             mediaPlayer.start()
 
             println("Clicked Start")
@@ -228,7 +229,7 @@ fun ShowUploadButton(viewModel: StartAndEndScreenViewModel) {
 fun ShowStartButton(canStart: Boolean, onStartClick: () -> Unit){
     Button(
         onClick = onStartClick,
-        enabled = canStart
+        enabled = true
     ) {
         Text("Start")
     }
