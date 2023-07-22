@@ -1,5 +1,6 @@
 package com.shaphr.accessanotes
 
+import android.graphics.Bitmap
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
@@ -7,10 +8,12 @@ import android.graphics.pdf.PdfDocument.PageInfo
 import android.os.Environment
 import android.text.StaticLayout
 import android.text.TextPaint
+import org.apache.poi.util.Units.toEMU
 import org.apache.poi.wp.usermodel.HeaderFooterType
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 
@@ -26,6 +29,8 @@ class FileCompiler {
     private val pageWidth = (9.5 * psPerInch).toInt()
     private val pageHeight = 11 * psPerInch
     private val margins = 1 * psPerInch
+    private val imageWidth = 300F
+    private val imageHeight = 100F
 
 
     private fun writePDF(doc: PdfDocument, name: String) {
@@ -115,12 +120,15 @@ class FileCompiler {
             curHeight += it.height + bodyPaint.textSize
         }
 
+//        canvas.drawBitmap(bmp, 100F, 100F, null)
+
         doc.finishPage(page)
         writePDF(doc, title)
     }
 
-    fun toTXT(title: String, text: List<String>) {
+    fun toTXT(title: String, content: List<Any>) {
         val file = File(filePath, "$title.txt")
+        val text = content.filterIsInstance<String>()
 
         try {
             println("Writing TXT file to $filePath")
@@ -131,7 +139,7 @@ class FileCompiler {
         }
     }
 
-    fun toDOCX(title: String, text: List<String>) {
+    fun toDOCX(title: String, content: List<Any>) {
         val doc = XWPFDocument()
 
         // Disclaimer
@@ -150,11 +158,27 @@ class FileCompiler {
         titleRun.setText(title)
 
         // Body text
-        text.forEach {
-            val bodyRun = doc.createParagraph().createRun()
-            bodyRun.fontSize = bodySize
-            bodyRun.setText(it)
+        content.forEach {
+            val paragraph = doc.createParagraph()
+            val bodyRun = paragraph.createRun()
+
+            if (it is String) {
+                bodyRun.fontSize = bodySize
+                bodyRun.setText(it)
+
+            } else if (it is Bitmap) {
+                paragraph.alignment = ParagraphAlignment.CENTER
+                // Write bitmap to temp file so that we can open FileInputStream
+                FileOutputStream("$filePath/temp.jpeg").use { out ->
+                    it.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                }
+                bodyRun.addPicture(
+                    FileInputStream("$filePath/temp.jpeg"), XWPFDocument.PICTURE_TYPE_JPEG,
+                    "temp.jpeg", toEMU(imageWidth.toDouble()), toEMU(imageHeight.toDouble())
+                )
+            }
         }
+        File("$filePath/temp.jpeg").delete() // Delete temp file
 
         val file = File(filePath, "$title.docx")
         try {
