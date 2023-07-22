@@ -101,7 +101,7 @@ fun SessionStartScreen(
 
     Scaffold(
         topBar = {
-            Row(modifier = Modifier.fillMaxWidth().padding(0.dp,10.dp,0.dp,10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center ) {
+            Row(modifier = Modifier.fillMaxWidth().padding(0.dp,40.dp,0.dp,40.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center ) {
                 Text(text="Start Recording Session", fontSize = 30.sp, maxLines = 1)
             }
         },
@@ -111,7 +111,7 @@ fun SessionStartScreen(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Spacer(modifier = Modifier.height(48.dp))
+                Spacer(modifier = Modifier.height(80.dp))
                 Text("Session Title:")
                 ShowSessionTitle(title, setName)
 
@@ -229,7 +229,7 @@ fun ShowUploadButton(viewModel: StartAndEndScreenViewModel) {
 fun ShowStartButton(canStart: Boolean, onStartClick: () -> Unit){
     Button(
         onClick = onStartClick,
-        enabled = true
+        enabled = canStart
     ) {
         Text("Start")
     }

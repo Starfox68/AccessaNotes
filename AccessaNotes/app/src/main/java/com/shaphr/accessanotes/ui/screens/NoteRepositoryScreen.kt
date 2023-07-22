@@ -76,7 +76,7 @@ fun NoteRepositoryScreen(
 
     Scaffold (
         topBar = {
-            Row(modifier = Modifier.fillMaxWidth().padding(0.dp,10.dp,0.dp,10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center ) {
+            Row(modifier = Modifier.fillMaxWidth().padding(0.dp,40.dp,0.dp,30.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center ) {
                 Text(text="All Notes", fontSize = 40.sp, maxLines = 1)
             }
                  },
