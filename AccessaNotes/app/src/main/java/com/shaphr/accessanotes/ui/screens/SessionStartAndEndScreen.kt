@@ -41,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.shaphr.accessanotes.Destination
+import com.shaphr.accessanotes.ui.components.BottomNavBar
 import com.shaphr.accessanotes.ui.components.TopNav
 import com.shaphr.accessanotes.ui.viewmodels.StartAndEndScreenViewModel
 
@@ -69,7 +70,8 @@ fun SessionStartAndEndScreen(navController: NavHostController, viewModel: StartA
         title = title,
         setName = viewModel::setTitle,
         setPrompt = viewModel::setPrompt,
-        viewModel = viewModel
+        viewModel = viewModel,
+        navController = navController
     )
 }
 
@@ -82,14 +84,15 @@ fun SessionStartScreen(
     title: String,
     setName: (String) -> Unit,
     setPrompt: (String) -> Unit,
-    viewModel: StartAndEndScreenViewModel
+    viewModel: StartAndEndScreenViewModel,
+    navController: NavHostController
 ) {
     var dropdown1Expanded by remember { mutableStateOf(false) }
     var dropdown2Expanded by remember { mutableStateOf(false) }
     var promptPurpose by remember { mutableStateOf(TextFieldValue("")) }
 
     Scaffold(
-        topBar = { TopNav("Record Session") },
+//        topBar = { TopNav("Record Session") },
         content = {
             Column(
                 modifier = Modifier
@@ -159,7 +162,8 @@ fun SessionStartScreen(
 
                 ShowStartButton(canStart, onStartClick)
             }
-        }
+        },
+        bottomBar = { BottomNavBar(navController)}
     )
 }
 

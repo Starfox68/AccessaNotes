@@ -1,5 +1,6 @@
 package com.shaphr.accessanotes.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,6 +9,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Build
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,6 +36,7 @@ import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.shaphr.accessanotes.ui.components.BottomNavBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,7 +47,7 @@ fun NoteRepositoryScreen(
     val notes = viewModel.notes.collectAsState().value
 
     Scaffold (
-        topBar = { TopNav("All Saved Notes") },
+//        topBar = { TopNav("All Saved Notes") },
         content = { padding ->
             LazyColumn(modifier = Modifier.padding(padding)) {
                 notes.forEach { note ->
@@ -49,7 +56,13 @@ fun NoteRepositoryScreen(
                         val paddingModifier = Modifier
                             .padding(10.dp)
                             .fillMaxWidth()
-                            .clickable { navController.navigate(Destination.SingleNoteScreen.createRoute(note.id)) }
+                            .clickable {
+                                navController.navigate(
+                                    Destination.SingleNoteScreen.createRoute(
+                                        note.id
+                                    )
+                                )
+                            }
                         Card(shape = RoundedCornerShape(20.dp), modifier = paddingModifier) {
                             Column(modifier = paddingModifier) {
                                 Text(note.title, color = Color.Black)
@@ -60,25 +73,11 @@ fun NoteRepositoryScreen(
                 }
             }
         },
-        floatingActionButton = {
-            FloatingActionButton(navController)
-        },
+//        floatingActionButton = {
+//            FloatingActionButton(navController)
+//        },
         bottomBar = {
-
-            val selectedItem = remember { mutableStateOf(0) }
-
-            val items = listOf("Songs", "Artists", "Playlists")
-
-            NavigationBar {
-                items.forEachIndexed { index, item ->
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Filled.Favorite, contentDescription = item) },
-                        label = { Text(item) },
-                        selected = selectedItem.value == index,
-                        onClick = { selectedItem.value = index }
-                    )
-                }
-            }
+            BottomNavBar(navController)
         }
     )
 }
