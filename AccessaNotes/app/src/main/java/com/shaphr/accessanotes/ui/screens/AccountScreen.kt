@@ -30,9 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.components.BottomNavBar
+import com.shaphr.accessanotes.ui.viewmodels.AccountSettingsViewModel
 
 //Account Screen
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -40,7 +42,7 @@ import com.shaphr.accessanotes.ui.components.BottomNavBar
 @Composable
 fun AccountScreen(
     navController: NavHostController,
-//    viewModel: AccountViewModel = hiltViewModel()
+    viewModel: AccountSettingsViewModel = hiltViewModel()
 ) {
 //    val AccountSettings = viewModel.settings.collectAsState().value
 
@@ -60,17 +62,17 @@ fun AccountScreen(
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
                         Text("Change Font Size", color = Color.Black)
                         Spacer(modifier = Modifier.weight(1f))
-                        Button(modifier = Modifier.padding(0.dp,0.dp,5.dp,0.dp), onClick = { /*TODO*/ }) {
+                        Button(modifier = Modifier.padding(0.dp,0.dp,5.dp,0.dp), onClick = { viewModel.decreaseFont() }) {
                             Text("-")
                         }
-                        Button(modifier = Modifier.padding(0.dp,0.dp,5.dp,0.dp), onClick = { /*TODO*/ }) {
+                        Button(modifier = Modifier.padding(0.dp,0.dp,5.dp,0.dp), onClick = { viewModel.increaseFont() }) {
                             Text("+")
                         }
                     }
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(20.dp, 0.dp, 20.dp, 0.dp)) {
                         Text("Turn on colour blind mode", color = Color.Black)
                         Spacer(modifier = Modifier.weight(1f))
-                        Switch(checked = checkedState.value , onCheckedChange = { checkedState.value = it })
+                        Switch(checked = checkedState.value , onCheckedChange = { checkedState.value = it; viewModel.toggleColBlindMode() })
                     }
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(20.dp, 0.dp, 20.dp, 0.dp)) {
                         Text("Connect to Google Drive", color = Color.Black)
