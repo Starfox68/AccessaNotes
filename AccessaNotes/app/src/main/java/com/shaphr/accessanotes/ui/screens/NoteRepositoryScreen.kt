@@ -1,12 +1,19 @@
 package com.shaphr.accessanotes.ui.screens
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,6 +26,7 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -41,8 +49,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.sp
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.components.BottomNavBar
+import com.shaphr.accessanotes.ui.components.SignInButton
 
 
 //search bar at the top of the screen if time permits
@@ -59,12 +69,17 @@ fun NoteRepositoryScreen(
 //    val notes = viewModel.notes.collectAsState().value
 
     val notes = listOf(
-        Note("hi", "Test Note 1", id=0),
-        Note("there", "Test Note 2", id=1 ),
-        Note("sir", "Test Note 2", id=2 )
+        Note("Title 1", "Test Note 1", id=0),
+        Note("Title 2", "Test Note 2", id=1 ),
+        Note("Title 3", "Test Note 2", id=2 )
     );
 
     Scaffold (
+        topBar = {
+            Row(modifier = Modifier.fillMaxWidth().padding(0.dp,10.dp,0.dp,10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center ) {
+                Text(text="All Notes", fontSize = 40.sp, maxLines = 1)
+            }
+                 },
         content = { padding ->
             LazyColumn(modifier = Modifier.padding(padding)) {
                 notes.forEach { note ->
@@ -72,6 +87,8 @@ fun NoteRepositoryScreen(
                         val paddingModifier = Modifier
                             .padding(10.dp)
                             .fillMaxWidth()
+                            .defaultMinSize(20.dp, 50.dp)
+                            .height(IntrinsicSize.Min)
 //                            .clickable {
 ////                                navController.navigate(
 ////                                    Destination.SingleNoteScreen.createRoute(
@@ -79,14 +96,18 @@ fun NoteRepositoryScreen(
 ////                                    )
 ////                                )
 //                            }
-                        Card(shape = RoundedCornerShape(3.dp), modifier = paddingModifier, elevation = CardDefaults.cardElevation(10.dp)) {
+                        Card(shape = RoundedCornerShape(3.dp), modifier = paddingModifier, elevation = CardDefaults.cardElevation(10.dp), border = BorderStroke(2.dp, Color.Black)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Column() {
+                                Column(modifier = Modifier.padding(10.dp,0.dp,0.dp,0.dp)) {
                                 Text(note.title, color = Color.Black)
                                     Text(note.date.toString(), color = Color.Gray)
                                 }
+                                Spacer(modifier = Modifier.width(25.dp))
+                                Divider(modifier = Modifier
+                                    .fillMaxHeight()  //fill the max height
+                                    .width(1.dp))
                                 Spacer(modifier = Modifier.weight(1f))
-                                Button(onClick = { /*TODO*/ }) {
+                                Button(modifier = Modifier.padding(0.dp,0.dp,5.dp,0.dp), onClick = { /*TODO*/ }) {
                                     Text("Share to Drive")
                                 }
                             }
