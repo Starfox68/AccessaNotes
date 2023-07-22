@@ -36,7 +36,14 @@ import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.components.BottomNavBar
+
+
+//search bar at the top of the screen if time permits
+
+//each note has title, date, and share button
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +51,13 @@ fun NoteRepositoryScreen(
     navController: NavHostController,
     viewModel: NoteRepositoryViewModel = hiltViewModel()
 ) {
-    val notes = viewModel.notes.collectAsState().value
+//    val notes = viewModel.notes.collectAsState().value
+
+    val notes = listOf(
+        Note("hi", "Test Note 1", id=0),
+        Note("there", "Test Note 2", id=1 ),
+        Note("sir", "Test Note 2", id=2 )
+    );
 
     Scaffold (
 //        topBar = { TopNav("All Saved Notes") },
@@ -56,17 +69,17 @@ fun NoteRepositoryScreen(
                         val paddingModifier = Modifier
                             .padding(10.dp)
                             .fillMaxWidth()
-                            .clickable {
-                                navController.navigate(
-                                    Destination.SingleNoteScreen.createRoute(
-                                        note.id
-                                    )
-                                )
-                            }
+//                            .clickable {
+////                                navController.navigate(
+////                                    Destination.SingleNoteScreen.createRoute(
+////                                        note.id
+////                                    )
+////                                )
+//                            }
                         Card(shape = RoundedCornerShape(20.dp), modifier = paddingModifier) {
                             Column(modifier = paddingModifier) {
                                 Text(note.title, color = Color.Black)
-                                Text(note.date.toString(), color = Color.Gray)
+                                Text(note.content, color = Color.Gray)
                             }
                         }
                     }
