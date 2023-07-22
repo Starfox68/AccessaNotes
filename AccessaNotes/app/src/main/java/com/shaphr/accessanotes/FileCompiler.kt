@@ -79,21 +79,14 @@ class FileCompiler {
         return page
     }
 
-    fun toPDF(title: String, text: List<String>) {
+    fun toPDF(title: String, content: List<Any>) {
         val (titlePaint, bodyPaint, disclaimerPaint) = getPDFPaints()
-
         val disclaimerLayout = StaticLayout.Builder.obtain(
             disclaimer, 0, disclaimer.length, disclaimerPaint, pageWidth - 2 * margins
         ).setLineSpacing(2F, 1F).build()
-        val bodyLayouts = text.map {
-            StaticLayout.Builder.obtain(
-                it, 0, it.length, bodyPaint, pageWidth - 2 * margins
-            ).setLineSpacing(2F, 1F).build()
-        }
 
         val doc = PdfDocument()
         var nextPageNum = 1
-
         var page = makePDFPage(doc, nextPageNum, disclaimerLayout)
         var canvas = page.canvas
         nextPageNum += 1
@@ -104,8 +97,17 @@ class FileCompiler {
         // Draw text below title
         canvas.translate(1F * margins, 1.5F * margins + titlePaint.textSize)
         var curHeight = 1.5F * margins + titlePaint.textSize
-        bodyLayouts.forEach {
-            if (curHeight + it.height >= pageHeight - 1 * margins) {
+        content.forEach {
+            var height = imageHeight
+            var layout: StaticLayout? = null
+            if (it is String) {
+                layout = StaticLayout.Builder.obtain(
+                    it, 0, it.length, bodyPaint, pageWidth - 2 * margins
+                ).setLineSpacing(2F, 1F).build()
+                height = layout.height.toFloat()
+            }
+
+            if (curHeight + height >= pageHeight - 2 * margins) {
                 doc.finishPage(page)
                 page = makePDFPage(doc, nextPageNum, disclaimerLayout)
                 canvas = page.canvas
@@ -115,12 +117,15 @@ class FileCompiler {
                 curHeight = 0.2F
             }
 
-            it.draw(canvas)
-            canvas.translate(0F, it.height + bodyPaint.textSize)
-            curHeight += it.height + bodyPaint.textSize
-        }
+            if (it is String) {
+                layout?.draw(canvas)
+            } else if (it is Bitmap) {
+                canvas.drawBitmap(it, (pageWidth - imageWidth) / 2 - margins, 0F, null)
+            }
 
-//        canvas.drawBitmap(bmp, 100F, 100F, null)
+            canvas.translate(0F, height + bodyPaint.textSize)
+            curHeight += height + bodyPaint.textSize
+        }
 
         doc.finishPage(page)
         writePDF(doc, title)
@@ -172,13 +177,20 @@ class FileCompiler {
                 FileOutputStream("$filePath/temp.jpeg").use { out ->
                     it.compress(Bitmap.CompressFormat.JPEG, 100, out)
                 }
+                val iStream = FileInputStream("$filePath/temp.jpeg")
                 bodyRun.addPicture(
-                    FileInputStream("$filePath/temp.jpeg"), XWPFDocument.PICTURE_TYPE_JPEG,
+                    iStream, XWPFDocument.PICTURE_TYPE_JPEG,
                     "temp.jpeg", toEMU(imageWidth.toDouble()), toEMU(imageHeight.toDouble())
                 )
+                iStream.close()
             }
         }
-        File("$filePath/temp.jpeg").delete() // Delete temp file
+        try {
+            File("$filePath/temp.jpeg").delete() // Delete temp file
+        } catch (e: IOException) {
+            println("Delete temp file failed")
+            e.printStackTrace()
+        }
 
         val file = File(filePath, "$title.docx")
         try {
