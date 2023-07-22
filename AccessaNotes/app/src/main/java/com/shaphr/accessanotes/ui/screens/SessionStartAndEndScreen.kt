@@ -2,6 +2,7 @@ package com.shaphr.accessanotes.ui.screens
 
 
 import android.annotation.SuppressLint
+import android.media.MediaPlayer
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -36,11 +37,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.documentfile.provider.DocumentFile
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.shaphr.accessanotes.Destination
+import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.ui.components.BottomNavBar
 import com.shaphr.accessanotes.ui.components.TopNav
 import com.shaphr.accessanotes.ui.viewmodels.StartAndEndScreenViewModel
@@ -51,9 +54,13 @@ fun SessionStartAndEndScreen(navController: NavHostController, viewModel: StartA
     val title = viewModel.title.collectAsState().value
     var prompt = viewModel.prompt.collectAsState().value
     var fileText = viewModel.fileText.collectAsState().value
+    val context = LocalContext.current
 
     SessionStartScreen(
         onStartClick = {
+            val mediaPlayer = MediaPlayer.create(context, R.raw.recording_started)
+            mediaPlayer.start()
+
             println("Clicked Start")
             println("File text: $fileText")
             if (prompt.isBlank()) {
@@ -92,7 +99,11 @@ fun SessionStartScreen(
     var promptPurpose by remember { mutableStateOf(TextFieldValue("")) }
 
     Scaffold(
-//        topBar = { TopNav("Record Session") },
+        topBar = {
+            Row(modifier = Modifier.fillMaxWidth().padding(0.dp,10.dp,0.dp,10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center ) {
+                Text(text="Start Recording Session", fontSize = 30.sp, maxLines = 1)
+            }
+        },
         content = {
             Column(
                 modifier = Modifier
