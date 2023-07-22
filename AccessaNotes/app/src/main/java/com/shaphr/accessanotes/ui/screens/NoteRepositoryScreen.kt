@@ -36,6 +36,7 @@ import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.shaphr.accessanotes.ui.components.BottomNavBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +47,7 @@ fun NoteRepositoryScreen(
     val notes = viewModel.notes.collectAsState().value
 
     Scaffold (
-        topBar = { TopNav("All Saved Notes") },
+//        topBar = { TopNav("All Saved Notes") },
         content = { padding ->
             LazyColumn(modifier = Modifier.padding(padding)) {
                 notes.forEach { note ->
@@ -55,7 +56,13 @@ fun NoteRepositoryScreen(
                         val paddingModifier = Modifier
                             .padding(10.dp)
                             .fillMaxWidth()
-                            .clickable { navController.navigate(Destination.SingleNoteScreen.createRoute(note.id)) }
+                            .clickable {
+                                navController.navigate(
+                                    Destination.SingleNoteScreen.createRoute(
+                                        note.id
+                                    )
+                                )
+                            }
                         Card(shape = RoundedCornerShape(20.dp), modifier = paddingModifier) {
                             Column(modifier = paddingModifier) {
                                 Text(note.title, color = Color.Black)
@@ -66,32 +73,11 @@ fun NoteRepositoryScreen(
                 }
             }
         },
-        floatingActionButton = {
-            FloatingActionButton(navController)
-        },
+//        floatingActionButton = {
+//            FloatingActionButton(navController)
+//        },
         bottomBar = {
-            val selectedItem = remember { mutableStateOf("All Notes") }
-
-            NavigationBar {
-                NavigationBarItem(
-                    icon = {Icon(Icons.Outlined.Home, contentDescription = "All Notes")},
-                    label = {Text("All Notes")},
-                    selected = selectedItem.value == "All Notes",
-                    onClick = { selectedItem.value = "All Notes" }
-                )
-                NavigationBarItem(
-                    icon = {Icon(Icons.Outlined.Add, contentDescription = "New Session")},
-                    label = {Text("New Session")},
-                    selected = selectedItem.value == "New Session",
-                    onClick = { selectedItem.value = "New Session" }
-                )
-                NavigationBarItem(
-                    icon = {Icon(Icons.Outlined.AccountCircle, contentDescription = "Account")},
-                    label = {Text("Account")},
-                    selected = selectedItem.value == "Account",
-                    onClick = { selectedItem.value = "Account" }
-                )
-            }
+            BottomNavBar(navController)
         }
     )
 }

@@ -17,6 +17,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.shaphr.accessanotes.ui.screens.AccountScreen
 import com.shaphr.accessanotes.ui.screens.LiveRecordingScreen
 import com.shaphr.accessanotes.ui.screens.NoteRepositoryScreen
 import com.shaphr.accessanotes.ui.screens.SessionStartAndEndScreen
@@ -42,6 +43,8 @@ sealed class Destination(val route: String){
             return "singleNoteScreen/$noteID"
         }
     }
+
+    object AccountScreen: Destination("accountScreen")
 }
 
 
@@ -97,6 +100,7 @@ fun NavigationAppHost(navController: NavHostController) {
         composable(Destination.LiveRecordingScreen.route) { navBackStackEntry ->
             LiveRecordingScreen(navBackStackEntry)
         }
+        composable(Destination.AccountScreen.route) { AccountScreen(navController) }
         composable(Destination.SessionStartAndEndScreen.route) { SessionStartAndEndScreen(navController) }
         composable(Destination.SingleNoteScreen.route) { navBackStackEntry ->
             //get noteID from within the route
