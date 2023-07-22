@@ -5,45 +5,17 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.graphics.pdf.PdfDocument.PageInfo
-import android.os.Environment
 import android.text.StaticLayout
 import android.text.TextPaint
-import org.apache.poi.util.Units.toEMU
-import org.apache.poi.wp.usermodel.HeaderFooterType
-import org.apache.poi.xwpf.usermodel.ParagraphAlignment
-import org.apache.poi.xwpf.usermodel.XWPFDocument
-import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 
+class FileManagerPDF : FileManagerAbstract() {
 
-class FileCompiler {
-    private val filePath = "${Environment.getExternalStorageDirectory()}/Download"
-    private val disclaimer = "This notes document was generated through AccessaNotes from an " +
-            "audio recording using AI. Information may be inaccurate. Use at your own caution."
-    private val titleSize = 24
-    private val bodySize = 16
-    private val disclaimerSize = 14
     private val psPerInch = 72
     private val pageWidth = (9.5 * psPerInch).toInt()
     private val pageHeight = 11 * psPerInch
     private val margins = 1 * psPerInch
-    private val imageWidth = 300F
-    private val imageHeight = 100F
-
-
-    private fun writePDF(doc: PdfDocument, name: String) {
-        val file = File(filePath, "$name.pdf")
-
-        try {
-            println("Writing PDF file to $filePath")
-            doc.writeTo(FileOutputStream(file))
-        } catch (e: IOException) {
-            println("Writing PDF file failed")
-            e.printStackTrace()
-        }
-    }
 
     private fun getPDFPaints(): Triple<TextPaint, TextPaint, TextPaint> {
         val titlePaint = TextPaint()
@@ -79,7 +51,7 @@ class FileCompiler {
         return page
     }
 
-    fun toPDF(title: String, content: List<Any>) {
+    override fun createDoc(title: String, content: List<Any>): Any {
         val (titlePaint, bodyPaint, disclaimerPaint) = getPDFPaints()
         val disclaimerLayout = StaticLayout.Builder.obtain(
             disclaimer, 0, disclaimer.length, disclaimerPaint, pageWidth - 2 * margins
@@ -128,76 +100,15 @@ class FileCompiler {
         }
 
         doc.finishPage(page)
-        writePDF(doc, title)
+        return doc
     }
 
-    fun toTXT(title: String, content: List<Any>) {
-        val file = File(filePath, "$title.txt")
-        val text = content.filterIsInstance<String>()
-
+    override fun writeDoc(title: String, doc: Any) {
         try {
-            println("Writing TXT file to $filePath")
-            file.writeText((listOf(disclaimer, title) + text).joinToString(separator = "\n\n"))
+            println("Writing PDF file to $filePath")
+            (doc as PdfDocument).writeTo(FileOutputStream("$filePath/$title.pdf"))
         } catch (e: IOException) {
-            println("Writing TXT file failed")
-            e.printStackTrace()
-        }
-    }
-
-    fun toDOCX(title: String, content: List<Any>) {
-        val doc = XWPFDocument()
-
-        // Disclaimer
-        val header = doc.createHeader(HeaderFooterType.DEFAULT)
-        val headerRun = header.createParagraph().createRun()
-        headerRun.fontSize = disclaimerSize
-        headerRun.isItalic = true
-        headerRun.setText(disclaimer)
-
-        // Title
-        val titleParagraph = doc.createParagraph()
-        titleParagraph.alignment = ParagraphAlignment.CENTER
-        val titleRun = titleParagraph.createRun()
-        titleRun.fontSize = titleSize
-        titleRun.isBold = true
-        titleRun.setText(title)
-
-        // Body text
-        content.forEach {
-            val paragraph = doc.createParagraph()
-            val bodyRun = paragraph.createRun()
-
-            if (it is String) {
-                bodyRun.fontSize = bodySize
-                bodyRun.setText(it)
-
-            } else if (it is Bitmap) {
-                paragraph.alignment = ParagraphAlignment.CENTER
-                // Write bitmap to temp file so that we can open FileInputStream
-                FileOutputStream("$filePath/temp.jpeg").use { out ->
-                    it.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                }
-                val iStream = FileInputStream("$filePath/temp.jpeg")
-                bodyRun.addPicture(
-                    iStream, XWPFDocument.PICTURE_TYPE_JPEG,
-                    "temp.jpeg", toEMU(imageWidth.toDouble()), toEMU(imageHeight.toDouble())
-                )
-                iStream.close()
-            }
-        }
-        try {
-            File("$filePath/temp.jpeg").delete() // Delete temp file
-        } catch (e: IOException) {
-            println("Delete temp file failed")
-            e.printStackTrace()
-        }
-
-        val file = File(filePath, "$title.docx")
-        try {
-            println("Writing DOCX file to $filePath")
-            doc.write(FileOutputStream(file))
-        } catch (e: IOException) {
-            println("Writing DOCX file failed")
+            println("Writing PDF file failed")
             e.printStackTrace()
         }
     }
