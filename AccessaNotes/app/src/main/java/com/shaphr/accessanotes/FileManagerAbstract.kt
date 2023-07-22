@@ -14,7 +14,7 @@ abstract class FileManagerAbstract {
     protected val imageWidth = 300F
     protected val imageHeight = 100F
 
-    fun writeNote(title: String, content: List<Any>) {
+    fun exportNote(title: String, content: List<Any>) {
         val doc = createDoc(title, content)
         writeDoc(title, doc)
     }
