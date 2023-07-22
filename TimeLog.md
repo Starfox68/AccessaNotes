@@ -40,12 +40,13 @@
 | 07/07/2023 | | | | | 3 | | Text-to-Speech Clean-Up and Stop/Restart Function + UI |
 | 07/08/2023 | | | | | 2 | | File Compiler Write to PDF |
 | 07/08/2023 | | | | 12 | | | Firebase Integration + Google sign-in |
+| 07/10/2023 | | | | | | 5 | Uploading File functionality for user context |
 | 07/10/2023 | | | | | 1 | | File Compiler Dynamic Size PDF |
 | 07/10/2023 | 2 | 2 | | |  |  | Architecture Style pipe and filter |
 | 07/10/2023 | | 7 | | |  |  | DB integration with NoteRepo and testing |
 | 07/11/2023 | 1 | 1 | 1 | 1 | 1 | 1 | Team report Meeting |
-| 07/12/2023 |  |  | 2 | 2 |  |  | Architecture Style Examples |
-| 07/12/2023 | 2 |  |  |  | 2 |  | Design Pattern Examples |
+| 07/12/2023 |  |  | 2 | 2 |  | 1 | Architecture Style Examples |
+| 07/12/2023 | 2 |  |  |  | 2 | 1 | Design Pattern Examples |
 | 07/12/2023 |  |  3 |  |  | |  | DB interface integrations |
 | 07/12/2023 |  |  |  |  | 0.5 |  | Text-to-Speech on Single Note Screen |
 | 07/13/2023 |  |  | 4 |  | |  | Google Auth |
@@ -56,6 +57,7 @@
 | 07/17/2023 |  | 3 | |  | |  | DB Dependency adjustment and testing |
 | 07/18/2023 |  | 5 | |  | |  | Testing insert and fully integrating Room |
 | 07/18/2023 | 5 | | | | | | Implement basic camera image capture + text recognition |
+| 07/18/2023 |  | | |  | | 5 | Implementing and testing PDF + Doc file parsing |
 | 07/19/2023 | 2 |  2 | 2 | 2 |2 | 2 | Team meet up |
 | 07/19/2023 |  |  | 2 | 2 |  |  | Design Pattern Examples |
 | 07/20/2023 |  | 1 |  |  | |  | DB merge and fixes |
