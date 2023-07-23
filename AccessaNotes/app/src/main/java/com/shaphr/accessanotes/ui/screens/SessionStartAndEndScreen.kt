@@ -67,7 +67,7 @@ fun SessionStartAndEndScreen(navController: NavHostController, viewModel: StartA
                 prompt = "Summarize the following transcript as nested bullet points, capturing the main ideas"
             }
             if (!fileText.isBlank()) {
-                prompt += "\n\nBut before the transcript also use this text which gives some more context to improve your summary and incorporate it with same formatting:\n $fileText"
+                prompt += "\n\nBut before I give you the transcript use the below text for preliminary context to improve your summary and incorporate it with same formatting:\n$fileText"
             }
             fileText = ""
             navController.navigate(Destination.LiveRecordingScreen.createRoute(prompt))

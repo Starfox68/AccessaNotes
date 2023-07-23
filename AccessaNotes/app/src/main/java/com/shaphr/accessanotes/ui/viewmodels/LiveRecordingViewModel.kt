@@ -30,6 +30,9 @@ class LiveRecordingViewModel @Inject constructor(
     private val mutableStop: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val canStop: StateFlow<Boolean> = mutableStop
 
+    private val mutableListen: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val canListen: StateFlow<Boolean> = mutableListen
+
     // only initialized as an emergency default in case of failure, is  overwritten each time
     private var prompt: String = "Summarize the text"
 
@@ -57,6 +60,7 @@ class LiveRecordingViewModel @Inject constructor(
 
         viewModelScope.launch {
             resetTranscribedText()
+            resetNoteText()
             delay(1500)
             mutableStop.update {
                 true
@@ -71,6 +75,12 @@ class LiveRecordingViewModel @Inject constructor(
         }
     }
 
+    fun resetNoteText() {
+        mutableNoteText.update {
+            emptyList()
+        }
+    }
+
     fun updatePrompt(prompt: String) {
         if (prompt.isNotEmpty()) {
             this.prompt = prompt
@@ -80,6 +90,9 @@ class LiveRecordingViewModel @Inject constructor(
     fun stopRecording() {
         mutableStop.update {
             false
+        }
+        mutableListen.update {
+            true
         }
         viewModelScope.launch {
             liveRecordingRepository.stopRecording()

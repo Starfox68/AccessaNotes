@@ -92,7 +92,7 @@ class StartAndEndScreenViewModel(application: Application) : AndroidViewModel(ap
     }
 
     fun uploadPdfFile(file: File) {
-        println("Uploading PDF file ${file.name} ...")
+        println("Uploading PDF file...")
         val url = "https://api.pdf.co/v1/file/upload"
         val apiKey = "mhmohebbi@gmail.com_17073ef6740486dd9a58fdfcb2d377ab6e07bc45894b6e3d167526053d91031133df7b3b"
 
