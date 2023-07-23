@@ -50,15 +50,17 @@ class LiveRecordingViewModel @Inject constructor(
                 }
             }
         }
-
-        viewModelScope.launch {
-            liveRecordingRepository.startRecording()
-        }
     }
 
     fun updatePrompt(prompt: String) {
         if (prompt.isNotEmpty()) {
             this.prompt = prompt
+        }
+    }
+
+    fun startRecording() {
+        viewModelScope.launch {
+            liveRecordingRepository.startRecording()
         }
     }
 

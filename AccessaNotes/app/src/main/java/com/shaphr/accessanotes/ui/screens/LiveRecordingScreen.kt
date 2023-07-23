@@ -40,7 +40,8 @@ fun LiveRecordingScreen(
         transcribedText = transcribedText,
         summarizedContent = summarizedContent,
         onTextToSpeechClick = viewModel::onTextToSpeech,
-        onStopClick = viewModel::stopRecording
+        onStopClick = viewModel::stopRecording,
+        onStartClick = viewModel::startRecording
     )
 }
 
@@ -51,6 +52,7 @@ fun LiveRecordingScreenContent(
     summarizedContent: List<String>,
     onTextToSpeechClick: (String) -> Unit,
     onStopClick: () -> Unit,
+    onStartClick: () -> Unit,
     viewModel: LiveRecordingViewModel = hiltViewModel()
 ) {
     var ttsButtonText by remember { mutableStateOf("Read Summarized Notes") }
@@ -92,7 +94,7 @@ fun LiveRecordingScreenContent(
             }
         }
         Button(
-            onClick = {},
+            onClick = { onStartClick() },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
@@ -147,6 +149,7 @@ fun LiveRecordingScreenPreview() {
             "Morbi efficitur aliquam molestie."
         ),
         onTextToSpeechClick = { },
-        onStopClick = { }
+        onStopClick = { },
+        onStartClick = { }
     )
 }
