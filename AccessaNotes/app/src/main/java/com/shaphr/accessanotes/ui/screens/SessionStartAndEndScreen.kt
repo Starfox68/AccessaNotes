@@ -200,6 +200,7 @@ fun ShowUploadButton(viewModel: StartAndEndScreenViewModel) {
     ) {
         Button(
             onClick = {
+                println("Clicked Upload")
                 clickState = !clickState
             }
         ) {
@@ -220,7 +221,7 @@ fun ShowUploadButton(viewModel: StartAndEndScreenViewModel) {
 
     LaunchedEffect(clickState) {
         if (clickState) {
-            rememberLauncher.launch("text/*") // replace with "*/*" to allow all file types
+            rememberLauncher.launch("*/*") // replace with "*/*" to allow all file types
         }
     }
 }
