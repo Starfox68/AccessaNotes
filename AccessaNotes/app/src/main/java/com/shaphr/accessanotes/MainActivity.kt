@@ -95,7 +95,7 @@ class MainActivity : ComponentActivity() {
 //Functionality for navigating to different UI pages
 @Composable
 fun NavigationAppHost(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "noteRepositoryScreen") {
+    NavHost(navController = navController, startDestination = "liveRecordingScreen/{prompt}") {
         composable(Destination.NoteRepositoryScreen.route) { NoteRepositoryScreen(navController) }
         composable(Destination.LiveRecordingScreen.route) { navBackStackEntry ->
             LiveRecordingScreen(navBackStackEntry)
