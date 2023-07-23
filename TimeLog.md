@@ -67,3 +67,6 @@
 | 07/22/2023 | | | | | 0.5 | | Start Recording on Button |
 | 07/22/2023 | | | | 6 | | | NoteRepository, LiveRecording, and AccountSeetings UI |
 | 07/22/2023 | | | | 0.5 | | | Recording Notification for Pivot |
+| 07/22/2023 | | | | | | 3 | Docx file upload feature |
+| 07/22/2023 | | | | | | 1 | Fixed "start recording" bug |
+
