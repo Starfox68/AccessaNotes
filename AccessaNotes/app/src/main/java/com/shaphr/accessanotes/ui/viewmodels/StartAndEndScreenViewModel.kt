@@ -3,7 +3,6 @@ package com.shaphr.accessanotes.ui.viewmodels
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.Dispatchers

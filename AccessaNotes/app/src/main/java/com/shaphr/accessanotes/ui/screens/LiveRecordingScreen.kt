@@ -45,6 +45,7 @@ fun LiveRecordingScreen(
     val prompt = arguments?.getString("prompt") ?: ""
     viewModel.updatePrompt(prompt)
 
+    val canStop = viewModel.canStop.collectAsState().value
     val transcribedText = viewModel.transcribedText.collectAsState().value
     val summarizedContent = viewModel.noteText.collectAsState().value
     LiveRecordingScreenContent(
@@ -52,6 +53,7 @@ fun LiveRecordingScreen(
         summarizedContent = summarizedContent,
         onTextToSpeechClick = viewModel::onTextToSpeech,
         onStopClick = viewModel::stopRecording,
+        canStop = canStop
     )
 }
 
@@ -62,6 +64,7 @@ fun LiveRecordingScreenContent(
     summarizedContent: List<String>,
     onTextToSpeechClick: (String) -> Unit,
     onStopClick: () -> Unit,
+    canStop: Boolean,
     viewModel: LiveRecordingViewModel = hiltViewModel()
 ) {
     var ttsButtonText by remember { mutableStateOf("Read Summarized Notes") }
@@ -112,7 +115,8 @@ fun LiveRecordingScreenContent(
                         Spacer (modifier = Modifier.size(ButtonDefaults.IconSpacing))
                         Text(text = "Add Image")
                     }
-                    OutlinedButton(onClick = { onStopClick() }) {
+                    OutlinedButton(onClick = { onStopClick() }, enabled = canStop
+                    ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.stop_icon),
                             contentDescription = "Stop Icon",
@@ -163,6 +167,7 @@ fun LiveRecordingScreenPreview() {
             "Morbi efficitur aliquam molestie."
         ),
         onTextToSpeechClick = { },
-        onStopClick = { }
+        onStopClick = { },
+        canStop = true
     )
 }

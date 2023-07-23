@@ -1,6 +1,5 @@
 package com.shaphr.accessanotes.ui.screens
 
-
 import android.annotation.SuppressLint
 import android.media.MediaPlayer
 import android.net.Uri
@@ -45,7 +44,6 @@ import androidx.navigation.compose.rememberNavController
 import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.ui.components.BottomNavBar
-import com.shaphr.accessanotes.ui.components.TopNav
 import com.shaphr.accessanotes.ui.viewmodels.StartAndEndScreenViewModel
 
 @Composable
