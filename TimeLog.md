@@ -69,4 +69,6 @@
 | 07/22/2023 | | | | 0.5 | | | Recording Notification for Pivot |
 | 07/22/2023 | | | | | | 3 | Docx file upload feature |
 | 07/22/2023 | | | | | | 1 | Fixed "start recording" bug |
+| 07/22/2023 | | | | | | 1 | Reset transcript on screen after session |
+| 07/22/2023 | | | | | | 1 | Fix app crash bug with multiple stops |
 
