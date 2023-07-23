@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Build
@@ -49,10 +50,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
+import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.components.BottomNavBar
 import com.shaphr.accessanotes.ui.components.SignInButton
+import com.shaphr.accessanotes.ui.screens.AuthScreen
 
 
 //search bar at the top of the screen if time permits
@@ -67,6 +71,7 @@ fun NoteRepositoryScreen(
     viewModel: NoteRepositoryViewModel = hiltViewModel()
 ) {
 //    val notes = viewModel.notes.collectAsState().value
+    var isLoading by remember { mutableStateOf(false) }
 
     val notes = listOf(
         Note("Title 1", "Test Note 1", id=0),
@@ -107,9 +112,13 @@ fun NoteRepositoryScreen(
                                     .fillMaxHeight()  //fill the max height
                                     .width(1.dp))
                                 Spacer(modifier = Modifier.weight(1f))
-                                Button(modifier = Modifier.padding(0.dp,0.dp,5.dp,0.dp), onClick = { /*TODO*/ }) {
-                                    Text("Share to Drive")
-                                }
+                                SignInButton(
+                                    text = "Share to Drive",
+                                    loadingText = "Signing in...",
+                                    isLoading = isLoading,
+                                    icon = painterResource(id = R.drawable.ic_google_logo),
+                                    onClick = { }
+                                )
                             }
                         }
                     }
