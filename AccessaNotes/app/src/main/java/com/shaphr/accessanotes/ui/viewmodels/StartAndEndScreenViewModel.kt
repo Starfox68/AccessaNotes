@@ -15,6 +15,8 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor
+import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.json.JSONObject
 import java.io.File
 
@@ -57,7 +59,17 @@ class StartAndEndScreenViewModel(application: Application) : AndroidViewModel(ap
                     println("Error: Invalid PDF file")
                 }
             }
-            // add cases for other file types here
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> {
+                // read from .docx file
+                println("Reading DOCX file...")
+                val docx = XWPFDocument(inputStream)
+                val xwpfWordExtractor = XWPFWordExtractor(docx)
+                val text = xwpfWordExtractor.text
+                mutableFileText.value = text
+                xwpfWordExtractor.close()
+            } else -> {
+                println("Error: Invalid file type")
+            }
         }
     }
 
