@@ -52,7 +52,6 @@ fun LiveRecordingScreen(
         summarizedContent = summarizedContent,
         onTextToSpeechClick = viewModel::onTextToSpeech,
         onStopClick = viewModel::stopRecording,
-        onStartClick = viewModel::startRecording
     )
 }
 
@@ -63,7 +62,6 @@ fun LiveRecordingScreenContent(
     summarizedContent: List<String>,
     onTextToSpeechClick: (String) -> Unit,
     onStopClick: () -> Unit,
-    onStartClick: () -> Unit,
     viewModel: LiveRecordingViewModel = hiltViewModel()
 ) {
     var ttsButtonText by remember { mutableStateOf("Read Summarized Notes") }
@@ -105,7 +103,7 @@ fun LiveRecordingScreenContent(
 
 
                 item{
-                    OutlinedButton(onClick = { onStartClick() }) {
+                    OutlinedButton(onClick = { }) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.camera_icon),
                             contentDescription = "Camera Icon",
@@ -165,7 +163,6 @@ fun LiveRecordingScreenPreview() {
             "Morbi efficitur aliquam molestie."
         ),
         onTextToSpeechClick = { },
-        onStopClick = { },
-        onStartClick = { }
+        onStopClick = { }
     )
 }

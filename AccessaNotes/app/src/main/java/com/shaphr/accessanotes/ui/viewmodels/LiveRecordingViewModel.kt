@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.shaphr.accessanotes.TextToSpeechClient
 import com.shaphr.accessanotes.data.repositories.LiveRecordingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -50,17 +51,16 @@ class LiveRecordingViewModel @Inject constructor(
                 }
             }
         }
+
+        viewModelScope.launch {
+            delay(1400)
+            liveRecordingRepository.startRecording()
+        }
     }
 
     fun updatePrompt(prompt: String) {
         if (prompt.isNotEmpty()) {
             this.prompt = prompt
-        }
-    }
-
-    fun startRecording() {
-        viewModelScope.launch {
-            liveRecordingRepository.startRecording()
         }
     }
 

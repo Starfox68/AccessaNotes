@@ -26,11 +26,12 @@ class TranscriptionClient @Inject constructor(
     private var mediaRecorder: MediaRecorder? = null
     private var mediaPlayer: MediaPlayer? = null
     private val filePath: String by lazy {
-        context.getExternalFilesDir(null)?.absolutePath + "/androidMIC.mp3"
+        context.getExternalFilesDir(null)?.absolutePath + "/transcript_recording.mp3"
     }
 
     fun startRecording() {
         println("Starting recording...")
+        println("Audio File path: $filePath")
         mediaRecorder = MediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
