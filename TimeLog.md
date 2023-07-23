@@ -71,4 +71,5 @@
 | 07/22/2023 | | | | | | 1 | Fixed "start recording" bug |
 | 07/22/2023 | | | | | | 1 | Reset transcript on screen after session |
 | 07/22/2023 | | | | | | 1 | Fix app crash bug with multiple stops |
+| 07/22/2023 | | | | | | 1 | Note summarization bug fix and TTS enable/disable functionality |
 
