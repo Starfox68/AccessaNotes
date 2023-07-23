@@ -53,8 +53,15 @@ class LiveRecordingViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            delay(1400)
+            resetTranscribedText()
+            delay(1500)
             liveRecordingRepository.startRecording()
+        }
+    }
+
+    fun resetTranscribedText() {
+        mutableTranscribedText.update {
+            emptyList()
         }
     }
 
