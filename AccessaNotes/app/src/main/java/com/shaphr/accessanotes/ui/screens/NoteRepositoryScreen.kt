@@ -71,7 +71,8 @@ fun NoteRepositoryScreen(
     val notes = listOf(
         Note("Title 1", "Test Note 1", id=0),
         Note("Title 2", "Test Note 2", id=1 ),
-        Note("Title 3", "Test Note 2", id=2 )
+        Note("Title 3", "Test Note 2", id=2 ),
+        Note("Title 4", "Test Note 3", id=3 )
     );
 
     Scaffold (
@@ -115,6 +116,7 @@ fun NoteRepositoryScreen(
                     }
                 }
             }
+            Text("Hello", fontSize = 40.sp)
         },
         bottomBar = {
             BottomNavBar(navController)

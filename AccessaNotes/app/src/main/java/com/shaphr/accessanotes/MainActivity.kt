@@ -7,6 +7,9 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -18,12 +21,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.shaphr.accessanotes.ui.screens.AccountScreen
+import com.shaphr.accessanotes.ui.screens.AuthScreen
 import com.shaphr.accessanotes.ui.screens.LiveRecordingScreen
 import com.shaphr.accessanotes.ui.screens.NoteRepositoryScreen
 import com.shaphr.accessanotes.ui.screens.SessionStartAndEndScreen
 import com.shaphr.accessanotes.ui.screens.SingleNoteScreen
 import com.shaphr.accessanotes.ui.theme.AccessaNotesTheme
+import com.shaphr.accessanotes.ui.viewmodels.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 //sealed class idea came from this tutorial:
 //https://www.youtube.com/watch?v=hGg0HjcoP9w
@@ -45,6 +51,8 @@ sealed class Destination(val route: String){
     }
 
     object AccountScreen: Destination("accountScreen")
+
+    object GoogleAuth: Destination("authScreen")
 }
 
 
@@ -61,7 +69,10 @@ class MainActivity : ComponentActivity() {
                 Toast.makeText(this, "Permission denied, can't record audio", Toast.LENGTH_SHORT).show()
             }
         }
-
+    private val authViewModel: AuthViewModel by viewModels()
+    @OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class,
+        ExperimentalCoroutinesApi::class
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -80,7 +91,12 @@ class MainActivity : ComponentActivity() {
                     //main navigation controller
                     val navController = rememberNavController()
                     NavigationAppHost(navController = navController)
+                    AuthScreen(authViewModel = authViewModel)
                 }
+
+//                Surface(color=MaterialTheme.colorScheme.background) {
+//                    AuthScreen(authViewModel = authViewModel)
+//                }
             }
         }
     }
