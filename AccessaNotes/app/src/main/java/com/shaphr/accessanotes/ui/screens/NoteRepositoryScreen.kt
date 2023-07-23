@@ -1,6 +1,7 @@
 package com.shaphr.accessanotes.ui.screens
 
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -48,15 +49,20 @@ import com.shaphr.accessanotes.ui.components.TopNav
 import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
+import com.google.android.gms.common.api.ApiException
+import com.shaphr.accessanotes.AuthResultContract
 import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.components.BottomNavBar
 import com.shaphr.accessanotes.ui.components.SignInButton
 import com.shaphr.accessanotes.ui.screens.AuthScreen
+import com.shaphr.accessanotes.ui.viewmodels.AuthViewModel
+import kotlinx.coroutines.launch
 
 
 //search bar at the top of the screen if time permits
@@ -68,8 +74,59 @@ import com.shaphr.accessanotes.ui.screens.AuthScreen
 @Composable
 fun NoteRepositoryScreen(
     navController: NavHostController,
-    viewModel: NoteRepositoryViewModel = hiltViewModel()
+    viewModel: NoteRepositoryViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel
 ) {
+
+    val coroutineScope = rememberCoroutineScope()
+    var text by remember { mutableStateOf<String?>(null) }
+    val user by remember(authViewModel) { authViewModel.user }.collectAsState()
+    val signInRequestCode = 1
+
+    val authResultLauncher =
+        rememberLauncherForActivityResult(contract = AuthResultContract()) { task ->
+            try {
+                val account = task?.getResult(ApiException::class.java)
+                if (account == null) {
+                    text = "Google sign in failed"
+                } else {
+                    coroutineScope.launch {
+                        account.email?.let {
+                            account.displayName?.let { it1 ->
+                                authViewModel.signIn(
+                                    email = it,
+                                    displayName = it1,
+                                )
+                            }
+                        }
+                    }
+                }
+            } catch (e: ApiException) {
+                text = "Google sign in failed"
+            }
+        }
+
+//    AuthView(
+//        errorText = text,
+//        onClick = {
+//            text = null
+//            authResultLauncher.launch(signInRequestCode)
+//        }
+//    )
+
+    user?.let {
+        HomeScreen(user = it)
+    }
+
+
+
+
+
+
+
+
+
+
 //    val notes = viewModel.notes.collectAsState().value
     var isLoading by remember { mutableStateOf(false) }
 
@@ -117,7 +174,7 @@ fun NoteRepositoryScreen(
                                     loadingText = "Signing in...",
                                     isLoading = isLoading,
                                     icon = painterResource(id = R.drawable.ic_google_logo),
-                                    onClick = { }
+                                    onClick = { authResultLauncher.launch(signInRequestCode) }
                                 )
                             }
                         }
