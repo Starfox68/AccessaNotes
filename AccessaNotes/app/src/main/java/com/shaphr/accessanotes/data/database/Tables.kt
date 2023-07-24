@@ -15,8 +15,8 @@ import androidx.room.TypeConverter
 
 data class Note(
     @ColumnInfo(name = "title") val title: String = "",
-    @ColumnInfo(name = "content") val content: String = "",
+    @ColumnInfo(name = "summarize_note") val summarizeContent: String = "",
+    @ColumnInfo(name = "transcript") val transcript: String = "",
     @ColumnInfo(name = "date") val date: LocalDate? = null,
-    @ColumnInfo(name = "notifyAt") val notifyAt: Long = Date().time,
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
 ) : Serializable
