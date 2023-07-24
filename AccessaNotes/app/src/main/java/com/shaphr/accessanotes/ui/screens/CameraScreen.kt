@@ -13,7 +13,6 @@ import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -24,8 +23,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +38,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -108,7 +110,7 @@ fun CameraCaptureScreen(
                         })
                 }
             ) {
-                Text(stringResource(R.string.camera_screen_take_picture))
+                Icon(painter = painterResource(id = R.drawable.camera_icon), contentDescription = null)
             }
         }
     ) { paddingValues: PaddingValues ->
@@ -137,35 +139,40 @@ fun ImagePreviewScreen(
     onFinish: () -> Unit
 ) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Start,
         modifier = Modifier
             .fillMaxSize()
+            .padding(8.dp)
             .verticalScroll(rememberScrollState())
     ) {
         Image(bitmap = image, contentDescription = null, modifier = Modifier.fillMaxWidth())
         Text(
             text = stringResource(R.string.camera_screen_description),
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Start,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(4.dp)
+                .padding(8.dp)
         )
+        Divider(modifier = Modifier.padding(start = 8.dp, end  = 8.dp))
         OptionCheckbox(
             isChecked = ImageOption.SAVE_IMAGE in selectedOptions,
             text = stringResource(id = R.string.camera_screen_image),
             onClick = { isChecked: Boolean -> onOptionSelect(isChecked, ImageOption.SAVE_IMAGE) }
         )
+        Divider(modifier = Modifier.padding(start = 8.dp, end  = 8.dp))
         OptionCheckbox(
             isChecked = ImageOption.TRANSCRIPT in selectedOptions,
             text = stringResource(id = R.string.camera_screen_transcription),
             onClick = { isChecked: Boolean -> onOptionSelect(isChecked, ImageOption.TRANSCRIPT) }
         )
+        Divider(modifier = Modifier.padding(start = 8.dp, end  = 8.dp))
         OptionCheckbox(
             isChecked = ImageOption.SUMMARY in selectedOptions,
             text = stringResource(id = R.string.camera_screen_summary),
             onClick = { isChecked: Boolean -> onOptionSelect(isChecked, ImageOption.SUMMARY) }
         )
-        Button(onClick = onFinish) {
+        Divider(modifier = Modifier.padding(start = 8.dp, end  = 8.dp))
+        Button(onClick = onFinish, modifier = Modifier.padding(8.dp)) {
             Text(text = stringResource(id = R.string.camera_screen_finish))
         }
     }
@@ -174,10 +181,9 @@ fun ImagePreviewScreen(
 @Composable
 fun OptionCheckbox(isChecked: Boolean, text: String, onClick: (Boolean) -> Unit) {
     Row(
-        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .padding(4.dp)
+            .padding(top = 4.dp, bottom = 4.dp)
             .fillMaxWidth()
             .clickable { onClick(!isChecked) }
     ) {
@@ -192,4 +198,10 @@ private fun PreviewCameraScreen() {
     CameraCaptureScreen(
         onPhotoTaken = {}
     )
+}
+
+@Preview
+@Composable
+private fun ImagePreviewScreen() {
+
 }
