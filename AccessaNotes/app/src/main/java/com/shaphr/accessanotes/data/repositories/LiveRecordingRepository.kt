@@ -3,9 +3,8 @@ package com.shaphr.accessanotes.data.repositories
 import com.shaphr.accessanotes.TranscriptionClient
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.data.sources.SummarizedNoteSource
-import com.shaphr.accessanotes.data.sources.TextRecognizerSource
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,13 +14,15 @@ import javax.inject.Singleton
 class LiveRecordingRepository @Inject constructor(
     private val summarizedNoteSource: SummarizedNoteSource,
     private val transcriptionClient: TranscriptionClient,
-    private val textRecognizerSource: TextRecognizerSource
 ) {
     // Final summarized note text
     val summarizedNotesFlow: MutableSharedFlow<String> = summarizedNoteSource.summarizedNotes
 
     // Recorded text to summarize
     val transcriptFlow: MutableSharedFlow<String> = transcriptionClient.transcription
+
+    // Bare transcription text
+    val bareTranscriptFlow: MutableSharedFlow<String> = MutableStateFlow("")
 
     private val summarizedNote: MutableList<String> = mutableListOf()
 
@@ -38,6 +39,12 @@ class LiveRecordingRepository @Inject constructor(
         }
     }
 
+    suspend fun collectBareTranscript() {
+        bareTranscriptFlow.collect {
+            transcript.add(it)
+        }
+    }
+
     suspend fun collectSummaries() {
         summarizedNotesFlow.collect {
             summarizedNote.add(it)
@@ -47,7 +54,7 @@ class LiveRecordingRepository @Inject constructor(
     suspend fun startRecording() {
         transcriptionClient.startRecording()
 
-        merge(summarizedNoteSource.summarizedNotes, textRecognizerSource.imageTextFlow).collect {
+        summarizedNoteSource.summarizedNotes.collect {
             summarizedNotesFlow.emit(it)
         }
     }

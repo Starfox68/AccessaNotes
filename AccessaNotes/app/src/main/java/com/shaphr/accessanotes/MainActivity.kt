@@ -120,6 +120,6 @@ fun NavigationAppHost(navController: NavHostController) {
                 SingleNoteScreen(noteID)
             }
         }
-        composable(Destination.CameraScreen.route) { CameraScreen() }
+        composable(Destination.CameraScreen.route) { CameraScreen(navController) }
     }
 }
