@@ -23,7 +23,6 @@ import com.shaphr.accessanotes.ui.screens.NoteRepositoryScreen
 import com.shaphr.accessanotes.ui.screens.SessionStartAndEndScreen
 import com.shaphr.accessanotes.ui.screens.SingleNoteScreen
 import com.shaphr.accessanotes.ui.theme.AccessaNotesTheme
-import com.shaphr.accessanotes.ui.viewmodels.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 //sealed class idea came from this tutorial:
@@ -97,7 +96,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun NavigationAppHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "noteRepositoryScreen") {
-        composable(Destination.NoteRepositoryScreen.route) { NoteRepositoryScreen(navController, authViewModel = AuthViewModel()) }
+        composable(Destination.NoteRepositoryScreen.route) { NoteRepositoryScreen(navController) }
         composable(Destination.LiveRecordingScreen.route) { navBackStackEntry ->
             LiveRecordingScreen(navBackStackEntry, navController)
         }
