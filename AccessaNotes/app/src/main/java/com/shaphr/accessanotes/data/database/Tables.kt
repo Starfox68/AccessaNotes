@@ -22,6 +22,7 @@ data class NoteImage(
     )
     val items: List<NoteItem>
 )
+
 data class Note(
     @ColumnInfo(name = "title") val title: String = "",
     @ColumnInfo(name = "summarize_content") val content: String = "",
@@ -35,6 +36,7 @@ data class Note(
 data class NoteItem(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
     @ColumnInfo(name = "note_id") var noteId: Int,
+    @ColumnInfo(name = "image_true") var imageTrue: Boolean,
     @ColumnInfo(name = "content") var content: String?,
     @ColumnInfo(name = "image_path") var imagePath: String?,
     @ColumnInfo(name = "order") var order: Int,
