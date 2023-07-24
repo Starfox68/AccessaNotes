@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
@@ -36,17 +37,13 @@ import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.components.BottomNavBar
 import com.shaphr.accessanotes.ui.viewmodels.AccountSettingsViewModel
 
-//Account Screen
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountScreen(
     navController: NavHostController,
-    viewModel: AccountSettingsViewModel = hiltViewModel()
 ) {
-//    val AccountSettings = viewModel.settings.collectAsState().value
-
-    val checkedState = remember { mutableStateOf(true) }
+    val viewModel: AccountSettingsViewModel = hiltViewModel()
 
     Scaffold (
         topBar = {
@@ -57,35 +54,63 @@ fun AccountScreen(
             }
         },
         content = { padding ->
-            LazyColumn(modifier = Modifier.padding(padding)) {
-                item {
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-                        Text("Change Font Size", color = Color.Black)
-                        Spacer(modifier = Modifier.weight(1f))
-                        Button(modifier = Modifier.padding(0.dp,0.dp,5.dp,0.dp), onClick = { viewModel.decreaseFont() }) {
-                            Text("-")
-                        }
-                        Button(modifier = Modifier.padding(0.dp,0.dp,5.dp,0.dp), onClick = { viewModel.increaseFont() }) {
-                            Text("+")
-                        }
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(20.dp, 0.dp, 20.dp, 0.dp)) {
-                        Text("Turn on colour blind mode", color = Color.Black)
-                        Spacer(modifier = Modifier.weight(1f))
-                        Switch(checked = checkedState.value , onCheckedChange = { checkedState.value = it; viewModel.toggleColBlindMode() })
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(20.dp, 0.dp, 20.dp, 0.dp)) {
-                        Text("Connect to Google Drive", color = Color.Black)
-                        Spacer(modifier = Modifier.weight(1f))
-                        Button(modifier = Modifier.padding(0.dp,0.dp,5.dp,0.dp), onClick = { /*TODO*/ }) {
-                            Text("Connect")
-                        }
-                    }
-                }
-            }
+            AccountScreenContent(padding)
         },
         bottomBar = {
             BottomNavBar(navController)
         }
     )
+}
+
+@Composable
+fun AccountScreenContent(
+    padding: PaddingValues,
+    onFontChange: (Boolean) -> Unit,
+    onColourChange: (Boolean) -> Unit,
+    isColourBlind: Boolean,
+    isFontLarge: Boolean
+) {
+    LazyColumn(modifier = Modifier.padding(padding)) {
+        item {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)
+            ) {
+                Text("Change Font Size", color = Color.Black)
+                Spacer(modifier = Modifier.weight(1f))
+                Button(
+                    modifier = Modifier.padding(0.dp, 0.dp, 5.dp, 0.dp),
+                    onClick = { onColourChange(!isColourBlind) }) {
+                    Text("-")
+                }
+                Button(
+                    modifier = Modifier.padding(0.dp, 0.dp, 5.dp, 0.dp),
+                    onClick = { onFontChange(!isFontLarge) }) {
+                    Text("+")
+                }
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(20.dp, 0.dp, 20.dp, 0.dp)
+            ) {
+                Text("Turn on colour blind mode", color = Color.Black)
+                Spacer(modifier = Modifier.weight(1f))
+                Switch(
+                    checked = checkedState.value,
+                    onCheckedChange = { checkedState.value = it; viewModel.toggleColBlindMode() })
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(20.dp, 0.dp, 20.dp, 0.dp)
+            ) {
+                Text("Connect to Google Drive", color = Color.Black)
+                Spacer(modifier = Modifier.weight(1f))
+                Button(
+                    modifier = Modifier.padding(0.dp, 0.dp, 5.dp, 0.dp),
+                    onClick = { /*TODO*/ }) {
+                    Text("Connect")
+                }
+            }
+        }
+    }
 }

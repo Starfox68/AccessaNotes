@@ -37,19 +37,21 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+private val ColourBlindScheme = lightColorScheme(
+    primary = Indigo,
+    secondary = Yellow,
+    tertiary = DarkYellow
+)
+
 @Composable
 fun AccessaNotesTheme(
+    isLargeFont: Boolean,
+    isColourBlind: Boolean,
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
+        isColourBlind -> ColourBlindScheme
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
@@ -64,7 +66,7 @@ fun AccessaNotesTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = if (isLargeFont) largeTypography else defaultTypography,
         content = content
     )
 }
