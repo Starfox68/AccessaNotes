@@ -1,6 +1,5 @@
 package com.shaphr.accessanotes.ui.screens
 
-import android.content.Context
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
@@ -23,32 +22,25 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.shaphr.accessanotes.AuthResultContract
 import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.components.BottomNavBar
 import com.shaphr.accessanotes.ui.components.SignInButton
-import com.shaphr.accessanotes.ui.viewmodels.AuthViewModel
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.launch
 
 
 //search bar at the top of the screen if time permits
@@ -61,12 +53,12 @@ import kotlinx.coroutines.launch
 fun NoteRepositoryScreen(
     navController: NavHostController,
 //    viewModel: NoteRepositoryViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel
 ) {
+
+    val context = LocalContext.current
 
     val coroutineScope = rememberCoroutineScope()
     var text by remember { mutableStateOf<String?>(null) }
-    val user by remember(authViewModel) { authViewModel.user }.collectAsState()
     val signInRequestCode = 1
 
     val authResultLauncher =
@@ -76,30 +68,13 @@ fun NoteRepositoryScreen(
                 if (account == null) {
                     text = "Google sign in failed"
                 } else {
-                    coroutineScope.launch {
-                        account.email?.let {
-                            account.displayName?.let { it1 ->
-                                authViewModel.signIn(
-                                    email = it,
-                                    displayName = it1,
-                                )
-                            }
-                        }
-                    }
-//                    GoogleSignIn.getLastSignedInAccount(this)?.let { googleAccount -> }
-//                    val credential = GoogleAccountCredential.usingOAuth2(
-//                        this, listOf(DriveScopes.DRIVE_FILE)
-//                    )
-//                    credential.selectedAccount = googleAccount.account!!
+                    Log.d("HI", account.email!!)
+                    Log.d("HI", account.displayName!!)
                 }
             } catch (e: ApiException) {
                 text = "Google sign in failed"
             }
         }
-
-    user?.let {
-        HomeScreen(user = it)
-    }
 
 
 //    val notes = viewModel.notes.collectAsState().value
@@ -162,3 +137,20 @@ fun NoteRepositoryScreen(
         }
     )
 }
+
+//private fun getDriveService(): Drive? {
+//    GoogleSignIn.getLastSignedInAccount(this)?.let { googleAccount ->
+//        val credential = GoogleAccountCredential.usingOAuth2(
+//            this, listOf(DriveScopes.DRIVE_FILE)
+//        )
+//        credential.selectedAccount = googleAccount.account!!
+//        return Drive.Builder(
+//            AndroidHttp.newCompatibleTransport(),
+//            JacksonFactory.getDefaultInstance(),
+//            credential
+//        )
+//            .setApplicationName(R.string.app_name.toString())
+//            .build()
+//    }
+//    return null
+//}
