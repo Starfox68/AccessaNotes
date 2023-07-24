@@ -51,9 +51,12 @@ class LiveRecordingRepository @Inject constructor(
         val note = Note(
             title = title,
             date = date,
-            content = summarizedNote.reduce { acc: String, next: String ->
+            summarizeContent = summarizedNote.reduce { acc: String, next: String ->
                 acc + next
-            }
+            },
+            transcript = transcript.reduce { acc: String, next: String ->
+                acc + next
+            },
         )
         summarizedNote.clear()
         transcript.clear()

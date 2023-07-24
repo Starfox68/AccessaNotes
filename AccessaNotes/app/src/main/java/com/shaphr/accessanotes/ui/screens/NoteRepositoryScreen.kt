@@ -2,8 +2,6 @@ package com.shaphr.accessanotes.ui.screens
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
-import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,45 +24,33 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
-import com.google.api.client.http.FileContent
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
-import com.google.api.services.drive.model.File
 import com.shaphr.accessanotes.AuthResultContract
 import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.ui.components.BottomNavBar
 import com.shaphr.accessanotes.ui.components.SignInButton
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import com.shaphr.accessanotes.ui.viewmodels.AuthViewModel
 import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
-import kotlinx.coroutines.launch
 
 
 //search bar at the top of the screen if time permits
@@ -76,7 +62,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun NoteRepositoryScreen(
     navController: NavHostController,
-//    viewModel: NoteRepositoryViewModel = hiltViewModel(),
+    viewModel: NoteRepositoryViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     
@@ -105,10 +91,6 @@ fun NoteRepositoryScreen(
                 text = "Google sign in failed"
             }
         }
-
-    user?.let {
-        HomeScreen(user = it)
-    }
 
     val notes = viewModel.notes.collectAsState().value
     var isLoading by remember { mutableStateOf(false) }

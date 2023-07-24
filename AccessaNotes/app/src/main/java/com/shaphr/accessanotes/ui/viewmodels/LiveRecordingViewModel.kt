@@ -119,7 +119,7 @@ class LiveRecordingViewModel @Inject constructor(
         val note = liveRecordingRepository.onFinish()
         notesRepository.setNote(note)
         onClose()
-        Log.d("TEST",  note.title + ", " + note.content + ", " + note.date.toString() + ", " + note.id)
+        Log.d("TEST",  note.title + ", " + note.summarizeContent + ", " + note.date.toString() + ", " + note.id)
         navHostController.popBackStack()
     }
 

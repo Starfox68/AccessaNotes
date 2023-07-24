@@ -84,7 +84,7 @@ fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewM
                 .background(Color.White)
         ) {
             Text(
-                text = note?.content ?: "default",
+                text = note?.summarizeContent ?: "default",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .padding(top = 16.dp, start = 16.dp, end = 16.dp)
@@ -94,7 +94,7 @@ fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewM
 
             Button(
                 onClick = {
-                    viewModel.onTextToSpeech(note?.content ?: "default")
+                    viewModel.onTextToSpeech(note?.summarizeContent ?: "default")
                     ttsButtonText = if (viewModel.isSpeaking) {
                         "Stop Reading"
                     } else {
