@@ -20,7 +20,7 @@ class ImageSummaryAction @Inject constructor(
         val inputImage = InputImage.fromBitmap(image, 0)
         val result = recognizer.process(inputImage).await()
         if (result.text.isNotBlank()) {
-            liveRecordingRepository.transcriptionFlow.emit(result.text)
+            liveRecordingRepository.transcriptFlow.emit(result.text)
         }
     }
 }

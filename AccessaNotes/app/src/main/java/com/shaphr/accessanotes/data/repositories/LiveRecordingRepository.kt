@@ -13,7 +13,7 @@ import javax.inject.Singleton
 @Singleton
 class LiveRecordingRepository @Inject constructor(
     private val summarizedNoteSource: SummarizedNoteSource,
-    private val transcriptionClient: TranscriptionClient,
+    private val transcriptionClient: TranscriptionClient
 ) {
     // Final summarized note text
     val summarizedNotesFlow: MutableSharedFlow<String> = summarizedNoteSource.summarizedNotes
@@ -51,13 +51,7 @@ class LiveRecordingRepository @Inject constructor(
         }
     }
 
-    suspend fun startRecording() {
-        transcriptionClient.startRecording()
-
-        summarizedNoteSource.summarizedNotes.collect {
-            summarizedNotesFlow.emit(it)
-        }
-    }
+    fun startRecording() = transcriptionClient.startRecording()
 
     suspend fun stopRecording() {
         transcriptionClient.stopRecording()

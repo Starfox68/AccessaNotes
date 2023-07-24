@@ -13,6 +13,7 @@ import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -34,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -60,7 +63,8 @@ fun CameraScreen(navController: NavHostController) {
             selectedOptions = viewModel.selectedOptions.collectAsState().value,
             image = viewModel.image.collectAsState().value.asImageBitmap(),
             onOptionSelect = viewModel::onOptionSelect,
-            onFinish = { viewModel.onFinish(navController) }
+            onFinish = { viewModel.onFinish(navController) },
+            isLoading = viewModel.isLoading.collectAsState().value
         )
     } else {
         CameraCaptureScreen(
@@ -136,44 +140,61 @@ fun ImagePreviewScreen(
     selectedOptions: List<ImageOption>,
     image: ImageBitmap,
     onOptionSelect: (Boolean, ImageOption) -> Unit,
-    onFinish: () -> Unit
+    onFinish: () -> Unit,
+    isLoading: Boolean
 ) {
-    Column(
-        horizontalAlignment = Alignment.Start,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-            .verticalScroll(rememberScrollState())
-    ) {
-        Image(bitmap = image, contentDescription = null, modifier = Modifier.fillMaxWidth())
-        Text(
-            text = stringResource(R.string.camera_screen_description),
-            textAlign = TextAlign.Start,
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+        if (isLoading) {
+            CircularProgressIndicator()
+        }
+        Column(
+            horizontalAlignment = Alignment.Start,
             modifier = Modifier
-                .fillMaxWidth()
+                .alpha(if (isLoading) 0.5f else 1.0f)
+                .fillMaxSize()
                 .padding(8.dp)
-        )
-        Divider(modifier = Modifier.padding(start = 8.dp, end  = 8.dp))
-        OptionCheckbox(
-            isChecked = ImageOption.SAVE_IMAGE in selectedOptions,
-            text = stringResource(id = R.string.camera_screen_image),
-            onClick = { isChecked: Boolean -> onOptionSelect(isChecked, ImageOption.SAVE_IMAGE) }
-        )
-        Divider(modifier = Modifier.padding(start = 8.dp, end  = 8.dp))
-        OptionCheckbox(
-            isChecked = ImageOption.TRANSCRIPT in selectedOptions,
-            text = stringResource(id = R.string.camera_screen_transcription),
-            onClick = { isChecked: Boolean -> onOptionSelect(isChecked, ImageOption.TRANSCRIPT) }
-        )
-        Divider(modifier = Modifier.padding(start = 8.dp, end  = 8.dp))
-        OptionCheckbox(
-            isChecked = ImageOption.SUMMARY in selectedOptions,
-            text = stringResource(id = R.string.camera_screen_summary),
-            onClick = { isChecked: Boolean -> onOptionSelect(isChecked, ImageOption.SUMMARY) }
-        )
-        Divider(modifier = Modifier.padding(start = 8.dp, end  = 8.dp))
-        Button(onClick = onFinish, modifier = Modifier.padding(8.dp)) {
-            Text(text = stringResource(id = R.string.camera_screen_finish))
+                .verticalScroll(rememberScrollState())
+        ) {
+            Image(bitmap = image, contentDescription = null, modifier = Modifier.fillMaxWidth())
+            Text(
+                text = stringResource(R.string.camera_screen_description),
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp, bottom = 12.dp, start = 8.dp, end = 8.dp)
+            )
+            Divider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
+            OptionCheckbox(
+                isChecked = ImageOption.SAVE_IMAGE in selectedOptions,
+                text = stringResource(id = R.string.camera_screen_image),
+                onClick = { isChecked: Boolean ->
+                    onOptionSelect(
+                        isChecked,
+                        ImageOption.SAVE_IMAGE
+                    )
+                }
+            )
+            Divider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
+            OptionCheckbox(
+                isChecked = ImageOption.TRANSCRIPT in selectedOptions,
+                text = stringResource(id = R.string.camera_screen_transcription),
+                onClick = { isChecked: Boolean ->
+                    onOptionSelect(
+                        isChecked,
+                        ImageOption.TRANSCRIPT
+                    )
+                }
+            )
+            Divider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
+            OptionCheckbox(
+                isChecked = ImageOption.SUMMARY in selectedOptions,
+                text = stringResource(id = R.string.camera_screen_summary),
+                onClick = { isChecked: Boolean -> onOptionSelect(isChecked, ImageOption.SUMMARY) }
+            )
+            Divider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
+            Button(onClick = onFinish, modifier = Modifier.padding(8.dp)) {
+                Text(text = stringResource(id = R.string.camera_screen_finish))
+            }
         }
     }
 }

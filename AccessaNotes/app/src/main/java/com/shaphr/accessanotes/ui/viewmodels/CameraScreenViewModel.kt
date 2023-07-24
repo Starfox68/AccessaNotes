@@ -40,6 +40,9 @@ class CameraScreenViewModel @Inject constructor(
     private val selectedOptionsFlow: MutableStateFlow<List<ImageOption>> = MutableStateFlow(emptyList())
     val selectedOptions: StateFlow<List<ImageOption>> = selectedOptionsFlow
 
+    private val isLoadingFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = isLoadingFlow
+
     fun onPhotoTaken(bitmap: Bitmap) {
         viewModelScope.launch {
             imageFlow.emit(bitmap)
@@ -57,9 +60,11 @@ class CameraScreenViewModel @Inject constructor(
 
     fun onFinish(navController: NavHostController) {
         viewModelScope.launch {
+            isLoadingFlow.value = true
             selectedOptionsFlow.value.forEach {
                 options[it]?.parseImage(image.value)
             }
+            isLoadingFlow.value = false
             navController.popBackStack()
         }
     }

@@ -98,21 +98,12 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun NavigationAppHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "noteRepositoryScreen") {
-        composable(Destination.NoteRepositoryScreen.route) {
-            NoteRepositoryScreen(
-                navController,
-                authViewModel = AuthViewModel()
-            )
-        }
+        composable(Destination.NoteRepositoryScreen.route) { NoteRepositoryScreen(navController) }
         composable(Destination.LiveRecordingScreen.route) { navBackStackEntry ->
             LiveRecordingScreen(navBackStackEntry, navController)
         }
         composable(Destination.AccountScreen.route) { AccountScreen(navController) }
-        composable(Destination.SessionStartAndEndScreen.route) {
-            SessionStartAndEndScreen(
-                navController
-            )
-        }
+        composable(Destination.SessionStartAndEndScreen.route) { SessionStartAndEndScreen(navController) }
         composable(Destination.SingleNoteScreen.route) { navBackStackEntry ->
             //get noteID from within the route
             val noteID = navBackStackEntry.arguments?.getString("noteID")?.toInt()

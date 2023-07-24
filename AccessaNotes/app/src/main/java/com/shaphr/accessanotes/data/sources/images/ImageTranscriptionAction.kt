@@ -1,7 +1,6 @@
 package com.shaphr.accessanotes.data.sources.images
 
 import android.graphics.Bitmap
-import android.util.Log
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -20,10 +19,8 @@ class ImageTranscriptionAction @Inject constructor(
     override suspend fun parseImage(image: Bitmap) {
         val inputImage = InputImage.fromBitmap(image, 0)
         val result = recognizer.process(inputImage).await()
-        Log.d("TEST", "Parsing image")
         if (result.text.isNotBlank()) {
-            Log.d("TEST", result.text)
-            liveRecordingRepository.bareTranscriptionFlow.emit(result.text)
+            liveRecordingRepository.bareTranscriptFlow.emit("\n" + result.text)
         }
     }
 }
