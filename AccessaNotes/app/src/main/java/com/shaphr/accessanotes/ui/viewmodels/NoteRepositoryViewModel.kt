@@ -7,6 +7,7 @@ import com.shaphr.accessanotes.data.repositories.NotesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,7 +35,10 @@ class NoteRepositoryViewModel @Inject constructor(
 
         isSpeaking = !isSpeaking
     }
-    fun getNote(id: Int) = notes.value.firstOrNull {
-        it.id == id
+
+    fun getNote(id: Int) = notes.map { notes ->
+        notes.firstOrNull {
+            it.id == id
+        }
     }
 }

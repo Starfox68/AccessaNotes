@@ -58,6 +58,7 @@ fun LiveRecordingScreen(
         summarizedContent = summarizedContent,
         onTextToSpeechClick = viewModel::onTextToSpeech,
         onStopClick = viewModel::stopRecording,
+        onSaveClick = { viewModel.onSave(navController) },
         canStop = canStop,
         canListen = canListen
     )
@@ -71,6 +72,7 @@ fun LiveRecordingScreenContent(
     summarizedContent: List<String>,
     onTextToSpeechClick: (String) -> Unit,
     onStopClick: () -> Unit,
+    onSaveClick: () -> Unit,
     canStop: Boolean,
     canListen: Boolean,
     viewModel: LiveRecordingViewModel = hiltViewModel()
@@ -166,7 +168,7 @@ fun LiveRecordingScreenContent(
 
                         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
 
-                        OutlinedButton(enabled = !canStop, onClick = { /*TODO*/ }) {
+                        OutlinedButton(enabled = !canStop, onClick = onSaveClick) {
                             Text(text = "Save")
                         }
                     }
@@ -197,6 +199,7 @@ fun LiveRecordingScreenPreview() {
         ),
         onTextToSpeechClick = { },
         onStopClick = { },
+        onSaveClick = { },
         canStop = true,
         canListen = false
     )

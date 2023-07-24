@@ -3,10 +3,13 @@ package com.shaphr.accessanotes.ui.viewmodels
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import androidx.lifecycle.viewModelScope
+import com.shaphr.accessanotes.data.repositories.LiveRecordingRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -19,8 +22,14 @@ import org.apache.poi.xwpf.extractor.XWPFWordExtractor
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.json.JSONObject
 import java.io.File
+import java.time.LocalDate
+import javax.inject.Inject
 
-class StartAndEndScreenViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class StartAndEndScreenViewModel @Inject constructor(
+    application: Application,
+    private val liveRecordingRepository: LiveRecordingRepository
+) : AndroidViewModel(application) {
 
     private val mutableTitle: MutableStateFlow<String> = MutableStateFlow("")
     val title: StateFlow<String> = mutableTitle
@@ -34,7 +43,14 @@ class StartAndEndScreenViewModel(application: Application) : AndroidViewModel(ap
     private val mutableFileText: MutableStateFlow<String> = MutableStateFlow("")
     val fileText: StateFlow<String> = mutableFileText
 
-    init { }
+    init {
+        liveRecordingRepository.date = LocalDate.now()
+        viewModelScope.launch {
+            mutableTitle.collect {
+                liveRecordingRepository.title = it
+            }
+        }
+    }
 
     fun getFileContext(uri: Uri) {
         val mimeType = getApplication<Application>().contentResolver.getType(uri)
