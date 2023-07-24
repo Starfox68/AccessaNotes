@@ -36,7 +36,7 @@ class StartAndEndScreenViewModel(application: Application) : AndroidViewModel(ap
 
     init { }
 
-    fun readFile(uri: Uri) {
+    fun getFileContext(uri: Uri) {
         val mimeType = getApplication<Application>().contentResolver.getType(uri)
         val inputStream = getApplication<Application>().contentResolver.openInputStream(uri)
 

@@ -27,17 +27,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
+import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.ui.viewmodels.LiveRecordingViewModel
 
 @Composable
 fun LiveRecordingScreen(
     navBackStackEntry: NavBackStackEntry,
+    navController: NavHostController,
     viewModel: LiveRecordingViewModel = hiltViewModel()
 ) {
     val arguments = navBackStackEntry.arguments
@@ -49,6 +53,7 @@ fun LiveRecordingScreen(
     val transcribedText = viewModel.transcribedText.collectAsState().value
     val summarizedContent = viewModel.noteText.collectAsState().value
     LiveRecordingScreenContent(
+        navController = navController,
         transcribedText = transcribedText,
         summarizedContent = summarizedContent,
         onTextToSpeechClick = viewModel::onTextToSpeech,
@@ -61,6 +66,7 @@ fun LiveRecordingScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LiveRecordingScreenContent(
+    navController: NavHostController,
     transcribedText: List<String>,
     summarizedContent: List<String>,
     onTextToSpeechClick: (String) -> Unit,
@@ -152,13 +158,15 @@ fun LiveRecordingScreenContent(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        OutlinedButton(onClick = { /*TODO*/ }) {
+                        OutlinedButton(onClick = {
+                            navController.navigate(Destination.SessionStartAndEndScreen.route)
+                        }) {
                             Text(text = "Discard")
                         }
 
                         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
 
-                        OutlinedButton(onClick = { /*TODO*/ }) {
+                        OutlinedButton(enabled = !canStop, onClick = { /*TODO*/ }) {
                             Text(text = "Save")
                         }
                     }
@@ -172,6 +180,7 @@ fun LiveRecordingScreenContent(
 @Composable
 fun LiveRecordingScreenPreview() {
     LiveRecordingScreenContent(
+        navController = NavHostController(LocalContext.current),
         transcribedText = listOf(
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             "Suspendisse a quam sodales, pretium libero non, pharetra ligula.",
