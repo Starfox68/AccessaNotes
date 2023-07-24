@@ -21,4 +21,9 @@ interface NoteDataAccess {
 
     @Query("SELECT * FROM `Note` ORDER BY id ASC")
     fun getNotes(): LiveData<List<Note>>
+
+    @Transaction
+    @Query("SELECT * FROM `Note` WHERE id = :noteId")
+    fun getNoteWithItems(noteId: Int): LiveData<NoteImage>
+
 }
