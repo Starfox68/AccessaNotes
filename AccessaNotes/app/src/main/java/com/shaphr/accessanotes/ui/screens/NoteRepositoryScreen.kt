@@ -118,15 +118,6 @@ fun NoteRepositoryScreen(
         HomeScreen(user = it)
     }
 
-
-
-
-
-
-
-
-
-
 //    val notes = viewModel.notes.collectAsState().value
     var isLoading by remember { mutableStateOf(false) }
 
@@ -173,7 +164,7 @@ fun NoteRepositoryScreen(
                                     text = "Share to Drive",
                                     loadingText = "Signing in...",
                                     isLoading = isLoading,
-                                    icon = painterResource(id = R.drawable.ic_google_logo),
+                                    icon = painterResource(id = R.drawable.ic_google_logo_small),
                                     onClick = { authResultLauncher.launch(signInRequestCode) }
                                 )
                             }
