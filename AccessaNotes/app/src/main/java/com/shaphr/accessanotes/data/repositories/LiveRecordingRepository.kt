@@ -4,6 +4,7 @@ import com.shaphr.accessanotes.TranscriptionClient
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.data.sources.SummarizedNoteSource
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -20,6 +21,9 @@ class LiveRecordingRepository @Inject constructor(
     // Recorded text to summarize
     val transcriptFlow: MutableSharedFlow<String> = transcriptionClient.transcription
 
+    // Bare transcription text
+    val bareTranscriptFlow: MutableSharedFlow<String> = MutableStateFlow("")
+
     private val summarizedNote: MutableList<String> = mutableListOf()
 
     private val transcript: MutableList<String> = mutableListOf()
@@ -32,6 +36,12 @@ class LiveRecordingRepository @Inject constructor(
         transcriptFlow.collect {
             transcript.add(it)
             summarizedNoteSource.summarize(prompt, it)
+        }
+    }
+
+    suspend fun collectBareTranscript() {
+        bareTranscriptFlow.collect {
+            transcript.add(it)
         }
     }
 

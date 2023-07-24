@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -44,19 +45,20 @@ class LiveRecordingViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            liveRecordingRepository.summarizedNotesFlow.collect { summarizedNote ->
-                Log.d("VIEW MODEL", summarizedNote)
-                mutableNoteText.update {
-                    it + listOf(summarizedNote)
+            merge(liveRecordingRepository.transcriptFlow,
+                liveRecordingRepository.bareTranscriptFlow).collect { transcribedText ->
+                Log.d("VIEW MODEL", "Transcribed text: $transcribedText")
+                mutableTranscribedText.update {
+                    it + listOf(transcribedText)
                 }
             }
         }
 
         viewModelScope.launch {
-            liveRecordingRepository.transcriptFlow.collect { transcribedText ->
-                Log.d("VIEW MODEL", "Transcribed text: $transcribedText")
-                mutableTranscribedText.update {
-                    it + listOf(transcribedText)
+            liveRecordingRepository.summarizedNotesFlow.collect { summarizedNote ->
+                Log.d("VIEW MODEL", summarizedNote)
+                mutableNoteText.update {
+                    it + listOf(summarizedNote)
                 }
             }
         }
@@ -107,6 +109,9 @@ class LiveRecordingViewModel @Inject constructor(
         }
         viewModelScope.launch {
             liveRecordingRepository.collectSummaries()
+        }
+        viewModelScope.launch {
+            liveRecordingRepository.collectBareTranscript()
         }
     }
 
