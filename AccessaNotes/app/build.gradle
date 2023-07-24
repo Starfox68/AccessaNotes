@@ -58,7 +58,7 @@ android {
     }
     packagingOptions {
         resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+            excludes += '/META-INF/*'
         }
     }
 }
@@ -124,8 +124,14 @@ dependencies {
 
     //Google Drive
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3-native-mt'
-    implementation 'com.google.api-client:google-api-client-android:1.23.0'
-    implementation 'com.google.apis:google-api-services-drive:v3-rev136-1.25.0'
+    implementation('com.google.api-client:google-api-client-android:1.23.0')
+    implementation('com.google.apis:google-api-services-drive:v3-rev136-1.25.0')
+    implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
+
+
+
+//    implementation 'com.google.api-client:google-api-client-android:1.23.0'
+//    implementation 'com.google.apis:google-api-services-drive:v3-rev136-1.25.0'
 
     // Word
     implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '3.17'
