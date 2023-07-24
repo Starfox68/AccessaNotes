@@ -184,7 +184,7 @@ fun ShowUploadButton(viewModel: StartAndEndScreenViewModel) {
 
     val rememberLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
-            viewModel.readFile(it)
+            viewModel.getFileContext(it)
             selectedUri = it
         }
     }

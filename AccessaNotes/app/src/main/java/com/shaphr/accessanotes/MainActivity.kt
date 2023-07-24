@@ -98,7 +98,7 @@ fun NavigationAppHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "noteRepositoryScreen") {
         composable(Destination.NoteRepositoryScreen.route) { NoteRepositoryScreen(navController) }
         composable(Destination.LiveRecordingScreen.route) { navBackStackEntry ->
-            LiveRecordingScreen(navBackStackEntry)
+            LiveRecordingScreen(navBackStackEntry, navController)
         }
         composable(Destination.AccountScreen.route) { AccountScreen(navController) }
         composable(Destination.SessionStartAndEndScreen.route) { SessionStartAndEndScreen(navController) }

@@ -3,8 +3,10 @@ package com.shaphr.accessanotes.ui.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import com.shaphr.accessanotes.TextToSpeechClient
 import com.shaphr.accessanotes.data.repositories.LiveRecordingRepository
+import com.shaphr.accessanotes.data.repositories.NotesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LiveRecordingViewModel @Inject constructor(
     private val liveRecordingRepository: LiveRecordingRepository,
-    private val textToSpeechClient: TextToSpeechClient
+    private val textToSpeechClient: TextToSpeechClient,
+    private val notesRepository: NotesRepository
 ) : ViewModel() {
 
     private val mutableNoteText: MutableStateFlow<List<String>> = MutableStateFlow(emptyList())
@@ -41,7 +44,7 @@ class LiveRecordingViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            liveRecordingRepository.summarizedNotes.collect { summarizedNote ->
+            liveRecordingRepository.summarizedNotesFlow.collect { summarizedNote ->
                 Log.d("VIEW MODEL", summarizedNote)
                 mutableNoteText.update {
                     it + listOf(summarizedNote)
@@ -50,7 +53,7 @@ class LiveRecordingViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            liveRecordingRepository.recording.collect { transcribedText ->
+            liveRecordingRepository.transcriptFlow.collect { transcribedText ->
                 Log.d("VIEW MODEL", "Transcribed text: $transcribedText")
                 mutableTranscribedText.update {
                     it + listOf(transcribedText)
@@ -102,6 +105,22 @@ class LiveRecordingViewModel @Inject constructor(
             Log.d("VIEW MODEL", "The prompt used was: $prompt")
             liveRecordingRepository.summarizeRecording(prompt)
         }
+        viewModelScope.launch {
+            liveRecordingRepository.collectSummaries()
+        }
+    }
+
+    fun onClose() {
+        mutableNoteText.value = emptyList()
+        mutableTranscribedText.value = emptyList()
+    }
+
+    fun onSave(navHostController: NavHostController) {
+        val note = liveRecordingRepository.onFinish()
+        notesRepository.setNote(note)
+        onClose()
+        Log.d("TEST",  note.title + ", " + note.content + ", " + note.date.toString() + ", " + note.id)
+        navHostController.popBackStack()
     }
 
     fun onTextToSpeech(text: String) {

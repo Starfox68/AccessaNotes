@@ -21,7 +21,7 @@ import javax.inject.Singleton
 class TranscriptionClient @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    val transcription: MutableSharedFlow<String> = MutableSharedFlow(replay = 1)
+    val transcription: MutableSharedFlow<String> = MutableSharedFlow(replay = 0)
 
     private var mediaRecorder: MediaRecorder? = null
     private var mediaPlayer: MediaPlayer? = null

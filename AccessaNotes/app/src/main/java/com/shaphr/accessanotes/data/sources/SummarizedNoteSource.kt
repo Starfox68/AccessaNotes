@@ -10,7 +10,7 @@ import javax.inject.Singleton
 class SummarizedNoteSource @Inject constructor(
     private val openAIAPIClient: OpenAIAPIClient
 ) {
-    val summarizedNotes: MutableSharedFlow<String> = MutableSharedFlow()
+    val summarizedNotes: MutableSharedFlow<String> = MutableSharedFlow(replay = 0)
 
     @OptIn(BetaOpenAI::class)
     suspend fun summarize(prompt: String, transcript: String) {

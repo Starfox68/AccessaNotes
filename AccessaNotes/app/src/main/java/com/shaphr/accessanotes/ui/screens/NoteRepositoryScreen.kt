@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -30,15 +31,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.google.android.gms.common.api.ApiException
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
@@ -48,12 +56,14 @@ import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.File
 import com.shaphr.accessanotes.AuthResultContract
+import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.R
-import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.components.BottomNavBar
 import com.shaphr.accessanotes.ui.components.SignInButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import com.shaphr.accessanotes.ui.viewmodels.AuthViewModel
+import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
 import kotlinx.coroutines.launch
 
 
@@ -68,7 +78,6 @@ fun NoteRepositoryScreen(
     navController: NavHostController,
 //    viewModel: NoteRepositoryViewModel = hiltViewModel(),
 ) {
-
     val context = LocalContext.current
     
     var text by remember { mutableStateOf<String?>(null) }
@@ -97,15 +106,12 @@ fun NoteRepositoryScreen(
             }
         }
 
+    user?.let {
+        HomeScreen(user = it)
+    }
 
-//    val notes = viewModel.notes.collectAsState().value
-    val isLoading by remember { mutableStateOf(false) }
-
-    val notes = listOf(
-        Note("Title 1", "Test Note 1", id=0),
-        Note("Title 2", "Test Note 2", id=1 ),
-        Note("Title 3", "Test Note 2", id=2 )
-    )
+    val notes = viewModel.notes.collectAsState().value
+    var isLoading by remember { mutableStateOf(false) }
 
     Scaffold (
         topBar = {
@@ -122,14 +128,15 @@ fun NoteRepositoryScreen(
                             .fillMaxWidth()
                             .defaultMinSize(20.dp, 50.dp)
                             .height(IntrinsicSize.Min)
-//                            .clickable {
-////                                navController.navigate(
-////                                    Destination.SingleNoteScreen.createRoute(
-////                                        note.id
-////                                    )
-////                                )
-//                            }
-                        Card(shape = RoundedCornerShape(3.dp), modifier = paddingModifier, elevation = CardDefaults.cardElevation(10.dp)) {
+                            .clickable {
+                                Log.d("TEST", "id is ${note.id}")
+                                navController.navigate(
+                                    Destination.SingleNoteScreen.createRoute(
+                                        note.id
+                                    )
+                                )
+                            }
+                        Card(shape = RoundedCornerShape(3.dp), modifier = paddingModifier, elevation = CardDefaults.cardElevation(10.dp), ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Column(modifier = Modifier.padding(10.dp,0.dp,0.dp,0.dp)) {
                                 Text(note.title, color = Color.Black)
@@ -137,14 +144,14 @@ fun NoteRepositoryScreen(
                                 }
                                 Spacer(modifier = Modifier.width(25.dp))
                                 Divider(modifier = Modifier
-                                    .fillMaxHeight()  //fill the max height
+                                    .fillMaxHeight()
                                     .width(1.dp))
                                 Spacer(modifier = Modifier.weight(1f))
                                 SignInButton(
                                     text = "Share to Drive",
                                     loadingText = "Signing in...",
                                     isLoading = isLoading,
-                                    icon = painterResource(id = R.drawable.ic_google_logo),
+                                    icon = painterResource(id = R.drawable.ic_google_logo_small),
                                     onClick = { authResultLauncher.launch(signInRequestCode) }
                                 )
                             }

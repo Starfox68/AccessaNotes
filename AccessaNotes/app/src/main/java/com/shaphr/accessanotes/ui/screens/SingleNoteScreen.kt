@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,11 +30,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
 
 @Composable
 fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewModel()) {
-    val note = viewModel.getNote(noteID)
+    val note = viewModel.getNote(noteID).collectAsState(initial = Note()).value
     var ttsButtonText by remember { mutableStateOf("Read Notes") }
 
     Column(Modifier.fillMaxSize()) {
