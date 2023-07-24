@@ -1,6 +1,9 @@
 package com.shaphr.accessanotes.ui.screens
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,12 +38,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
+import com.google.api.client.extensions.android.http.AndroidHttp
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import com.google.api.client.http.FileContent
+import com.google.api.client.json.jackson2.JacksonFactory
+import com.google.api.services.drive.Drive
+import com.google.api.services.drive.DriveScopes
+import com.google.api.services.drive.model.File
 import com.shaphr.accessanotes.AuthResultContract
 import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.components.BottomNavBar
 import com.shaphr.accessanotes.ui.components.SignInButton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 //search bar at the top of the screen if time permits
@@ -56,8 +70,7 @@ fun NoteRepositoryScreen(
 ) {
 
     val context = LocalContext.current
-
-    val coroutineScope = rememberCoroutineScope()
+    
     var text by remember { mutableStateOf<String?>(null) }
     val signInRequestCode = 1
 
@@ -68,8 +81,16 @@ fun NoteRepositoryScreen(
                 if (account == null) {
                     text = "Google sign in failed"
                 } else {
-                    Log.d("HI", account.email!!)
-                    Log.d("HI", account.displayName!!)
+                    val driveInstance = getDriveService(context)
+                    if (driveInstance == null){
+                        text = "Drive sign in failed"
+                    }else{
+                        uploadFileToGDrive(context)
+//                        Log.d("HI","You're in drive with this login:")
+//                        Log.d("HI", account.email!!)
+//                        Log.d("HI", account.displayName!!)
+                    }
+
                 }
             } catch (e: ApiException) {
                 text = "Google sign in failed"
@@ -138,19 +159,39 @@ fun NoteRepositoryScreen(
     )
 }
 
-//private fun getDriveService(): Drive? {
-//    GoogleSignIn.getLastSignedInAccount(this)?.let { googleAccount ->
-//        val credential = GoogleAccountCredential.usingOAuth2(
-//            this, listOf(DriveScopes.DRIVE_FILE)
-//        )
-//        credential.selectedAccount = googleAccount.account!!
-//        return Drive.Builder(
-//            AndroidHttp.newCompatibleTransport(),
-//            JacksonFactory.getDefaultInstance(),
-//            credential
-//        )
-//            .setApplicationName(R.string.app_name.toString())
-//            .build()
+//reference https://www.section.io/engineering-education/backup-services-with-google-drive-api-in-android/
+private fun getDriveService(context: Context): Drive? {
+    GoogleSignIn.getLastSignedInAccount(context)?.let { googleAccount ->
+        val credential = GoogleAccountCredential.usingOAuth2(
+            context, listOf(DriveScopes.DRIVE_FILE)
+        )
+        credential.selectedAccount = googleAccount.account!!
+        return Drive.Builder(
+            AndroidHttp.newCompatibleTransport(),
+            JacksonFactory.getDefaultInstance(),
+            credential
+        )
+            .setApplicationName(R.string.app_name.toString())
+            .build()
+    }
+    return null
+}
+
+//reference https://www.section.io/engineering-education/backup-services-with-google-drive-api-in-android/
+fun uploadFileToGDrive(context: Context) {
+    Log.d("Hi", "Uploading file")
+//    getDriveService(context)?.let { googleDriveService ->
+//        CoroutineScope(Dispatchers.IO).launch {
+//            try {
+//                val localFileDirectory = File(getExternalFilesDir("backup")!!.toURI())
+//                val actualFile = File("${localFileDirectory}/FILE_NAME_BACKUP")
+//                val gFile = com.google.api.services.drive.model.File()
+//                gFile.name = actualFile.name
+//                val fileContent = FileContent("text/plain", actualFile)
+//                googleDriveService.Files().create(gFile, fileContent).execute()
+//            } catch (exception: Exception) {
+//                exception.printStackTrace()
+//            }
+//        }
 //    }
-//    return null
-//}
+}
