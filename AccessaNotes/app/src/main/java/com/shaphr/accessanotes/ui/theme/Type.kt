@@ -10,7 +10,7 @@ import com.shaphr.accessanotes.R
 
 //private val customFont = FontFamily(Font(R.font.Lato-Black.ttf))
 // Set of Material typography styles to start with
-val Typography = Typography(
+val defaultTypography = Typography(
     bodyLarge = TextStyle(
         fontFamily = FontFamily(Font(R.font.regular)),
         fontWeight = FontWeight.Normal,
@@ -34,4 +34,14 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
     )
     */
+)
+
+val largeTypography = Typography(
+    bodyMedium = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 24.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.5.sp
+    )
 )

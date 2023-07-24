@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,6 +26,7 @@ import com.shaphr.accessanotes.ui.screens.NoteRepositoryScreen
 import com.shaphr.accessanotes.ui.screens.SessionStartAndEndScreen
 import com.shaphr.accessanotes.ui.screens.SingleNoteScreen
 import com.shaphr.accessanotes.ui.theme.AccessaNotesTheme
+import com.shaphr.accessanotes.ui.viewmodels.ThemeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 // sealed class idea came from this tutorial:
@@ -73,7 +76,12 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            AccessaNotesTheme {
+            val themeViewModel: ThemeViewModel = hiltViewModel()
+
+            AccessaNotesTheme(
+                isColourBlind = themeViewModel.colourFlow.collectAsState(initial = false).value,
+                isLargeFont = themeViewModel.fontFlow.collectAsState(initial = false).value,
+            ) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
