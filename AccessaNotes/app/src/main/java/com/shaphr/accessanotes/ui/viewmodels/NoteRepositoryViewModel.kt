@@ -1,7 +1,10 @@
 package com.shaphr.accessanotes.ui.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.shaphr.accessanotes.FileManagerAbstract
+import com.shaphr.accessanotes.FileManagerDOCX
+import com.shaphr.accessanotes.FileManagerPDF
+import com.shaphr.accessanotes.FileManagerTXT
 import com.shaphr.accessanotes.TextToSpeechClient
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.data.repositories.NotesRepository
@@ -49,5 +52,24 @@ class NoteRepositoryViewModel @Inject constructor(
         notes.firstOrNull {
             it.id == id
         }
+    }
+
+    fun downloadNote(note: Note) {
+        var fileManager: FileManagerAbstract? = null
+        when (docType.value) {
+            "PDF" -> {
+                // use FileManagerPDF
+                fileManager = FileManagerPDF()
+            }
+            "TXT" -> {
+                // use FileManagerTXT
+                fileManager = FileManagerTXT()
+            }
+            "DOCX" -> {
+                // use FileManagerDOCX
+                fileManager = FileManagerDOCX()
+            }
+        }
+        fileManager?.exportNote(note.title, listOf(note.summarizeContent))
     }
 }

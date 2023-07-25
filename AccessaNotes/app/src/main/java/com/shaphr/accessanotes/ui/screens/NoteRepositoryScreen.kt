@@ -2,6 +2,7 @@ package com.shaphr.accessanotes.ui.screens
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -23,6 +25,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -159,6 +162,24 @@ fun NoteRepositoryScreen(
                                 .fillMaxHeight()
                                 .width(1.dp))
                             Spacer(modifier = Modifier.weight(1f))
+
+                            Button(
+                                onClick = {
+                                    viewModel.downloadNote(note)
+                                    Toast.makeText(context, "File Downloaded", Toast.LENGTH_LONG).show()
+                                },
+                                modifier = Modifier.width(65.dp) // Adjust the value to the desired width
+                            ) {
+                                Icon(
+                                    painterResource(id = R.drawable.baseline_file_download_black_24dp),
+                                    contentDescription = "Download Icon"
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+//                                    Text("Download")
+                            }
+
+                            Spacer(modifier = Modifier.weight(1f))
+
                             SignInButton(
                                 text = "Share to Drive",
                                 loadingText = "Signing in...",
