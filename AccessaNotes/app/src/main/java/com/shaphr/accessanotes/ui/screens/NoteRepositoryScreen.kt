@@ -1,6 +1,7 @@
 package com.shaphr.accessanotes.ui.screens
 
 import android.content.Context
+import android.content.Intent
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
@@ -42,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -52,7 +54,6 @@ import com.google.api.client.http.FileContent
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
-import com.google.api.services.drive.model.File
 import com.shaphr.accessanotes.AuthResultContract
 import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.R
@@ -63,6 +64,7 @@ import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 
 
 //search bar at the top of the screen if time permits
@@ -234,23 +236,20 @@ fun uploadFileToGDrive(context: Context) {
     getDriveService(context)?.let { googleDriveService ->
         CoroutineScope(Dispatchers.IO).launch {
             try {
-//                val localFileDirectory = File(getExternalFilesDir("backup")!!.toURI())
-//                val localFileDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-//
-            //       val actualFile = File("${localFileDirectory}/FILE_NAME_BACKUP")
+
+                val localFileDirectory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
+                val actualFile = File("${localFileDirectory}/j.pdf")
+
+                val gFile = com.google.api.services.drive.model.File()
+                gFile.name = actualFile.name
 
 
+                val fileContent = FileContent("application/pdf", actualFile)
+                googleDriveService.Files().create(gFile, fileContent).execute()
 
-
-
-
-//                val gFile = com.google.api.services.drive.model.File()
-//                gFile.name = actualFile.name
-//                val fileContent = FileContent("text/plain", actualFile)
-//                googleDriveService.Files().create(gFile, fileContent).execute()
             } catch (exception: Exception) {
-                Log.d("Hello", "WE HAVE ERRORS")
-//                exception.printStackTrace()
+//                Log.d("Hello", "WE HAVE ERRORS")
+                exception.printStackTrace()
             }
         }
     }
