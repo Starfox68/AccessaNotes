@@ -1,6 +1,7 @@
 package com.shaphr.accessanotes.ui.screens
 
 import android.content.Context
+import android.os.Environment
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -47,15 +48,21 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import com.google.api.client.http.FileContent
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
+import com.google.api.services.drive.model.File
 import com.shaphr.accessanotes.AuthResultContract
 import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.R
+import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.components.SignInButton
 import com.shaphr.accessanotes.ui.components.TopScaffold
 import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 //search bar at the top of the screen if time permits
@@ -86,9 +93,6 @@ fun NoteRepositoryScreen(
                         text = "Drive sign in failed"
                     }else{
                         uploadFileToGDrive(context)
-//                        Log.d("HI","You're in drive with this login:")
-//                        Log.d("HI", account.email!!)
-//                        Log.d("HI", account.displayName!!)
                     }
 
                 }
@@ -102,6 +106,21 @@ fun NoteRepositoryScreen(
 
     var expanded by remember { mutableStateOf(false) }
     val docConversionTypes = arrayOf("PDF", "DOCX", "TXT")
+
+    fun downloadClick(note: Note, type: String){
+
+        viewModel.downloadNote(note)
+
+        if (type == "download"){
+            Toast.makeText(context, "File Downloaded", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        if (type == "share"){
+            authResultLauncher.launch(signInRequestCode)
+        }
+    }
+
     var selectedText by remember { mutableStateOf(docConversionTypes[0]) }
 
     TopScaffold(text = "All Notes", navController = navController) { padding ->
@@ -164,10 +183,7 @@ fun NoteRepositoryScreen(
                             Spacer(modifier = Modifier.weight(1f))
 
                             Button(
-                                onClick = {
-                                    viewModel.downloadNote(note)
-                                    Toast.makeText(context, "File Downloaded", Toast.LENGTH_LONG).show()
-                                },
+                                onClick = { downloadClick(note, "download") },
                                 modifier = Modifier.width(65.dp) // Adjust the value to the desired width
                             ) {
                                 Icon(
@@ -185,7 +201,7 @@ fun NoteRepositoryScreen(
                                 loadingText = "Signing in...",
                                 isLoading = isLoading,
                                 icon = painterResource(id = R.drawable.ic_google_logo_small),
-                                onClick = { authResultLauncher.launch(signInRequestCode) }
+                                onClick = { downloadClick(note, "share") }
                             )
                         }
                     }
@@ -215,19 +231,27 @@ private fun getDriveService(context: Context): Drive? {
 
 //reference https://www.section.io/engineering-education/backup-services-with-google-drive-api-in-android/
 fun uploadFileToGDrive(context: Context) {
-    Log.d("Hi", "Uploading file")
-//    getDriveService(context)?.let { googleDriveService ->
-//        CoroutineScope(Dispatchers.IO).launch {
-//            try {
+    getDriveService(context)?.let { googleDriveService ->
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
 //                val localFileDirectory = File(getExternalFilesDir("backup")!!.toURI())
-//                val actualFile = File("${localFileDirectory}/FILE_NAME_BACKUP")
+//                val localFileDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+//
+            //       val actualFile = File("${localFileDirectory}/FILE_NAME_BACKUP")
+
+
+
+
+
+
 //                val gFile = com.google.api.services.drive.model.File()
 //                gFile.name = actualFile.name
 //                val fileContent = FileContent("text/plain", actualFile)
 //                googleDriveService.Files().create(gFile, fileContent).execute()
-//            } catch (exception: Exception) {
+            } catch (exception: Exception) {
+                Log.d("Hello", "WE HAVE ERRORS")
 //                exception.printStackTrace()
-//            }
-//        }
-//    }
+            }
+        }
+    }
 }
