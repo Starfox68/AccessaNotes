@@ -1,9 +1,6 @@
 package com.shaphr.accessanotes.data.models
 
 import android.graphics.Bitmap
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
-import com.shaphr.accessanotes.data.database.NoteItem
 import java.time.LocalDate
 import java.util.Date
 
