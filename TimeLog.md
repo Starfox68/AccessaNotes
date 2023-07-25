@@ -82,3 +82,4 @@
 | 07/23/2023 | | | | | | 1.5 | Transcribe recording every 5 mins |
 | 07/24/2023 | | 2 | | | | | NoteImage db implementation |
 | 07/24/2023 | | | | | | 6 | FileManager Template Pattern for Importing Files |
+| 07/24/2023 | | 5 | | | | | NoteImage testing and completion |
