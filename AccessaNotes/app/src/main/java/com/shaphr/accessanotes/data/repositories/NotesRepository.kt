@@ -14,7 +14,11 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
-
+import android.graphics.Bitmap
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import android.graphics.BitmapFactory
 @Singleton
 class NotesRepository @Inject constructor(private val application: Application) {
     private val ioScope = CoroutineScope(Dispatchers.IO)
@@ -46,5 +50,28 @@ class NotesRepository @Inject constructor(private val application: Application) 
 
     fun deleteNote(note: Note) = ioScope.launch {
         dao.delete(note)
+    }
+
+    fun saveBitmapToFile(bitmap: Bitmap): String {
+        val filename = "${System.currentTimeMillis()}.jpg"
+        val file = File(application.getExternalFilesDir(null), filename)
+        var fos: FileOutputStream? = null
+        try {
+            fos = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } finally {
+            try {
+                fos?.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+        return file.absolutePath
+    }
+
+    fun loadImageFromPath(path: String): Bitmap {
+        return BitmapFactory.decodeFile(path)
     }
 }
