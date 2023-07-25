@@ -33,12 +33,6 @@
             "notNull": false
           },
           {
-            "fieldPath": "notifyAt",
-            "columnName": "notifyAt",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",

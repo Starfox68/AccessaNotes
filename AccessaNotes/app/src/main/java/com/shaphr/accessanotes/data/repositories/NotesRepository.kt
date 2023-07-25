@@ -2,16 +2,13 @@ package com.shaphr.accessanotes.data.repositories
 
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.data.database.NoteDataAccess
 import com.shaphr.accessanotes.data.database.NoteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 import android.graphics.Bitmap

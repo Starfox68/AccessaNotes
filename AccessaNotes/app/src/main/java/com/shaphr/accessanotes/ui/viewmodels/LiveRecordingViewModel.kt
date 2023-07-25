@@ -3,12 +3,15 @@ package com.shaphr.accessanotes.ui.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import com.shaphr.accessanotes.TextToSpeechClient
 import com.shaphr.accessanotes.data.repositories.LiveRecordingRepository
+import com.shaphr.accessanotes.data.repositories.NotesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LiveRecordingViewModel @Inject constructor(
     private val liveRecordingRepository: LiveRecordingRepository,
-    private val textToSpeechClient: TextToSpeechClient
+    private val textToSpeechClient: TextToSpeechClient,
+    private val notesRepository: NotesRepository
 ) : ViewModel() {
 
     private val mutableNoteText: MutableStateFlow<List<String>> = MutableStateFlow(emptyList())
@@ -36,21 +40,10 @@ class LiveRecordingViewModel @Inject constructor(
     // only initialized as an emergency default in case of failure, is  overwritten each time
     private var prompt: String = "Summarize the text"
 
-    // Track if tts currently speaking
-    var isSpeaking = false
-
     init {
         viewModelScope.launch {
-            liveRecordingRepository.summarizedNotes.collect { summarizedNote ->
-                Log.d("VIEW MODEL", summarizedNote)
-                mutableNoteText.update {
-                    it + listOf(summarizedNote)
-                }
-            }
-        }
-
-        viewModelScope.launch {
-            liveRecordingRepository.recording.collect { transcribedText ->
+            merge(liveRecordingRepository.transcriptFlow,
+                liveRecordingRepository.bareTranscriptFlow).collect { transcribedText ->
                 Log.d("VIEW MODEL", "Transcribed text: $transcribedText")
                 mutableTranscribedText.update {
                     it + listOf(transcribedText)
@@ -59,9 +52,18 @@ class LiveRecordingViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            liveRecordingRepository.summarizedNotesFlow.collect { summarizedNote ->
+                Log.d("VIEW MODEL", summarizedNote)
+                mutableNoteText.update {
+                    it + listOf(summarizedNote)
+                }
+            }
+        }
+
+        viewModelScope.launch {
             resetTranscribedText()
             resetNoteText()
-            delay(1500)
+            delay(1800) // Prevent overlap with recording started audio
             mutableStop.update {
                 true
             }
@@ -102,15 +104,32 @@ class LiveRecordingViewModel @Inject constructor(
             Log.d("VIEW MODEL", "The prompt used was: $prompt")
             liveRecordingRepository.summarizeRecording(prompt)
         }
+        viewModelScope.launch {
+            liveRecordingRepository.collectSummaries()
+        }
+        viewModelScope.launch {
+            liveRecordingRepository.collectBareTranscript()
+        }
     }
 
-    fun onTextToSpeech(text: String) {
-        if (!isSpeaking) {
-            textToSpeechClient.speak(text)
-        } else {
-            textToSpeechClient.stop()
-        }
+    fun onClose() {
+        mutableNoteText.value = emptyList()
+        mutableTranscribedText.value = emptyList()
+    }
 
-        isSpeaking = !isSpeaking
+    fun onSave(navHostController: NavHostController) {
+        val note = liveRecordingRepository.onFinish()
+        notesRepository.setNote(note)
+        onClose()
+        Log.d("TEST",  note.title + ", " + note.summarizeContent + ", " + note.date.toString() + ", " + note.id)
+        navHostController.popBackStack()
+    }
+
+    fun startTextToSpeech(text: String) {
+        textToSpeechClient.speak(text)
+    }
+
+    fun stopTextToSpeech() {
+        textToSpeechClient.stop()
     }
 }

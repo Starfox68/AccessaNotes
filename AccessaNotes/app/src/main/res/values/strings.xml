@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">AccessaNotes</string>
+    <string name="camera_screen_take_picture">Take Picture</string>
+    <string name="camera_screen_description">How would you like to incorporate this image in your notes?</string>
+    <string name="camera_screen_image">Save the image to your gallery</string>
+    <string name="camera_screen_transcription">Transcribe text in the image "</string>
+    <string name="camera_screen_summary">Summarize text in the image"</string>
+    <string name="camera_screen_finish">Finish</string>
 </resources>

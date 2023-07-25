@@ -1,6 +1,8 @@
 package com.shaphr.accessanotes
 
+import android.app.Application
 import android.graphics.Bitmap
+import android.net.Uri
 import org.apache.poi.util.Units
 import org.apache.poi.wp.usermodel.HeaderFooterType
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment
@@ -9,8 +11,24 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import dagger.hilt.android.AndroidEntryPoint
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor
+import javax.inject.Inject
 
-class FileManagerDOCX : FileManagerAbstract() {
+class FileManagerDOCX @Inject constructor(application: Application) : FileManagerAbstract() {
+    private val contentResolver = application.contentResolver
+
+    override fun getFile(uri: Uri): Any {
+        val inputStream = contentResolver.openInputStream(uri)
+        return XWPFDocument(inputStream)
+    }
+    override suspend fun readFile(file: Any): String {
+        println("Reading DOCX file...")
+        val xwpfWordExtractor = XWPFWordExtractor(file as XWPFDocument)
+        val text = xwpfWordExtractor.text
+        xwpfWordExtractor.close()
+        return text
+    }
 
     override fun createDoc(title: String, content: List<Any>): Any {
         val doc = XWPFDocument()

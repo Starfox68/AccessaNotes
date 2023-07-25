@@ -2,6 +2,12 @@ package com.shaphr.accessanotes.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import com.shaphr.accessanotes.FileManagerAbstract
+import com.shaphr.accessanotes.FileManagerDOCX
+import com.shaphr.accessanotes.FileManagerPDF
+import com.shaphr.accessanotes.FileManagerTXT
 import com.shaphr.accessanotes.TextToSpeechClient
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.data.models.UiNote
@@ -16,9 +22,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NoteRepositoryViewModel @Inject constructor(
+    application: Application,
     private val notesRepository: NotesRepository,
     private val textToSpeechClient: TextToSpeechClient
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     val notes: Flow<List<UiNote>> = notesRepository.notes
 
@@ -31,6 +38,11 @@ class NoteRepositoryViewModel @Inject constructor(
     private fun refreshNotes() = viewModelScope.launch {
         notesRepository.refreshNotes()
     }
+
+    fun setDocType(text: String) {
+        mutableDocType.value = text
+    }
+
     fun onTextToSpeech(text: String) {
         if (!isSpeaking) {
             textToSpeechClient.speak(text)
@@ -46,4 +58,28 @@ class NoteRepositoryViewModel @Inject constructor(
         }
     }
 
+    fun downloadNote(note: Note) {
+        var fileManager: FileManagerAbstract? = null
+        println("docType.value: ${docType.value}")
+        when (docType.value) {
+            "PDF" -> {
+                // use FileManagerPDF
+                fileManager = FileManagerPDF(getApplication())
+            }
+            "TXT" -> {
+                // use FileManagerTXT
+                fileManager = FileManagerTXT(getApplication())
+            }
+            "DOCX" -> {
+                // use FileManagerDOCX
+                fileManager = FileManagerDOCX(getApplication())
+            }
+        }
+        println("downloadNote: ${note.title}")
+        fileManager?.exportNote(note.title, listOf(note.summarizeContent))
+    }
+
+    fun updateNote(note: Note) {
+        notesRepository.updateNote(note)
+    }
 }
