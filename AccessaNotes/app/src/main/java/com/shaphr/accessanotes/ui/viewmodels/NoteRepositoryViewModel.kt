@@ -1,12 +1,17 @@
 package com.shaphr.accessanotes.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.shaphr.accessanotes.TextToSpeechClient
 import com.shaphr.accessanotes.data.database.Note
+import com.shaphr.accessanotes.data.models.UiNote
 import com.shaphr.accessanotes.data.repositories.NotesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -15,15 +20,16 @@ class NoteRepositoryViewModel @Inject constructor(
     private val textToSpeechClient: TextToSpeechClient
 ) : ViewModel() {
 
-    private val mutableNotes = MutableStateFlow<List<Note>>(emptyList())
-    val notes: StateFlow<List<Note>> = mutableNotes
+    val notes: Flow<List<UiNote>> = notesRepository.notes
 
-    // Track if tts currently speaking
     var isSpeaking = false
+
     init {
-        notesRepository.getNotes().observeForever { notes ->
-            mutableNotes.value = notes
-        }
+        refreshNotes()
+    }
+
+    private fun refreshNotes() = viewModelScope.launch {
+        notesRepository.refreshNotes()
     }
     fun onTextToSpeech(text: String) {
         if (!isSpeaking) {
@@ -34,7 +40,10 @@ class NoteRepositoryViewModel @Inject constructor(
 
         isSpeaking = !isSpeaking
     }
-    fun getNote(id: Int) = notes.value.firstOrNull {
-        it.id == id
+    fun getNote(id: Int): Flow<UiNote?> {
+        return notes.map { noteList ->
+            noteList.firstOrNull { it.id == id }
+        }
     }
+
 }

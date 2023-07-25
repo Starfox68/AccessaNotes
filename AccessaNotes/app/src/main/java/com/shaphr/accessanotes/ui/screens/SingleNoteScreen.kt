@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,12 +30,19 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.shaphr.accessanotes.data.models.UiNote
 import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
 
 @Composable
 fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewModel()) {
-    val note = viewModel.getNote(noteID)
+    val note = remember { mutableStateOf<UiNote?>(null) }
     var ttsButtonText by remember { mutableStateOf("Read Notes") }
+
+    LaunchedEffect(noteID) {
+        viewModel.getNote(noteID).collect { value ->
+            note.value = value
+        }
+    }
 
     Column(Modifier.fillMaxSize()) {
         val config = LocalConfiguration
@@ -55,7 +63,7 @@ fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewM
             )
             //Text
             Text(
-                text = note?.title ?: "default",
+                text = note.value?.title ?: "default",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .padding(16.dp)
@@ -82,7 +90,7 @@ fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewM
                 .background(Color.White)
         ) {
             Text(
-                text = note?.content ?: "default",
+                text = note.value?.content ?: "default",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .padding(top = 16.dp, start = 16.dp, end = 16.dp)
@@ -92,7 +100,7 @@ fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewM
 
             Button(
                 onClick = {
-                    viewModel.onTextToSpeech(note?.content ?: "default")
+                    viewModel.onTextToSpeech(note.value?.content ?: "default")
                     ttsButtonText = if (viewModel.isSpeaking) {
                         "Stop Reading"
                     } else {
