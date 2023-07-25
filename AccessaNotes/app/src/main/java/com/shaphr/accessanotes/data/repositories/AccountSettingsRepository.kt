@@ -9,10 +9,11 @@ import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AccountSettingsRepository(@ApplicationContext private val context: Context) {
+class AccountSettingsRepository @Inject constructor(@ApplicationContext private val context: Context) {
 
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -34,7 +35,7 @@ class AccountSettingsRepository(@ApplicationContext private val context: Context
         context.dataStore.edit { settings ->
             settings[COLOUR_BLIND] = isColourBlind
         }
-    })
+    }
 
     companion object {
         val LARGE_FONT = booleanPreferencesKey("font")
