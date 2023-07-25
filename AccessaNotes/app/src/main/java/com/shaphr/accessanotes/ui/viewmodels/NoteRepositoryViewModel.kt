@@ -77,7 +77,7 @@ class NoteRepositoryViewModel @Inject constructor(
         fileManager?.exportNote(note.title, listOf(note.summarizeContent))
     }
 
-    fun updateNote(noteID: Int, newContent: String) {
-        // TODO: implement the database update here
+    fun updateNote(note: Note) {
+        notesRepository.updateNote(note)
     }
 }

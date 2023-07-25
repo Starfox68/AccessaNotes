@@ -97,7 +97,7 @@ fun SingleNoteScreen(noteID: Int, navController: NavHostController, viewModel: N
                 value = note?.summarizeContent ?: "",
                 onValueChange = { newValue ->
                     note?.summarizeContent = newValue
-                    viewModel.updateNote(noteID, newValue)
+                    viewModel.updateNote(note!!)
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 modifier = Modifier
