@@ -1,13 +1,16 @@
 package com.shaphr.accessanotes.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -30,11 +33,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
 
 @Composable
-fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewModel()) {
+fun SingleNoteScreen(noteID: Int, navController: NavHostController, viewModel: NoteRepositoryViewModel = hiltViewModel()) {
     val note = viewModel.getNote(noteID).collectAsState(initial = Note()).value
     var ttsButtonText by remember { mutableStateOf("Read Notes") }
 
@@ -50,10 +55,12 @@ fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewM
         ) {
             // Back button
             Icon(
-                Icons.Default.ArrowBack,
+                imageVector = Icons.Default.ArrowBack,
                 contentDescription = "Back",
                 tint = Color.Black,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .padding(16.dp)
+                    .clickable { navController.popBackStack() }
             )
             //Text
             Text(
@@ -113,5 +120,5 @@ fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewM
 @Preview
 @Composable
 fun SingleNoteScreenPreview() {
-    SingleNoteScreen(1)
+    SingleNoteScreen(1, navController = rememberNavController())
 }

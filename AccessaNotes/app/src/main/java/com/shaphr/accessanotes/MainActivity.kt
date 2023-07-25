@@ -116,7 +116,7 @@ fun NavigationAppHost(navController: NavHostController) {
             //get noteID from within the route
             val noteID = navBackStackEntry.arguments?.getString("noteID")?.toInt()
             if (noteID != null) {
-                SingleNoteScreen(noteID)
+                SingleNoteScreen(noteID, navController)
             }
         }
         composable(Destination.CameraScreen.route) { CameraScreen(navController) }
