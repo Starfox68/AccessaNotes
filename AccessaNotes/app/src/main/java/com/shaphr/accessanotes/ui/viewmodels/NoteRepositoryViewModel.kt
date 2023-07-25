@@ -1,5 +1,6 @@
 package com.shaphr.accessanotes.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.shaphr.accessanotes.TextToSpeechClient
 import com.shaphr.accessanotes.data.database.Note
@@ -19,6 +20,9 @@ class NoteRepositoryViewModel @Inject constructor(
     private val mutableNotes = MutableStateFlow<List<Note>>(emptyList())
     val notes: StateFlow<List<Note>> = mutableNotes
 
+    private val mutableDocType: MutableStateFlow<String> = MutableStateFlow("PDF")
+    val docType: StateFlow<String> = mutableDocType
+
     // Track if tts currently speaking
     var isSpeaking = false
     init {
@@ -26,6 +30,11 @@ class NoteRepositoryViewModel @Inject constructor(
             mutableNotes.value = notes
         }
     }
+
+    fun setDocType(text: String) {
+        mutableDocType.value = text
+    }
+
     fun onTextToSpeech(text: String) {
         if (!isSpeaking) {
             textToSpeechClient.speak(text)
