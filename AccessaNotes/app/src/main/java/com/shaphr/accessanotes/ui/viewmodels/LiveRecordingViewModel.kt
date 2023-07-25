@@ -40,9 +40,6 @@ class LiveRecordingViewModel @Inject constructor(
     // only initialized as an emergency default in case of failure, is  overwritten each time
     private var prompt: String = "Summarize the text"
 
-    // Track if tts currently speaking
-    var isSpeaking = false
-
     init {
         viewModelScope.launch {
             merge(liveRecordingRepository.transcriptFlow,
@@ -66,7 +63,7 @@ class LiveRecordingViewModel @Inject constructor(
         viewModelScope.launch {
             resetTranscribedText()
             resetNoteText()
-            delay(1500)
+            delay(1800)
             mutableStop.update {
                 true
             }
@@ -128,13 +125,11 @@ class LiveRecordingViewModel @Inject constructor(
         navHostController.popBackStack()
     }
 
-    fun onTextToSpeech(text: String) {
-        if (!isSpeaking) {
-            textToSpeechClient.speak(text)
-        } else {
-            textToSpeechClient.stop()
-        }
+    fun startTextToSpeech(text: String) {
+        textToSpeechClient.speak(text)
+    }
 
-        isSpeaking = !isSpeaking
+    fun stopTextToSpeech() {
+        textToSpeechClient.stop()
     }
 }
