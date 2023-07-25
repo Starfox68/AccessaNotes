@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +31,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -63,8 +65,8 @@ fun LiveRecordingScreen(
         navController = navController,
         transcribedText = transcribedText,
         summarizedContent = summarizedContent,
-        isSpeaking = viewModel.isSpeaking,
-        onTextToSpeechClick = viewModel::onTextToSpeech,
+        startTextToSpeech = viewModel::startTextToSpeech,
+        stopTextToSpeech = viewModel::stopTextToSpeech,
         onStopClick = viewModel::stopRecording,
         onSaveClick = { viewModel.onSave(navController) },
         canStop = canStop,
@@ -81,8 +83,8 @@ fun LiveRecordingScreenContent(
     navController: NavHostController,
     transcribedText: List<String>,
     summarizedContent: List<String>,
-    isSpeaking: Boolean,
-    onTextToSpeechClick: (String) -> Unit,
+    startTextToSpeech: (String) -> Unit,
+    stopTextToSpeech: () -> Unit,
     onStopClick: () -> Unit,
     onSaveClick: () -> Unit,
     canStop: Boolean,
@@ -92,6 +94,7 @@ fun LiveRecordingScreenContent(
     onCameraClick: () -> Unit,
 ) {
     var ttsButtonText by remember { mutableStateOf("Read Summarized Notes") }
+    var isSpeaking = false
     val config = LocalConfiguration
 
 
@@ -158,21 +161,25 @@ fun LiveRecordingScreenContent(
                         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
                         Text(text = "Stop Recording")
                     }
-                    OutlinedButton(enabled = canListen, onClick = {
-                        onTextToSpeechClick(summarizedContent.joinToString(separator = ""))
-                        ttsButtonText =
-                            if (isSpeaking) {
-                                "Stop Reading"
+                    OutlinedButton(
+                        enabled = canListen,
+                        modifier = Modifier.width(230.dp),
+                        onClick = {
+                            ttsButtonText = if (!isSpeaking) {
+                                startTextToSpeech(summarizedContent.joinToString(separator = ""))
+                                "Stop Reading Notes    "
                             } else {
+                                stopTextToSpeech()
                                 "Read Summarized Notes"
                             }
-                    }) {
+                            isSpeaking = !isSpeaking
+                        }) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.read_text_icon),
                             contentDescription = "Voice Icon",
                             modifier = Modifier.size(ButtonDefaults.IconSize)
                         )
-                        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing).weight(1F))
                         Text(text = ttsButtonText)
                     }
                 }
@@ -184,6 +191,7 @@ fun LiveRecordingScreenContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         OutlinedButton(onClick = {
+                            stopTextToSpeech()
                             navController.navigate(Destination.SessionStartAndEndScreen.route)
                         }) {
                             Text(text = "Discard")
@@ -191,7 +199,10 @@ fun LiveRecordingScreenContent(
 
                         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
 
-                        OutlinedButton(enabled = !canStop, onClick = onSaveClick) {
+                        OutlinedButton(enabled = !canStop, onClick = {
+                            stopTextToSpeech()
+                            onSaveClick()
+                        }) {
                             Text(text = "Save")
                         }
                     }
@@ -220,9 +231,9 @@ fun LiveRecordingScreenPreview() {
             "Duis malesuada facilisis lorem, eget cursus massa fermentum at.",
             "Morbi efficitur aliquam molestie."
         ),
-        onTextToSpeechClick = { },
+        startTextToSpeech = { },
+        stopTextToSpeech = { },
         onStopClick = { },
-        isSpeaking = false,
         onSaveClick = { },
         canStop = true,
         canListen = false,

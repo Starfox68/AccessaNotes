@@ -70,13 +70,15 @@ class FileManagerPDF : FileManagerAbstract() {
         canvas.translate(1F * margins, 1.5F * margins + titlePaint.textSize)
         var curHeight = 1.5F * margins + titlePaint.textSize
         content.forEach {
-            var height = imageHeight
+            var height = 0F
             var layout: StaticLayout? = null
             if (it is String) {
                 layout = StaticLayout.Builder.obtain(
                     it, 0, it.length, bodyPaint, pageWidth - 2 * margins
                 ).setLineSpacing(2F, 1F).build()
                 height = layout.height.toFloat()
+            } else if (it is Bitmap) {
+                height = imageHeight
             }
 
             if (curHeight + height >= pageHeight - 2 * margins) {
