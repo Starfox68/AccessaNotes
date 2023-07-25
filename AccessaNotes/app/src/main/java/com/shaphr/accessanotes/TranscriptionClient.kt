@@ -4,8 +4,12 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -28,6 +32,7 @@ class TranscriptionClient @Inject constructor(
     private val filePath: String by lazy {
         context.getExternalFilesDir(null)?.absolutePath + "/transcript_recording.mp3"
     }
+    private var recordingJob: Job? = null
 
     fun startRecording() {
         println("Starting recording...")
@@ -40,6 +45,13 @@ class TranscriptionClient @Inject constructor(
             prepare()
             start()
         }
+
+        recordingJob = CoroutineScope(Dispatchers.IO).launch {
+            delay(300000) // 5 minutes
+            stopRecording()
+            // Restart recording
+            startRecording()
+        }
     }
 
     suspend fun stopRecording() {
@@ -50,6 +62,7 @@ class TranscriptionClient @Inject constructor(
             release()
         }
         callWhisper()
+        recordingJob?.cancel()
     }
 
     private suspend fun callWhisper() {
