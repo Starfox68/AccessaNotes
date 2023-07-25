@@ -5,21 +5,22 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,6 +40,7 @@ import androidx.navigation.compose.rememberNavController
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SingleNoteScreen(noteID: Int, navController: NavHostController, viewModel: NoteRepositoryViewModel = hiltViewModel()) {
     val note = viewModel.getNote(noteID).collectAsState(initial = Note()).value
@@ -90,13 +93,17 @@ fun SingleNoteScreen(noteID: Int, navController: NavHostController, viewModel: N
                 .weight(1f)
                 .background(Color.White)
         ) {
-            Text(
-                text = note?.summarizeContent ?: "default",
-                style = MaterialTheme.typography.bodyMedium,
+            TextField(
+                value = note?.summarizeContent ?: "",
+                onValueChange = { newValue ->
+                    note?.summarizeContent = newValue
+                    viewModel.updateNote(noteID, newValue)
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 modifier = Modifier
                     .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                     .height((config.current.screenHeightDp * 0.82).dp)
-
+                    .fillMaxWidth()
             )
 
             Button(

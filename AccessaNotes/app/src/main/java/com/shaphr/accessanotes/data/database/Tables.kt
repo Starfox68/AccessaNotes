@@ -15,7 +15,7 @@ import androidx.room.TypeConverter
 
 data class Note(
     @ColumnInfo(name = "title") val title: String = "",
-    @ColumnInfo(name = "summarize_note") val summarizeContent: String = "",
+    @ColumnInfo(name = "summarize_note") var summarizeContent: String = "",
     @ColumnInfo(name = "transcript") val transcript: String = "",
     @ColumnInfo(name = "date") val date: LocalDate? = null,
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
