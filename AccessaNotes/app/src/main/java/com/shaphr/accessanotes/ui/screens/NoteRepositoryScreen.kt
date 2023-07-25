@@ -20,9 +20,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -51,6 +57,7 @@ import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.ui.components.BottomNavBar
 import com.shaphr.accessanotes.ui.components.SignInButton
 import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
+import kotlin.math.exp
 
 
 //search bar at the top of the screen if time permits
@@ -95,14 +102,49 @@ fun NoteRepositoryScreen(
     val notes = viewModel.notes.collectAsState().value
     var isLoading by remember { mutableStateOf(false) }
 
+    var expanded by remember { mutableStateOf(false) }
+    val docConversionTypes = arrayOf("PDF", "DOCX", "TXT")
+    var selectedText by remember { mutableStateOf(docConversionTypes[0]) }
+
     Scaffold (
         topBar = {
-            Row(modifier = Modifier.fillMaxWidth().padding(0.dp,40.dp,0.dp,30.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center ) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(0.dp, 40.dp, 0.dp, 30.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center ) {
                 Text(text="All Notes", fontSize = 40.sp, maxLines = 1)
             }
                  },
         content = { padding ->
             LazyColumn(modifier = Modifier.padding(padding)) {
+                item{
+                    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = {expanded = !expanded } ) {
+                        TextField(
+                            value = selectedText,
+//                            onValueChange = {viewModel.setDocType(selectedText)},
+                            onValueChange = { },
+                            readOnly = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            modifier = Modifier.menuAnchor()
+                        )
+
+                        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                            docConversionTypes.forEach { docType ->
+                                DropdownMenuItem(
+                                    text = { Text(docType) },
+                                    onClick = {
+                                        viewModel.setDocType(docType)
+                                        selectedText = docType
+                                        expanded = false
+
+                                    }
+                                )
+
+                            }
+
+                        }
+
+                    }
+                }
                 notes.forEach { note ->
                     item(note.id) {
                         val paddingModifier = Modifier
