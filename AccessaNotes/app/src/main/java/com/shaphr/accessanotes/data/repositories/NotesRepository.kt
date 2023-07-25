@@ -19,6 +19,12 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import android.graphics.BitmapFactory
+import com.shaphr.accessanotes.data.database.NoteItem
+import com.shaphr.accessanotes.data.models.UiNote
+import com.shaphr.accessanotes.data.models.UiNoteItem
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
 @Singleton
 class NotesRepository @Inject constructor(private val application: Application) {
     private val ioScope = CoroutineScope(Dispatchers.IO)
@@ -27,32 +33,68 @@ class NotesRepository @Inject constructor(private val application: Application) 
         // initiate database access
         dao = NoteDatabase.getDatabase(application).getNoteDataAccess()
     }
-    fun getNotes(): LiveData<List<Note>> {
-        // TODO - create a source + local database to store notes locally
-//        val notes = listOf(
-//            Note("Test Note 1", "Test Content!", LocalDate.now()),
-//            Note("Test Note 2", "This is a test note. I am writing a bunch of text here so that when we do our demonstration you guys have something to look at. I am trying to make it seem like there's a lot of text here but if you look too closely you will see that I'm actually repeating myself. I actually feel like I do that quite a bit anyway, but I'm just happy to be here", LocalDate.now()),
-//            Note("Test Note 3", "Test Content!", LocalDate.now())
-//        )
-//        for (note in notes) {
-//            setNote(note)
-//        }
-        return dao.getNotes()
+
+    private val _notes = MutableStateFlow<List<UiNote>>(emptyList())
+    val notes: StateFlow<List<UiNote>> = _notes
+    init {
+        ioScope.launch {
+            dao.getNotes().collect { notes ->
+                _notes.value = notes.map { note ->
+                    val uiNoteItems = mutableListOf<UiNoteItem>()
+                    dao.getNoteItems(note.id).collect { noteItems ->
+                        uiNoteItems.addAll(noteItems.map { noteItem ->
+                            val bitmap = if (noteItem.imageTrue) loadImageFromPath(noteItem.imagePath ?: "") else null
+                            UiNoteItem(noteItem.id, noteItem.noteId, noteItem.imageTrue, noteItem.content, bitmap, noteItem.itemOrder)
+                        })
+                    }
+                    UiNote(note.title, note.content, note.transcript, note.date, note.notifyAt, note.id, uiNoteItems)
+                }
+            }
+        }
     }
 
-    fun setNote(note: Note) = ioScope.launch {
-        dao.insert(note)
+    suspend fun refreshNotes() {
+        dao.getNotes().collect { notes ->
+            _notes.value = notes.map { note ->
+                val uiNoteItems = mutableListOf<UiNoteItem>()
+                dao.getNoteItems(note.id).collect { noteItems ->
+                    uiNoteItems.addAll(noteItems.map { noteItem ->
+                        val bitmap = if (noteItem.imageTrue) loadImageFromPath(noteItem.imagePath ?: "") else null
+                        UiNoteItem(noteItem.id, noteItem.noteId, noteItem.imageTrue, noteItem.content, bitmap, noteItem.itemOrder)
+                    })
+                }
+                UiNote(note.title, note.content, note.transcript, note.date, note.notifyAt, note.id, uiNoteItems)
+            }
+        }
     }
 
-    fun updateNote(note: Note) = ioScope.launch {
+
+    fun setNote(uiNote: UiNote) = ioScope.launch {
+        val note = Note(uiNote.title, uiNote.content, uiNote.transcript, uiNote.date, uiNote.notifyAt, uiNote.id)
+        val noteId = dao.insert(note).toInt()
+        uiNote.items?.forEach { uiNoteItem ->
+            val imagePath = if (uiNoteItem.imageTrue) saveBitmapToFile(uiNoteItem.bitmap!!) else null
+            val noteItem = NoteItem(uiNoteItem.id, noteId, uiNoteItem.imageTrue, uiNoteItem.content, imagePath, uiNoteItem.order)
+            dao.insertNoteItem(noteItem)
+        }
+    }
+
+    fun updateNote(uiNote: UiNote) = ioScope.launch {
+        val note = Note(uiNote.title, uiNote.content, uiNote.transcript, uiNote.date, uiNote.notifyAt, uiNote.id)
         dao.update(note)
+        uiNote.items?.forEach { uiNoteItem ->
+            val imagePath = if (uiNoteItem.imageTrue) saveBitmapToFile(uiNoteItem.bitmap!!) else null
+            val noteItem = NoteItem(uiNoteItem.id, uiNote.id, uiNoteItem.imageTrue, uiNoteItem.content, imagePath, uiNoteItem.order)
+            dao.updateNoteItem(noteItem)
+        }
     }
 
-    fun deleteNote(note: Note) = ioScope.launch {
+    fun deleteNote(uiNote: UiNote) = ioScope.launch {
+        val note = Note(uiNote.title, uiNote.content, uiNote.transcript, uiNote.date, uiNote.notifyAt, uiNote.id)
         dao.delete(note)
     }
 
-    fun saveBitmapToFile(bitmap: Bitmap): String {
+    private fun saveBitmapToFile(bitmap: Bitmap): String {
         val filename = "${System.currentTimeMillis()}.jpg"
         val file = File(application.getExternalFilesDir(null), filename)
         var fos: FileOutputStream? = null
@@ -71,7 +113,7 @@ class NotesRepository @Inject constructor(private val application: Application) 
         return file.absolutePath
     }
 
-    fun loadImageFromPath(path: String): Bitmap {
+    private fun loadImageFromPath(path: String): Bitmap {
         return BitmapFactory.decodeFile(path)
     }
 }
