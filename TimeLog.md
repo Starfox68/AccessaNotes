@@ -76,7 +76,7 @@
 | 07/23/2023 | | 1 | | | | | Note with image storing capability |
 | 07/24/2023 | 2 |  2 | 2 | 2 |2 | 2 | Team sync |
 | 07/24/2023 | | | | | 1 | | TTS UI-Related Fixes and Improvements |
-| 07/24/2023 | | | | | 5 | | google drive file upload + dropdown |
+| 07/24/2023 | | | | 5 | | | google drive file upload + dropdown |
 | 07/23/2023 | | | | | | 1.5 | Make Single Note Screen Editable |
 | 07/23/2023 | | | | | | 1.5 | Support File Download Option |
 | 07/23/2023 | | | | | | 1.5 | Transcribe recording every 5 mins |
