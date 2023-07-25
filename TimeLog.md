@@ -78,9 +78,10 @@
 | 07/24/2023 | 2 |  2 | 2 | 2 |2 | 2 | Team sync |
 | 07/24/2023 | | | | | 1 | | TTS UI-Related Fixes and Improvements |
 | 07/24/2023 | | | | 5 | | | google drive file upload + dropdown |
-| 07/23/2023 | | | | | | 1.5 | Make Single Note Screen Editable |
-| 07/23/2023 | | | | | | 1.5 | Support File Download Option |
-| 07/23/2023 | | | | | | 1.5 | Transcribe recording every 5 mins |
+| 07/24/2023 | | | | | | 1.5 | Make Single Note Screen Editable |
+| 07/24/2023 | | | | | | 1.5 | Support File Download Option |
+| 07/24/2023 | | | | | | 1.5 | Transcribe recording every 5 mins |
 | 07/24/2023 | | 2 | | | | | NoteImage db implementation |
 | 07/24/2023 | | | | | | 6 | FileManager Template Pattern for Importing Files |
 | 07/24/2023 | | 5 | | | | | NoteImage testing and completion |
+| 07/25/2023 | | | | | 0.5 | | D6 Outline |
