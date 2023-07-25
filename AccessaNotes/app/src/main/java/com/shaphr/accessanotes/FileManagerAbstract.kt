@@ -1,6 +1,7 @@
 package com.shaphr.accessanotes
 
 import android.os.Environment
+import android.net.Uri
 
 
 abstract class FileManagerAbstract {
@@ -14,10 +15,18 @@ abstract class FileManagerAbstract {
     protected val imageWidth = 300F
     protected val imageHeight = 100F
 
+    suspend fun importFile(uri: Uri): String {
+       return readFile(getFile(uri))
+    }
+
     fun exportNote(title: String, content: List<Any>) {
         val doc = createDoc(title, content)
         writeDoc(title, doc)
     }
+
+    // abstract functions for importing a file
+    protected abstract fun getFile(uri: Uri): Any
+    protected abstract suspend fun readFile(file: Any): String
 
     // Content must be list of strings/bitmap images
     protected abstract fun createDoc(title: String, content: List<Any>): Any

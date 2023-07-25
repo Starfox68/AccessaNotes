@@ -28,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +45,7 @@ import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.ui.components.TopScaffold
 import com.shaphr.accessanotes.ui.viewmodels.StartAndEndScreenViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun SessionStartAndEndScreen(navController: NavHostController, viewModel: StartAndEndScreenViewModel = hiltViewModel()) {
@@ -174,10 +176,14 @@ fun SessionStartScreen(
 fun ShowUploadButton(viewModel: StartAndEndScreenViewModel) {
     val context = LocalContext.current
     var selectedUri by remember { mutableStateOf<Uri?>(null) }
+    val coroutineScope = rememberCoroutineScope()
 
     val rememberLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
-            viewModel.getFileContext(it)
+            // Launch a new coroutine to call getFileContext
+            coroutineScope.launch {
+                viewModel.getFileContext(it)
+            }
             selectedUri = it
         }
     }

@@ -4,6 +4,10 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.shaphr.accessanotes.FileManagerAbstract
+import com.shaphr.accessanotes.FileManagerDOCX
+import com.shaphr.accessanotes.FileManagerPDF
+import com.shaphr.accessanotes.FileManagerTXT
 import com.shaphr.accessanotes.data.repositories.LiveRecordingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -18,8 +22,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.apache.poi.xwpf.extractor.XWPFWordExtractor
-import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.json.JSONObject
 import java.io.File
 import java.time.LocalDate
@@ -52,146 +54,26 @@ class StartAndEndScreenViewModel @Inject constructor(
         }
     }
 
-    fun getFileContext(uri: Uri) {
+    suspend fun getFileContext(uri: Uri) {
         val mimeType = getApplication<Application>().contentResolver.getType(uri)
-        val inputStream = getApplication<Application>().contentResolver.openInputStream(uri)
+        var fileManager: FileManagerAbstract? = null
 
         when (mimeType) {
-            "text/plain" -> {
-                // read from .txt file
-                println("Reading text file...")
-                val text = inputStream?.bufferedReader()?.use { it.readText() }
-                if (text != null) {
-                    mutableFileText.value = text
-                }
+            "text/plain" -> {  // read from .txt file
+                fileManager = FileManagerTXT(getApplication())
             }
-            "application/pdf" -> {
-                // read from .pdf file
-                println("Reading PDF file...")
-                val file = getFileFromUri(uri)
-                if (file != null) {
-                    uploadPdfFile(file)
-                } else {
-                    println("Error: Invalid PDF file")
-                }
+            "application/pdf" -> {  // read from .pdf file
+                fileManager = FileManagerPDF(getApplication())
             }
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> {
-                // read from .docx file
-                println("Reading DOCX file...")
-                val docx = XWPFDocument(inputStream)
-                val xwpfWordExtractor = XWPFWordExtractor(docx)
-                val text = xwpfWordExtractor.text
-                mutableFileText.value = text
-                xwpfWordExtractor.close()
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> {  // read from .docx file
+                fileManager = FileManagerDOCX(getApplication())
             } else -> {
                 println("Error: Invalid file type")
             }
         }
-    }
 
-    private fun getFileFromUri(uri: Uri): File? {
-        val context = getApplication<Application>()
-        val file = File(context.cacheDir, "temp_file.pdf")
-
-        try {
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                file.outputStream().use { outputStream ->
-                    inputStream.copyTo(outputStream)
-                }
-            }
-            return file
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        return null
-    }
-
-    fun uploadPdfFile(file: File) {
-        println("Uploading PDF file...")
-        val url = "https://api.pdf.co/v1/file/upload"
-        val apiKey = "mhmohebbi@gmail.com_17073ef6740486dd9a58fdfcb2d377ab6e07bc45894b6e3d167526053d91031133df7b3b"
-
-        GlobalScope.launch {
-            try {
-                val requestBody = MultipartBody.Builder()
-                    .setType(MultipartBody.FORM)
-                    .addFormDataPart(
-                        "file",
-                        file.name,
-                        file.asRequestBody("application/pdf".toMediaType())
-                    )
-                    .build()
-
-                val request = Request.Builder()
-                    .url(url)
-                    .header("x-api-key", apiKey)
-                    .post(requestBody)
-                    .build()
-
-                val client = OkHttpClient()
-                val response = withContext(Dispatchers.IO) {
-                    client.newCall(request).execute()
-                }
-
-                if (response.isSuccessful) {
-                    val responseBody = response.body?.string()
-                    val jsonResponse = responseBody?.let { JSONObject(it) }
-                    val fileUrl = jsonResponse?.getString("url")
-                    // Call getPDFText function with the extracted URL
-                    if (fileUrl != null) {
-                        getPDFText(fileUrl)
-                    }
-                } else {
-                    // Handle the error
-                    println("Error from response: ${response.code} ${response.message}")
-                }
-            } catch (e: Exception) {
-                // Handle the exception
-                println("Error: ${e.message}")
-            }
-        }
-    }
-
-    fun getPDFText(url: String) {
-        val apiUrl = "https://api.pdf.co/v1/pdf/convert/to/text-simple"
-        val apiKey = "mhmohebbi@gmail.com_17073ef6740486dd9a58fdfcb2d377ab6e07bc45894b6e3d167526053d91031133df7b3b"
-
-        GlobalScope.launch {
-            try {
-                val requestBody = JSONObject().apply {
-                    put("url", url)
-                    put("inline", true)
-                    put("async", false)
-                }
-
-                val request = Request.Builder()
-                    .url(apiUrl)
-                    .header("Content-Type", "application/json")
-                    .header("x-api-key", apiKey)
-                    .post(requestBody.toString().toRequestBody("application/json".toMediaType()))
-                    .build()
-
-                val client = OkHttpClient()
-                val response = withContext(Dispatchers.IO) {
-                    client.newCall(request).execute()
-                }
-
-                if (response.isSuccessful) {
-                    val responseBody = response.body?.string()
-                    val jsonResponse = responseBody?.let { JSONObject(it) }
-                    val text = jsonResponse?.getString("body")
-                    if (text != null) {
-                        mutableFileText.value = text
-                    }
-                } else {
-                    // Handle the error
-                    println("Error: ${response.code} ${response.message}")
-                }
-            } catch (e: Exception) {
-                // Handle the exception
-                println("Error: ${e.message}")
-            }
+        if (fileManager != null) {
+            mutableFileText.value = fileManager.importFile(uri)
         }
     }
 

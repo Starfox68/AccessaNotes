@@ -1,6 +1,7 @@
 package com.shaphr.accessanotes.ui.viewmodels
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import com.shaphr.accessanotes.FileManagerAbstract
 import com.shaphr.accessanotes.FileManagerDOCX
 import com.shaphr.accessanotes.FileManagerPDF
@@ -16,9 +17,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NoteRepositoryViewModel @Inject constructor(
+    application: Application,
     private val notesRepository: NotesRepository,
     private val textToSpeechClient: TextToSpeechClient
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     private val mutableNotes = MutableStateFlow<List<Note>>(emptyList())
     val notes: StateFlow<List<Note>> = mutableNotes
@@ -56,20 +58,22 @@ class NoteRepositoryViewModel @Inject constructor(
 
     fun downloadNote(note: Note) {
         var fileManager: FileManagerAbstract? = null
+        println("docType.value: ${docType.value}")
         when (docType.value) {
             "PDF" -> {
                 // use FileManagerPDF
-                fileManager = FileManagerPDF()
+                fileManager = FileManagerPDF(getApplication())
             }
             "TXT" -> {
                 // use FileManagerTXT
-                fileManager = FileManagerTXT()
+                fileManager = FileManagerTXT(getApplication())
             }
             "DOCX" -> {
                 // use FileManagerDOCX
-                fileManager = FileManagerDOCX()
+                fileManager = FileManagerDOCX(getApplication())
             }
         }
+        println("downloadNote: ${note.title}")
         fileManager?.exportNote(note.title, listOf(note.summarizeContent))
     }
 
