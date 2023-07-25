@@ -76,3 +76,4 @@
 | 07/23/2023 | | | | 5 | | | Fixed google sign-in + started google drive |
 | 07/24/2023 | 2 |  2 | 2 | 2 |2 | 2 | Team sync |
 | 07/24/2023 | | | | | 1 | | TTS UI-Related Fixes and Improvements |
+| 07/24/2023 | | | | | 5 | | google drive file upload + dropdown |
