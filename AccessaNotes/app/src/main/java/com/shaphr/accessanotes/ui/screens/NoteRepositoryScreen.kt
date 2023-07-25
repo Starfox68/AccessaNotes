@@ -4,33 +4,25 @@ import android.content.Context
 import android.content.Intent
 import android.os.Environment
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -56,7 +48,6 @@ import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 import com.shaphr.accessanotes.AuthResultContract
-import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.components.SignInButton
@@ -79,12 +70,124 @@ fun NoteRepositoryScreen(
     navController: NavHostController,
     viewModel: NoteRepositoryViewModel = hiltViewModel(),
 ) {
+    val notes = viewModel.notes.collectAsState().value
+    var isLoading by remember { mutableStateOf(false) }
+
+    var expanded by remember { mutableStateOf(false) }
+    val docConversionTypes = arrayOf("PDF", "DOCX", "TXT")
+    var selectedText by remember { mutableStateOf(docConversionTypes[0]) }
+
+    val selectedNotes = viewModel.selectedNotes.collectAsState().value
+
+    TopScaffold(text = "All Notes", navController = navController) { padding ->
+        LazyColumn(modifier = Modifier.padding(padding)) {
+//            item{
+//                ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = {expanded = !expanded } ) {
+//                    TextField(
+//                        value = selectedText,
+////                        onValueChange = {viewModel.setDocType(selectedText)},
+//                        onValueChange = { },
+//                        textStyle = MaterialTheme.typography.bodyMedium,
+//                        readOnly = true,
+//                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+//                        modifier = Modifier.menuAnchor()
+//                    )
+//
+//                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+//                        docConversionTypes.forEach { docType ->
+//                            DropdownMenuItem(
+//                                text = { Text(docType, style = MaterialTheme.typography.labelMedium) },
+//                                onClick = {
+//                                    viewModel.setDocType(docType)
+//                                    selectedText = docType
+//                                    expanded = false
+//
+//                                }
+//                            )
+//
+//                        }
+//
+//                    }
+//
+//                }
+//            }
+            notes.forEach { note ->
+                item(note.id) {
+                    NoteCard (
+                        note = note,
+                        isSelected = note.id in selectedNotes,
+                        onSelect = viewModel::onNoteSelect
+                    )
+                }
+//                    val paddingModifier = Modifier
+//                        .padding(10.dp)
+//                        .fillMaxWidth()
+//                        .defaultMinSize(20.dp, 50.dp)
+//                        .height(IntrinsicSize.Min)
+//                        .clickable {
+//                            Log.d("TEST", "id is ${note.id}")
+//                            navController.navigate(
+//                                Destination.SingleNoteScreen.createRoute(
+//                                    note.id
+//                                )
+//                            )
+//                        }
+//                    Card(shape = RoundedCornerShape(5.dp), modifier = paddingModifier, elevation = CardDefaults.cardElevation(4.dp)) {
+//                        Row(verticalAlignment = Alignment.CenterVertically) {
+//                            Column(modifier = Modifier.padding(10.dp,0.dp,0.dp,0.dp)) {
+//                                Text(note.title, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+//                                Text(note.date.toString(), style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+//                            }
+//                            Spacer(modifier = Modifier.width(25.dp))
+//                            Divider(modifier = Modifier
+//                                .fillMaxHeight()
+//                                .width(1.dp))
+//                            Spacer(modifier = Modifier.weight(1f))
+//
+//                            Button(
+//                                onClick = {
+//                                    viewModel.downloadNote(note)
+//                                    Toast.makeText(context, "File Downloaded", Toast.LENGTH_LONG).show()
+//                                },
+//                                modifier = Modifier.width(65.dp) // Adjust the value to the desired width
+//                            ) {
+//                                Icon(
+//                                    painterResource(id = R.drawable.baseline_file_download_black_24dp),
+//                                    contentDescription = "Download Icon"
+//                                )
+//                                Spacer(modifier = Modifier.width(6.dp))
+////                                    Text("Download")
+//                            }
+//
+//                            Spacer(modifier = Modifier.weight(1f))
+//
+//                            SignInButton(
+//                                text = "Share to Drive",
+//                                loadingText = "Signing in...",
+//                                isLoading = isLoading,
+//                                icon = painterResource(id = R.drawable.ic_google_logo_small),
+//                                onClick = { authResultLauncher.launch(signInRequestCode) }
+//                            )
+//                        }
+//                    }
+//                }
+            }
+        }
+    }
+}
+
+@Composable
+fun OptionRow(
+    onDownloadClick: () -> Unit,
+    isLoading: Boolean,
+) {
     val context = LocalContext.current
+
+    var text by remember { mutableStateOf<String?>(null) }
 
     val signInRequestCode = 1
 
     var noteToRemember: Note = Note("filler")
-
 
     val authResultLauncher =
         rememberLauncherForActivityResult(contract = AuthResultContract()) { task ->
@@ -105,99 +208,55 @@ fun NoteRepositoryScreen(
             }
         }
 
-    val notes = viewModel.notes.collectAsState().value
-    val isLoading by remember { mutableStateOf(false) }
+    Row {
+        IconButton(onClick = onDownloadClick, modifier = Modifier.padding(16.dp)) {
+            Icon(
+                painterResource(id = R.drawable.baseline_file_download_black_24dp),
+                contentDescription = "Download Icon"
+            )
+        }
+        SignInButton(
+            text = "Share to Drive",
+            loadingText = "Signing in...",
+            isLoading = isLoading,
+            icon = painterResource(id = R.drawable.ic_google_logo_small),
+            onClick = { authResultLauncher.launch(signInRequestCode) }
+        )
+    }
+}
 
-    var expanded by remember { mutableStateOf(false) }
-    val docConversionTypes = arrayOf("pdf", "docx", "txt")
-
-    var selectedText by remember { mutableStateOf(docConversionTypes[0]) }
-
-    TopScaffold(text = "All Notes", navController = navController) { padding ->
-        LazyColumn(modifier = Modifier.padding(padding)) {
-            item{
-                ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = {expanded = !expanded } ) {
-                    TextField(
-                        value = selectedText,
-                        onValueChange = { },
-                        textStyle = MaterialTheme.typography.bodyMedium,
-                        readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.menuAnchor()
-                    )
-
-                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        docConversionTypes.forEach { docType ->
-                            DropdownMenuItem(
-                                text = { Text(docType, style = MaterialTheme.typography.labelMedium) },
-                                onClick = {
-                                    viewModel.setDocType(docType)
-                                    selectedText = docType
-                                    expanded = false
-
-                                }
-                            )
-
-                        }
-
-                    }
-
-                }
+@Composable
+fun NoteCard(
+    note: Note,
+    isSelected: Boolean,
+    onSelect: (Boolean, Int) -> Unit,
+    onClick: () -> Unit = {}
+) {
+    Card(
+        shape = RoundedCornerShape(5.dp),
+        elevation = if (isSelected) CardDefaults.cardElevation(10.dp) else CardDefaults.cardElevation(),
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+    ) {
+        Row(
+            verticalAlignment = Alignment.Top
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(note.title, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                Text(
+                    note.date.toString(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
             }
-            notes.forEach { note ->
-                item(note.id) {
-                    val paddingModifier = Modifier
-                        .padding(10.dp)
-                        .fillMaxWidth()
-                        .defaultMinSize(20.dp, 50.dp)
-                        .height(IntrinsicSize.Min)
-                        .clickable {
-                            Log.d("TEST", "id is ${note.id}")
-                            navController.navigate(
-                                Destination.SingleNoteScreen.createRoute(
-                                    note.id
-                                )
-                            )
-                        }
-                    Card(shape = RoundedCornerShape(3.dp), modifier = paddingModifier, elevation = CardDefaults.cardElevation(10.dp), ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Column(modifier = Modifier.padding(10.dp,0.dp,0.dp,0.dp)) {
-                                Text(note.title, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
-                                Text(note.date.toString(), style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
-                            }
-                            Spacer(modifier = Modifier.width(25.dp))
-                            Divider(modifier = Modifier
-                                .fillMaxHeight()
-                                .width(1.dp))
-                            Spacer(modifier = Modifier.weight(1f))
-
-                            Button(
-                                onClick = { viewModel.downloadNote(note)
-                                    Toast.makeText(context, "File Downloaded", Toast.LENGTH_LONG).show()},
-                                modifier = Modifier.width(65.dp) // Adjust the value to the desired width
-                            ) {
-                                Icon(
-                                    painterResource(id = R.drawable.baseline_file_download_black_24dp),
-                                    contentDescription = "Download Icon"
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-//                                    Text("Download")
-                            }
-
-                            Spacer(modifier = Modifier.weight(1f))
-
-                            SignInButton(
-                                text = "Share to Drive",
-                                loadingText = "Signing in...",
-                                isLoading = isLoading,
-                                icon = painterResource(id = R.drawable.ic_google_logo_small),
-                                onClick = { viewModel.downloadNote(note)
-                                    noteToRemember = note
-                                authResultLauncher.launch(signInRequestCode)}
-                            )
-                        }
-                    }
-                }
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = { onSelect(!isSelected, note.id)}, modifier = Modifier.padding(4.dp)) {
+                Icon(
+                    if (isSelected) Icons.Outlined.CheckCircle else Icons.Outlined.Circle,
+                    contentDescription = null,
+                )
             }
         }
     }

@@ -61,10 +61,10 @@ class LiveRecordingRepository @Inject constructor(
         val note = Note(
             title = title,
             date = date,
-            summarizeContent = summarizedNote.reduce { acc: String, next: String ->
+            summarizeContent = if (summarizedNote.isEmpty()) "" else summarizedNote.reduce { acc: String, next: String ->
                 acc + next
             },
-            transcript = transcript.reduce { acc: String, next: String ->
+            transcript = if (transcript.isEmpty()) "" else transcript.reduce { acc: String, next: String ->
                 acc + next
             },
         )

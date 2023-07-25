@@ -28,6 +28,9 @@ class NoteRepositoryViewModel @Inject constructor(
     private val mutableDocType: MutableStateFlow<String> = MutableStateFlow("pdf")
     val docType: StateFlow<String> = mutableDocType
 
+    private val mutableSelectedNotes = MutableStateFlow<List<Int>>(emptyList())
+    val selectedNotes: StateFlow<List<Int>> = mutableSelectedNotes
+
     // Track if tts currently speaking
     var isSpeaking = false
     init {
@@ -38,6 +41,14 @@ class NoteRepositoryViewModel @Inject constructor(
 
     fun setDocType(text: String) {
         mutableDocType.value = text
+    }
+
+    fun onNoteSelect(isSelected: Boolean, id: Int) {
+        if (isSelected) {
+            mutableSelectedNotes.value = mutableSelectedNotes.value + id
+        } else {
+            mutableSelectedNotes.value = mutableSelectedNotes.value - id
+        }
     }
 
     fun onTextToSpeech(text: String) {
