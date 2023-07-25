@@ -44,7 +44,7 @@ import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewModel()) {
+fun SingleNoteScreen(noteID: Int, navController: NavHostController, viewModel: NoteRepositoryViewModel = hiltViewModel()) {
     val note = remember { mutableStateOf<UiNote?>(null) }
     var ttsButtonText by remember { mutableStateOf("Read Notes") }
 
@@ -104,8 +104,11 @@ fun SingleNoteScreen(noteID: Int, viewModel: NoteRepositoryViewModel = hiltViewM
             TextField(
                 value = note.value?.summarizeContent ?: "",
                 onValueChange = { newValue ->
-                    note.value?.summarizeContent = newValue
-                    viewModel.updateNote(note!!)
+                    val updatedNote = note.value?.copy(summarizeContent = newValue)
+                    updatedNote?.let {
+                        note.value = it
+                        viewModel.updateNote(it)
+                    }
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 modifier = Modifier

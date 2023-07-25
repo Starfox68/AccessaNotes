@@ -44,7 +44,7 @@ class NotesRepository @Inject constructor(private val application: Application) 
                             UiNoteItem(noteItem.id, noteItem.noteId, noteItem.imageTrue, noteItem.content, bitmap, noteItem.itemOrder)
                         })
                     }
-                    UiNote(note.title, note.content, note.transcript, note.date, note.notifyAt, note.id, uiNoteItems)
+                    UiNote(note.title, note.content, note.transcript, note.date, note.id, uiNoteItems)
                 }
             }
         }
@@ -60,14 +60,14 @@ class NotesRepository @Inject constructor(private val application: Application) 
                         UiNoteItem(noteItem.id, noteItem.noteId, noteItem.imageTrue, noteItem.content, bitmap, noteItem.itemOrder)
                     })
                 }
-                UiNote(note.title, note.content, note.transcript, note.date, note.notifyAt, note.id, uiNoteItems)
+                UiNote(note.title, note.content, note.transcript, note.date, note.id, uiNoteItems)
             }
         }
     }
 
 
     fun setNote(uiNote: UiNote) = ioScope.launch {
-        val note = Note(uiNote.title, uiNote.content, uiNote.transcript, uiNote.date, uiNote.notifyAt, uiNote.id)
+        val note = Note(uiNote.title, uiNote.summarizeContent, uiNote.transcript, uiNote.date, uiNote.id)
         val noteId = dao.insert(note).toInt()
         uiNote.items?.forEach { uiNoteItem ->
             val imagePath = if (uiNoteItem.imageTrue) saveBitmapToFile(uiNoteItem.bitmap!!) else null
@@ -77,7 +77,7 @@ class NotesRepository @Inject constructor(private val application: Application) 
     }
 
     fun updateNote(uiNote: UiNote) = ioScope.launch {
-        val note = Note(uiNote.title, uiNote.content, uiNote.transcript, uiNote.date, uiNote.notifyAt, uiNote.id)
+        val note = Note(uiNote.title, uiNote.summarizeContent, uiNote.transcript, uiNote.date, uiNote.id)
         dao.update(note)
         uiNote.items?.forEach { uiNoteItem ->
             val imagePath = if (uiNoteItem.imageTrue) saveBitmapToFile(uiNoteItem.bitmap!!) else null
@@ -87,7 +87,7 @@ class NotesRepository @Inject constructor(private val application: Application) 
     }
 
     fun deleteNote(uiNote: UiNote) = ioScope.launch {
-        val note = Note(uiNote.title, uiNote.content, uiNote.transcript, uiNote.date, uiNote.notifyAt, uiNote.id)
+        val note = Note(uiNote.title, uiNote.summarizeContent, uiNote.transcript, uiNote.date, uiNote.id)
         dao.delete(note)
     }
 

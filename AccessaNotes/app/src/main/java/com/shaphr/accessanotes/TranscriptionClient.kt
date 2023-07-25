@@ -95,6 +95,7 @@ class TranscriptionClient @Inject constructor(
             val text = json.optString("text", "")
             transcription.emit(text)
         } else {
+            println(response.message)
             // Handle error response
             println("Error with calling Whisper: status not 200")
         }

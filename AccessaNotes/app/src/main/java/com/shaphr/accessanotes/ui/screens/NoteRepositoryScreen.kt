@@ -30,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +54,7 @@ import com.google.api.services.drive.DriveScopes
 import com.shaphr.accessanotes.AuthResultContract
 import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.R
+import com.shaphr.accessanotes.data.models.UiNote
 import com.shaphr.accessanotes.ui.components.SignInButton
 import com.shaphr.accessanotes.ui.components.TopScaffold
 import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
@@ -70,7 +72,7 @@ fun NoteRepositoryScreen(
     viewModel: NoteRepositoryViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
-    
+
     var text by remember { mutableStateOf<String?>(null) }
     val signInRequestCode = 1
 
@@ -97,7 +99,8 @@ fun NoteRepositoryScreen(
             }
         }
 
-    val notes = viewModel.notes.collectAsState().value
+    val notes by viewModel.notes.collectAsState(initial = listOf())
+
     var isLoading by remember { mutableStateOf(false) }
 
     var expanded by remember { mutableStateOf(false) }

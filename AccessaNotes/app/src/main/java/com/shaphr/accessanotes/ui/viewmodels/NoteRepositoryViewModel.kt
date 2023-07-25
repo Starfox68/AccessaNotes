@@ -28,6 +28,8 @@ class NoteRepositoryViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     val notes: Flow<List<UiNote>> = notesRepository.notes
+    private val mutableDocType: MutableStateFlow<String> = MutableStateFlow("PDF")
+    val docType: StateFlow<String> = mutableDocType
 
     var isSpeaking = false
 
@@ -58,7 +60,7 @@ class NoteRepositoryViewModel @Inject constructor(
         }
     }
 
-    fun downloadNote(note: Note) {
+    fun downloadNote(note: UiNote) {
         var fileManager: FileManagerAbstract? = null
         println("docType.value: ${docType.value}")
         when (docType.value) {
@@ -79,7 +81,7 @@ class NoteRepositoryViewModel @Inject constructor(
         fileManager?.exportNote(note.title, listOf(note.summarizeContent))
     }
 
-    fun updateNote(note: Note) {
+    fun updateNote(note: UiNote) {
         notesRepository.updateNote(note)
     }
 }

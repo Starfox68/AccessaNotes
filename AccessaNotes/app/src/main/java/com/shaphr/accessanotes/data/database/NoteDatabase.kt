@@ -24,7 +24,7 @@ class Converters {
     }
 }
 
-@Database(entities = [Note::class, NoteItem::class], version = 19)
+@Database(entities = [Note::class, NoteItem::class], version = 20)
 @TypeConverters(Converters::class)
 abstract class NoteDatabase : RoomDatabase() {
     abstract fun getNoteDataAccess(): NoteDataAccess

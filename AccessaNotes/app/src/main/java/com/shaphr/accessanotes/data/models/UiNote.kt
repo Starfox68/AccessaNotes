@@ -9,7 +9,6 @@ data class UiNote(
     val summarizeContent: String = "",
     val transcript: String = "",
     val date: LocalDate? = null,
-    val notifyAt: Long = Date().time,
     var id: Int = 0,
     val items: List<UiNoteItem>? = null,
 )
