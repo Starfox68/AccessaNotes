@@ -63,7 +63,7 @@ class LiveRecordingViewModel @Inject constructor(
         viewModelScope.launch {
             resetTranscribedText()
             resetNoteText()
-            delay(1800)
+            delay(1800) // Prevent overlap with recording started audio
             mutableStop.update {
                 true
             }

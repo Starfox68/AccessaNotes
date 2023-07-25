@@ -180,7 +180,7 @@ fun LiveRecordingScreenContent(
                             modifier = Modifier.size(ButtonDefaults.IconSize)
                         )
                         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing).weight(1F))
-                        Text(text = ttsButtonText, textAlign = TextAlign.Left)
+                        Text(text = ttsButtonText)
                     }
                 }
 
@@ -191,6 +191,7 @@ fun LiveRecordingScreenContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         OutlinedButton(onClick = {
+                            stopTextToSpeech()
                             navController.navigate(Destination.SessionStartAndEndScreen.route)
                         }) {
                             Text(text = "Discard")
@@ -198,7 +199,10 @@ fun LiveRecordingScreenContent(
 
                         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
 
-                        OutlinedButton(enabled = !canStop, onClick = onSaveClick) {
+                        OutlinedButton(enabled = !canStop, onClick = {
+                            stopTextToSpeech()
+                            onSaveClick()
+                        }) {
                             Text(text = "Save")
                         }
                     }
