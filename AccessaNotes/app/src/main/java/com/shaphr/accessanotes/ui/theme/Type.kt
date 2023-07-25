@@ -37,11 +37,40 @@ val defaultTypography = Typography(
 )
 
 val largeTypography = Typography(
+    displayMedium = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 55.sp,
+        lineHeight = 60.sp,
+        letterSpacing = 0.sp,
+    ),
+    headlineMedium = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 32.sp,
+        lineHeight = 40.sp,
+        letterSpacing = 0.sp,
+    ),
+    titleMedium = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 22.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.15.sp,
+    ),
     bodyMedium = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
-        fontSize = 24.sp,
-        lineHeight = 28.sp,
+        fontSize = 20.sp,
+        lineHeight = 24.sp,
         letterSpacing = 0.5.sp
-    )
+    ),
+    labelMedium = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.5.sp,
+    ),
+
 )

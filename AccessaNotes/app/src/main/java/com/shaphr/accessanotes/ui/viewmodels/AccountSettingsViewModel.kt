@@ -1,41 +1,31 @@
 package com.shaphr.accessanotes.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import androidx.lifecycle.viewModelScope
+import com.shaphr.accessanotes.data.repositories.AccountSettingsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class AccountSettingsViewModel @Inject constructor(
-//    private val AccountSettingsRepository,
+    private val accountSettingsRepository: AccountSettingsRepository
 ) : ViewModel() {
 
-    //read original size from repository when it's set up
-    private val mutableFontSize: MutableStateFlow<Int> = MutableStateFlow(12)
-    val fontSize: StateFlow<Int> = mutableFontSize
+    val fontFlow: Flow<Boolean> = accountSettingsRepository.fontFlow
 
-    private val mutableColBlindMode: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val colBlindMode: StateFlow<Boolean> = mutableColBlindMode
+    val colourBlindFlow: Flow<Boolean> = accountSettingsRepository.colourFlow
 
-    fun increaseFont(){
-        //change this
-        if (mutableFontSize.value <= 23){
-            mutableFontSize.value = mutableFontSize.value + 1
+    fun onFontClick(isLarge: Boolean){
+        viewModelScope.launch {
+            accountSettingsRepository.onFontChange(isLarge)
         }
     }
 
-    fun decreaseFont(){
-        //change this
-        if (mutableFontSize.value >= 13){
-            mutableFontSize.value = mutableFontSize.value - 1
+    fun onColourClick(isEnabled: Boolean){
+        viewModelScope.launch {
+            accountSettingsRepository.onColourChange(isEnabled)
         }
     }
-
-    fun toggleColBlindMode(){
-        mutableColBlindMode.value = !mutableColBlindMode.value
-    }
-
-
-
-
-
 }
