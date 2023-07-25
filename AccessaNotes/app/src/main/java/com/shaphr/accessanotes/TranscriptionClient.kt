@@ -4,8 +4,12 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -28,6 +32,7 @@ class TranscriptionClient @Inject constructor(
     private val filePath: String by lazy {
         context.getExternalFilesDir(null)?.absolutePath + "/transcript_recording.mp3"
     }
+    private var recordingJob: Job? = null
 
     fun startRecording() {
         println("Starting recording...")
@@ -40,6 +45,13 @@ class TranscriptionClient @Inject constructor(
             prepare()
             start()
         }
+
+        recordingJob = CoroutineScope(Dispatchers.IO).launch {
+            delay(300000) // 5 minutes
+            stopRecording()
+            // Restart recording
+            startRecording()
+        }
     }
 
     suspend fun stopRecording() {
@@ -50,6 +62,7 @@ class TranscriptionClient @Inject constructor(
             release()
         }
         callWhisper()
+        recordingJob?.cancel()
     }
 
     private suspend fun callWhisper() {
@@ -97,135 +110,3 @@ class TranscriptionClient @Inject constructor(
         }
     }
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// FOR STREAMING REAL-TIME AUDIO AND LIVE TRANSCRIPTION (PENDING MEETING WITH DEEPGRAM DEVS)
-//
-/// UPDATED ATTEMPT
-//
-//import android.Manifest
-//import android.content.Context
-//import android.content.pm.PackageManager
-//import android.media.AudioFormat
-//import android.media.AudioRecord
-//import android.media.MediaRecorder
-//import android.widget.Toast
-//import androidx.core.app.ActivityCompat
-//import com.neovisionaries.ws.client.WebSocket
-//import com.neovisionaries.ws.client.WebSocketAdapter
-//import com.neovisionaries.ws.client.WebSocketException
-//import com.neovisionaries.ws.client.WebSocketFactory
-//import com.neovisionaries.ws.client.WebSocketFrame
-//import kotlinx.coroutines.flow.MutableSharedFlow
-//import java.nio.ByteBuffer
-//import java.nio.ByteOrder
-//
-//@Singleton
-//class TranscriptionClient @Inject constructor (@ApplicationContext private val context: Context) {
-//    val transcription: MutableSharedFlow<String> = MutableSharedFlow(replay = 1)
-//
-//    private var audioRecord: AudioRecord? = null
-//    private val bufferSize: Int
-//    private val buffer: ShortArray
-//    private var webSocket: WebSocket? = null
-//
-//    init {
-//        val sampleRateInHz = 44100
-//        val channelConfig = AudioFormat.CHANNEL_IN_MONO
-//        val audioFormat = AudioFormat.ENCODING_PCM_16BIT
-//
-//        bufferSize = Math.max(sampleRateInHz / 50, AudioRecord.getMinBufferSize(sampleRateInHz, channelConfig, audioFormat))
-//        buffer = ShortArray(bufferSize)
-//
-//        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-//            Toast.makeText(context, "Permission denied, can't record audio", Toast.LENGTH_SHORT).show()
-//        }
-//        audioRecord = AudioRecord(MediaRecorder.AudioSource.MIC, sampleRateInHz, channelConfig, audioFormat, bufferSize)
-//    }
-//
-//     fun startRecording() {
-//        println("Starting recording...")
-//        audioRecord?.startRecording()
-//
-//        Thread {
-//            try {
-//                webSocket = WebSocketFactory().createSocket("wss://api.deepgram.com/v1/listen?encoding=linear16&sample_rate=44100&model=nova&version=latest&punctuate=true&numerals=true&smart_format=true&interim_results=false")
-//                webSocket?.addHeader("Authorization", "Token 97b0346515cef2ffbc1f77ade14bf26a18c5c632")
-//
-//                webSocket?.addListener(object : WebSocketAdapter() {
-//                    override fun onConnected(websocket: WebSocket?, headers: Map<String, List<String>>?) {
-//                        println("Connected to Deepgram WebSocket")
-//                        val byteBuffer = ByteBuffer.allocate(bufferSize * 2)
-//                        while (audioRecord?.recordingState == AudioRecord.RECORDSTATE_RECORDING) {
-//                            println("Sending audio data...")
-//                            val read = audioRecord?.read(buffer, 0, bufferSize) ?: 0
-//                            if (read > 0) {
-//                                byteBuffer.asShortBuffer().put(buffer, 0, read)
-//                                websocket?.sendBinary(byteBuffer.array())
-//                                byteBuffer.clear()
-//                            }
-//                        }
-//                    }
-//
-//                    override fun onTextMessageError(
-//                        websocket: WebSocket?,
-//                        cause: WebSocketException?,
-//                        data: ByteArray?
-//                    ) {
-//                        super.onTextMessageError(websocket, cause, data)
-//                        println("Error sending audio data: ${cause?.message}")
-//                    }
-//
-//                    override fun onError(websocket: WebSocket?, cause: WebSocketException?) {
-//                        super.onError(websocket, cause)
-//                        println("Error on WebSocket: ${cause?.message}")
-//                    }
-//
-//                    override fun onTextMessage(websocket: WebSocket?, text: String?) {
-//                        println("Received transcript: $text")
-//                        if (text != null) {
-//                            transcription.tryEmit(text)
-//                        }
-//                        // do something with the transcript later...
-//                    }
-//
-//                    override fun onDisconnected(websocket: WebSocket?, serverCloseFrame: WebSocketFrame?, clientCloseFrame: WebSocketFrame?, closedByServer: Boolean) {
-//                        println("Disconnected from Deepgram WebSocket. Server Close Frame: ${serverCloseFrame?.closeCode} ${serverCloseFrame?.closeReason}")
-//                    }
-//
-//                    override fun onCloseFrame(websocket: WebSocket?, frame: WebSocketFrame) {
-//                        super.onCloseFrame(websocket, frame)
-//                        println("Received Close Frame: ${frame?.closeCode} ${frame?.closeReason}")
-//                    }
-//                })
-//
-//                webSocket?.connect()
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//                println("Error connecting to Deepgram WebSocket: ${e.message}")
-//            }
-//        }.start()
-//    }
-//
-//    fun stopRecording() {
-//        println("Stopping recording...")
-//        webSocket?.sendClose(1000, "Recording stopped")
-//
-//        audioRecord?.stop()
-//        audioRecord?.release()
-//        audioRecord = null
-//
-//        // Close WebSocket when you're finished
-//        webSocket?.disconnect(1000, "Recording done")
-//        webSocket = null
-//    }
-//
-//    private fun ShortArray.toByteArray(): ByteArray {
-//        val byteBuffer = ByteBuffer.allocate(this.size * 2)
-//        byteBuffer.order(ByteOrder.LITTLE_ENDIAN)
-//        byteBuffer.asShortBuffer().put(this)
-//        return byteBuffer.array()
-//    }
-//}
-//

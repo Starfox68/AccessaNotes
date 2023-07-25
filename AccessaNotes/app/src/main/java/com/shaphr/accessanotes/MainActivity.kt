@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,8 +16,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,6 +31,7 @@ import com.shaphr.accessanotes.ui.screens.NoteRepositoryScreen
 import com.shaphr.accessanotes.ui.screens.SessionStartAndEndScreen
 import com.shaphr.accessanotes.ui.screens.SingleNoteScreen
 import com.shaphr.accessanotes.ui.theme.AccessaNotesTheme
+import com.shaphr.accessanotes.ui.viewmodels.ThemeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 // sealed class idea came from this tutorial:
@@ -80,10 +82,17 @@ class MainActivity : ComponentActivity() {
 
         // Check if the popup has been shown before
         setContent {
+
             if (!isPopupShown()) {
                 PopupDialog(onDismiss = { onPopupDismissed() })
             } else {
-                AccessaNotesTheme {
+
+                val themeViewModel: ThemeViewModel = hiltViewModel()
+
+                AccessaNotesTheme(
+                    isColourBlind = themeViewModel.colourFlow.collectAsState(initial = false).value,
+                    isLargeFont = themeViewModel.fontFlow.collectAsState(initial = false).value,
+                ) {
                     // A surface container using the 'background' color from the theme
                     Surface(
                         modifier = Modifier.fillMaxSize(),
@@ -128,7 +137,7 @@ fun NavigationAppHost(navController: NavHostController) {
             //get noteID from within the route
             val noteID = navBackStackEntry.arguments?.getString("noteID")?.toInt()
             if (noteID != null) {
-                SingleNoteScreen(noteID)
+                SingleNoteScreen(noteID, navController)
             }
         }
         composable(Destination.CameraScreen.route) { CameraScreen(navController) }

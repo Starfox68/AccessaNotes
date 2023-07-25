@@ -73,6 +73,9 @@
 | 07/22/2023 | | | | | | 1 | Fix app crash bug with multiple stops |
 | 07/22/2023 | | | | | | 1 | Note summarization bug fix and TTS enable/disable functionality |
 | 07/23/2023 | | | | | | 1 | Add note discard functionality |
-| 07/23/2023 | | | | 5 | | | Fixed google sign-in + started google drive |
+| 07/23/2023 | | | | | | 1 | Add note discard functionality |
+| 07/23/2023 | | 1 | | | | | Note with image storing capability |
 | 07/24/2023 | 2 |  2 | 2 | 2 |2 | 2 | Team sync |
 | 07/24/2023 | | | | | 1 | | TTS UI-Related Fixes and Improvements |
+| 07/24/2023 | | | | | 5 | | google drive file upload + dropdown |
+| 07/24/2023 | | 2 | | | | | NoteImage db implementation |

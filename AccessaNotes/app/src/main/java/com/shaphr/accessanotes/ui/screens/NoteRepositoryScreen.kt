@@ -2,9 +2,9 @@ package com.shaphr.accessanotes.ui.screens
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -17,15 +17,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -40,8 +41,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -54,10 +53,9 @@ import com.google.api.services.drive.DriveScopes
 import com.shaphr.accessanotes.AuthResultContract
 import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.R
-import com.shaphr.accessanotes.ui.components.BottomNavBar
 import com.shaphr.accessanotes.ui.components.SignInButton
+import com.shaphr.accessanotes.ui.components.TopScaffold
 import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
-import kotlin.math.exp
 
 
 //search bar at the top of the screen if time permits
@@ -106,88 +104,95 @@ fun NoteRepositoryScreen(
     val docConversionTypes = arrayOf("PDF", "DOCX", "TXT")
     var selectedText by remember { mutableStateOf(docConversionTypes[0]) }
 
-    Scaffold (
-        topBar = {
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(0.dp, 40.dp, 0.dp, 30.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center ) {
-                Text(text="All Notes", fontSize = 40.sp, maxLines = 1)
-            }
-                 },
-        content = { padding ->
-            LazyColumn(modifier = Modifier.padding(padding)) {
-                item{
-                    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = {expanded = !expanded } ) {
-                        TextField(
-                            value = selectedText,
-//                            onValueChange = {viewModel.setDocType(selectedText)},
-                            onValueChange = { },
-                            readOnly = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                            modifier = Modifier.menuAnchor()
-                        )
+    TopScaffold(text = "All Notes", navController = navController) { padding ->
+        LazyColumn(modifier = Modifier.padding(padding)) {
+            item{
+                ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = {expanded = !expanded } ) {
+                    TextField(
+                        value = selectedText,
+//                        onValueChange = {viewModel.setDocType(selectedText)},
+                        onValueChange = { },
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                        readOnly = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier.menuAnchor()
+                    )
 
-                        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                            docConversionTypes.forEach { docType ->
-                                DropdownMenuItem(
-                                    text = { Text(docType) },
-                                    onClick = {
-                                        viewModel.setDocType(docType)
-                                        selectedText = docType
-                                        expanded = false
+                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        docConversionTypes.forEach { docType ->
+                            DropdownMenuItem(
+                                text = { Text(docType, style = MaterialTheme.typography.labelMedium) },
+                                onClick = {
+                                    viewModel.setDocType(docType)
+                                    selectedText = docType
+                                    expanded = false
 
-                                    }
-                                )
-
-                            }
-
-                        }
-
-                    }
-                }
-                notes.forEach { note ->
-                    item(note.id) {
-                        val paddingModifier = Modifier
-                            .padding(10.dp)
-                            .fillMaxWidth()
-                            .defaultMinSize(20.dp, 50.dp)
-                            .height(IntrinsicSize.Min)
-                            .clickable {
-                                Log.d("TEST", "id is ${note.id}")
-                                navController.navigate(
-                                    Destination.SingleNoteScreen.createRoute(
-                                        note.id
-                                    )
-                                )
-                            }
-                        Card(shape = RoundedCornerShape(3.dp), modifier = paddingModifier, elevation = CardDefaults.cardElevation(10.dp), ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Column(modifier = Modifier.padding(10.dp,0.dp,0.dp,0.dp)) {
-                                Text(note.title, color = Color.Black)
-                                    Text(note.date.toString(), color = Color.Gray)
                                 }
-                                Spacer(modifier = Modifier.width(25.dp))
-                                Divider(modifier = Modifier
-                                    .fillMaxHeight()
-                                    .width(1.dp))
-                                Spacer(modifier = Modifier.weight(1f))
-                                SignInButton(
-                                    text = "Share to Drive",
-                                    loadingText = "Signing in...",
-                                    isLoading = isLoading,
-                                    icon = painterResource(id = R.drawable.ic_google_logo_small),
-                                    onClick = { authResultLauncher.launch(signInRequestCode) }
+                            )
+
+                        }
+
+                    }
+
+                }
+            }
+            notes.forEach { note ->
+                item(note.id) {
+                    val paddingModifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxWidth()
+                        .defaultMinSize(20.dp, 50.dp)
+                        .height(IntrinsicSize.Min)
+                        .clickable {
+                            Log.d("TEST", "id is ${note.id}")
+                            navController.navigate(
+                                Destination.SingleNoteScreen.createRoute(
+                                    note.id
                                 )
+                            )
+                        }
+                    Card(shape = RoundedCornerShape(3.dp), modifier = paddingModifier, elevation = CardDefaults.cardElevation(10.dp), ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Column(modifier = Modifier.padding(10.dp,0.dp,0.dp,0.dp)) {
+                                Text(note.title, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+                                Text(note.date.toString(), style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
                             }
+                            Spacer(modifier = Modifier.width(25.dp))
+                            Divider(modifier = Modifier
+                                .fillMaxHeight()
+                                .width(1.dp))
+                            Spacer(modifier = Modifier.weight(1f))
+
+                            Button(
+                                onClick = {
+                                    viewModel.downloadNote(note)
+                                    Toast.makeText(context, "File Downloaded", Toast.LENGTH_LONG).show()
+                                },
+                                modifier = Modifier.width(65.dp) // Adjust the value to the desired width
+                            ) {
+                                Icon(
+                                    painterResource(id = R.drawable.baseline_file_download_black_24dp),
+                                    contentDescription = "Download Icon"
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+//                                    Text("Download")
+                            }
+
+                            Spacer(modifier = Modifier.weight(1f))
+
+                            SignInButton(
+                                text = "Share to Drive",
+                                loadingText = "Signing in...",
+                                isLoading = isLoading,
+                                icon = painterResource(id = R.drawable.ic_google_logo_small),
+                                onClick = { authResultLauncher.launch(signInRequestCode) }
+                            )
                         }
                     }
                 }
             }
-        },
-        bottomBar = {
-            BottomNavBar(navController)
         }
-    )
+    }
 }
 
 //reference https://www.section.io/engineering-education/backup-services-with-google-drive-api-in-android/
