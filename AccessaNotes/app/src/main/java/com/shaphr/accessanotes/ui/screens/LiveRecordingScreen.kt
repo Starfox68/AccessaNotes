@@ -1,6 +1,7 @@
 package com.shaphr.accessanotes.ui.screens
 
 import android.Manifest
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,8 +14,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,11 +31,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
@@ -95,8 +99,9 @@ fun LiveRecordingScreenContent(
 ) {
     var ttsButtonText by remember { mutableStateOf("Read Summarized Notes") }
     var isSpeaking = false
-    val config = LocalConfiguration
-
+    val screenHeight = (LocalConfiguration.current.screenHeightDp).dp
+    var transcriptHeight by remember { mutableStateOf(screenHeight * 0.35F) }
+    var summaryHeight by remember { mutableStateOf(screenHeight * 0.35F) }
 
     Scaffold(
         content = { padding ->
@@ -104,7 +109,7 @@ fun LiveRecordingScreenContent(
 
                 item {
                     Column(
-                        modifier = Modifier.height((config.current.screenHeightDp * 0.35).dp)
+                        modifier = Modifier.height(transcriptHeight).padding(4.dp)
                     ) {
                         Text(
                             text = "Transcribed Text",
@@ -117,9 +122,26 @@ fun LiveRecordingScreenContent(
                         )
                     }
                 }
+
+                item {
+                    Divider(color = MaterialTheme.colorScheme.tertiary, thickness = 4.dp,
+                        modifier = Modifier.padding(4.dp).pointerInput(Unit) {
+                            detectVerticalDragGestures { _, dragAmount ->
+                                transcriptHeight = (transcriptHeight + dragAmount.dp).coerceIn(
+                                    screenHeight * 0.15F,
+                                    screenHeight * 0.55F
+                                )
+                                summaryHeight = (summaryHeight - dragAmount.dp).coerceIn(
+                                    screenHeight * 0.15F,
+                                    screenHeight * 0.55F
+                                )
+                            }
+                        })
+                }
+
                 item {
                     Column(
-                        modifier = Modifier.height((config.current.screenHeightDp * 0.35).dp)
+                        modifier = Modifier.height(summaryHeight).padding(4.dp)
                     ) {
                         Text(
                             text = "Summarized Notes",
@@ -135,12 +157,14 @@ fun LiveRecordingScreenContent(
 
 
                 item {
-                    OutlinedButton(onClick = {
-                        if (hasCameraPermission) {
-                            onCameraClick()
-                        } else {
-                            onCameraPermissionRequest()
-                        }
+                    OutlinedButton(
+                        modifier = Modifier.padding(start = 4.dp),
+                        onClick = {
+                            if (hasCameraPermission) {
+                                onCameraClick()
+                            } else {
+                                onCameraPermissionRequest()
+                            }
                     }) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.camera_icon),
@@ -151,7 +175,9 @@ fun LiveRecordingScreenContent(
                         Text(text = "Add Image")
                     }
                     OutlinedButton(
-                        onClick = { onStopClick() }, enabled = canStop
+                        onClick = { onStopClick() },
+                        enabled = canStop,
+                        modifier = Modifier.padding(start = 4.dp)
                     ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.stop_icon),
@@ -163,7 +189,7 @@ fun LiveRecordingScreenContent(
                     }
                     OutlinedButton(
                         enabled = canListen,
-                        modifier = Modifier.width(230.dp),
+                        modifier = Modifier.width(235.dp).padding(start = 4.dp),
                         onClick = {
                             ttsButtonText = if (!isSpeaking) {
                                 startTextToSpeech(summarizedContent.joinToString(separator = ""))
@@ -179,7 +205,11 @@ fun LiveRecordingScreenContent(
                             contentDescription = "Voice Icon",
                             modifier = Modifier.size(ButtonDefaults.IconSize)
                         )
-                        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing).weight(1F))
+                        Spacer(
+                            modifier = Modifier
+                                .size(ButtonDefaults.IconSpacing)
+                                .weight(1F)
+                        )
                         Text(text = ttsButtonText)
                     }
                 }
