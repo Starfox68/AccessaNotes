@@ -14,8 +14,8 @@ data class UiNote(
 )
 
 data class UiNoteItem(
-    val id: Int,
-    val noteId: Int,
+    val id: Int = 0,
+    val noteId: Int = 0,
     val imageTrue: Boolean,
     val content: String?,
     val bitmap: Bitmap?,
