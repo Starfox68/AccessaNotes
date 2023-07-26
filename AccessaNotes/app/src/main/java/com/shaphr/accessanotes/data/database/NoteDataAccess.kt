@@ -2,6 +2,7 @@ package com.shaphr.accessanotes.data.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -17,8 +18,22 @@ interface NoteDataAccess {
     suspend fun delete(note: Note)
 
     @Query("DELETE FROM `Note` WHERE id = :id")
-    fun deleteNoteById(id: Long)
+    suspend fun deleteNoteById(id: Long)
 
     @Query("SELECT * FROM `Note` ORDER BY id ASC")
-    fun getNotes(): LiveData<List<Note>>
+    fun getNotes(): Flow<List<Note>>
+
+    // Methods for NoteItem
+    @Insert(onConflict = OnConflictStrategy.IGNORE, entity = NoteItem::class)
+    suspend fun insertNoteItem(noteItem: NoteItem): Long
+
+    @Update(entity = NoteItem::class)
+    suspend fun updateNoteItem(noteItem: NoteItem)
+
+    @Delete(entity = NoteItem::class)
+    suspend fun deleteNoteItem(noteItem: NoteItem)
+
+    @Query("SELECT * FROM `note_items` ORDER BY item_order ASC")
+    fun getNoteItems(): Flow<List<NoteItem>>
+
 }

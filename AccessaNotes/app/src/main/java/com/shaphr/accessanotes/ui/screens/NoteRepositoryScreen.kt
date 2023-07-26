@@ -35,6 +35,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,7 +60,7 @@ import com.google.api.services.drive.DriveScopes
 import com.shaphr.accessanotes.AuthResultContract
 import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.R
-import com.shaphr.accessanotes.data.database.Note
+import com.shaphr.accessanotes.data.models.UiNote
 import com.shaphr.accessanotes.ui.components.SignInButton
 import com.shaphr.accessanotes.ui.components.TopScaffold
 import com.shaphr.accessanotes.ui.viewmodels.DialogState
@@ -83,6 +84,8 @@ fun NoteRepositoryScreen(
     viewModel: NoteRepositoryViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+
+    var text by remember { mutableStateOf<String?>(null) }
     val signInRequestCode = 1
 
     val notes = viewModel.notes.collectAsState().value
@@ -104,6 +107,9 @@ fun NoteRepositoryScreen(
             }
         }
 
+    val notes by viewModel.notes.collectAsState(initial = listOf())
+
+    var isLoading by remember { mutableStateOf(false) }
 
     if (viewModel.dialogState.collectAsState().value != DialogState.CLOSED) {
         FileFormatDialog(

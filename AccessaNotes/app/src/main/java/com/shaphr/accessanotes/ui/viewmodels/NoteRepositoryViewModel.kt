@@ -1,5 +1,7 @@
 package com.shaphr.accessanotes.ui.viewmodels
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.shaphr.accessanotes.FileManagerDOCX
@@ -7,11 +9,14 @@ import com.shaphr.accessanotes.FileManagerPDF
 import com.shaphr.accessanotes.FileManagerTXT
 import com.shaphr.accessanotes.TextToSpeechClient
 import com.shaphr.accessanotes.data.database.Note
+import com.shaphr.accessanotes.data.models.UiNote
 import com.shaphr.accessanotes.data.repositories.NotesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,8 +26,7 @@ class NoteRepositoryViewModel @Inject constructor(
     private val textToSpeechClient: TextToSpeechClient
 ) : AndroidViewModel(application) {
 
-    private val mutableNotes = MutableStateFlow<List<Note>>(emptyList())
-    val notes: StateFlow<List<Note>> = mutableNotes
+    val notes: Flow<List<UiNote>> = notesRepository.notes
 
     private val mutableFileFormat = MutableStateFlow(FileFormat.PDF)
     val fileFormat = mutableFileFormat
@@ -36,12 +40,19 @@ class NoteRepositoryViewModel @Inject constructor(
     private val mutableSelectedNotes = MutableStateFlow<List<Int>>(emptyList())
     val selectedNotes: StateFlow<List<Int>> = mutableSelectedNotes
 
-    // Track if tts currently speaking
     var isSpeaking = false
+
     init {
-        notesRepository.getNotes().observeForever { notes ->
-            mutableNotes.value = notes
-        }
+//        viewModelScope.launch {
+//            refreshNotes()
+//            notes.collect { noteList ->
+//                println("Number of notes: ${noteList.size}")
+//            }
+//        }
+    }
+
+    private fun refreshNotes() = viewModelScope.launch {
+        notesRepository.refreshNotes()
     }
 
     private fun downloadNote(fileFormat: FileFormat) {
@@ -114,14 +125,34 @@ class NoteRepositoryViewModel @Inject constructor(
 
         isSpeaking = !isSpeaking
     }
-
-    fun getNote(id: Int) = notes.map { notes ->
-        notes.firstOrNull {
-            it.id == id
+    fun getNote(id: Int): Flow<UiNote?> {
+        return notes.map { noteList ->
+            noteList.firstOrNull { it.id == id }
         }
     }
 
-    fun updateNote(note: Note) {
+    fun downloadNote(note: UiNote) {
+        var fileManager: FileManagerAbstract? = null
+        println("docType.value: ${docType.value}")
+        when (docType.value) {
+            "PDF" -> {
+                // use FileManagerPDF
+                fileManager = FileManagerPDF(getApplication())
+            }
+            "TXT" -> {
+                // use FileManagerTXT
+                fileManager = FileManagerTXT(getApplication())
+            }
+            "DOCX" -> {
+                // use FileManagerDOCX
+                fileManager = FileManagerDOCX(getApplication())
+            }
+        }
+        println("downloadNote: ${note.title}")
+        fileManager?.exportNote(note.title, listOf(note.summarizeContent))
+    }
+
+    fun updateNote(note: UiNote) {
         notesRepository.updateNote(note)
     }
 }

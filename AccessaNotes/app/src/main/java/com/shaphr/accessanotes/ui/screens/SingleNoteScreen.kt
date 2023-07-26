@@ -27,6 +27,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.shaphr.accessanotes.data.models.UiNote
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.shaphr.accessanotes.R
@@ -62,6 +64,12 @@ fun SingleNoteScreen(
     val screenHeight = (LocalConfiguration.current.screenHeightDp).dp
     var transcriptHeight by remember { mutableStateOf(screenHeight * 0.4F) }
     var summaryHeight by remember { mutableStateOf(screenHeight * 0.4F) }
+
+    LaunchedEffect(noteID) {
+        viewModel.getNote(noteID).collect { value ->
+            note.value = value
+        }
+    }
 
     Column(Modifier.fillMaxSize()) {
         // Header
@@ -82,7 +90,7 @@ fun SingleNoteScreen(
             )
             //Text
             Text(
-                text = note?.title ?: "default",
+                text = note.value?.title ?: "default",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .padding(16.dp)

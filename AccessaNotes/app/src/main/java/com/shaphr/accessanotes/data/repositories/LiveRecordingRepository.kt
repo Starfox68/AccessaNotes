@@ -2,10 +2,13 @@ package com.shaphr.accessanotes.data.repositories
 
 import com.shaphr.accessanotes.TranscriptionClient
 import com.shaphr.accessanotes.data.database.Note
+import com.shaphr.accessanotes.data.models.UiNote
+import com.shaphr.accessanotes.data.models.UiNoteItem
 import com.shaphr.accessanotes.data.sources.SummarizedNoteSource
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
+import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -57,8 +60,8 @@ class LiveRecordingRepository @Inject constructor(
         transcriptionClient.stopRecording()
     }
 
-    fun onFinish(): Note {
-        val note = Note(
+    fun onFinish(): UiNote {
+        val note = UiNote(
             title = title,
             date = date,
             summarizeContent = if (summarizedNote.isEmpty()) "" else summarizedNote.reduce { acc: String, next: String ->
@@ -67,6 +70,7 @@ class LiveRecordingRepository @Inject constructor(
             transcript = if (transcript.isEmpty()) "" else transcript.reduce { acc: String, next: String ->
                 acc + next
             },
+            date = date,
         )
         summarizedNote.clear()
         transcript.clear()
