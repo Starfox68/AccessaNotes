@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.shaphr.accessanotes.data.sources.images.ImageSaveAction
 import com.shaphr.accessanotes.data.sources.images.ImageAction
+import com.shaphr.accessanotes.data.sources.images.ImageEmbedAction
 import com.shaphr.accessanotes.data.sources.images.ImageSummaryAction
 import com.shaphr.accessanotes.data.sources.images.ImageTranscriptionAction
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,13 +22,15 @@ import javax.inject.Inject
 class CameraScreenViewModel @Inject constructor(
     imageTranscriptionSource: ImageTranscriptionAction,
     imageSummarySource: ImageSummaryAction,
-    imageDirectSource: ImageSaveAction
+    imageDirectSource: ImageSaveAction,
+    imageEmbedSource: ImageEmbedAction
 ) : ViewModel() {
 
     private val options: Map<ImageOption, ImageAction> = mapOf(
         ImageOption.TRANSCRIPT to imageTranscriptionSource,
         ImageOption.SUMMARY to imageSummarySource,
-        ImageOption.SAVE_IMAGE to imageDirectSource
+        ImageOption.SAVE_IMAGE to imageDirectSource,
+        ImageOption.EMBED to imageEmbedSource
     )
 
     private val imageFlow: MutableStateFlow<Bitmap> =
@@ -74,4 +77,5 @@ enum class ImageOption() {
     SAVE_IMAGE,
     TRANSCRIPT,
     SUMMARY,
+    EMBED
 }

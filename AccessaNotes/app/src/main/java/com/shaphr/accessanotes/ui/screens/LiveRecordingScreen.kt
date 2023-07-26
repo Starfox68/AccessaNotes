@@ -1,6 +1,8 @@
 package com.shaphr.accessanotes.ui.screens
 
 import android.Manifest
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
@@ -64,7 +68,7 @@ fun LiveRecordingScreen(
     val canStop = viewModel.canStop.collectAsState().value
     val canListen = viewModel.canListen.collectAsState().value
     val transcribedText = viewModel.transcribedText.collectAsState().value
-    val summarizedContent = viewModel.noteText.collectAsState().value
+    val summarizedContent = viewModel.summaryAndImages.collectAsState().value
     LiveRecordingScreenContent(
         navController = navController,
         transcribedText = transcribedText,
@@ -86,7 +90,7 @@ fun LiveRecordingScreen(
 fun LiveRecordingScreenContent(
     navController: NavHostController,
     transcribedText: List<String>,
-    summarizedContent: List<String>,
+    summarizedContent: List<Any>,
     startTextToSpeech: (String) -> Unit,
     stopTextToSpeech: () -> Unit,
     onStopClick: () -> Unit,
@@ -105,136 +109,137 @@ fun LiveRecordingScreenContent(
 
     Scaffold(
         content = { padding ->
-            LazyColumn(modifier = Modifier.padding(padding)) {
+            Column(modifier = Modifier.padding(padding)) {
+                Column(
+                    modifier = Modifier.height(transcriptHeight).padding(4.dp)
+                ) {
+                    Text(
+                        text = "Transcribed Text",
+                        modifier = Modifier.padding(12.dp)
+                    )
+                    TextField(
+                        value = transcribedText.joinToString(separator = ""),
+                        onValueChange = { },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
 
-                item {
-                    Column(
-                        modifier = Modifier.height(transcriptHeight).padding(4.dp)
-                    ) {
-                        Text(
-                            text = "Transcribed Text",
-                            modifier = Modifier.padding(12.dp)
-                        )
-                        TextField(
-                            value = transcribedText.joinToString(separator = ""),
-                            onValueChange = { },
-                            modifier = Modifier.fillMaxSize()
-                        )
+                Divider(color = MaterialTheme.colorScheme.tertiary, thickness = 4.dp,
+                    modifier = Modifier.padding(4.dp).pointerInput(Unit) {
+                        detectVerticalDragGestures { _, dragAmount ->
+                            transcriptHeight = (transcriptHeight + dragAmount.dp).coerceIn(
+                                screenHeight * 0.15F,
+                                screenHeight * 0.55F
+                            )
+                            summaryHeight = (summaryHeight - dragAmount.dp).coerceIn(
+                                screenHeight * 0.15F,
+                                screenHeight * 0.55F
+                            )
+                        }
                     }
-                }
+                )
 
-                item {
-                    Divider(color = MaterialTheme.colorScheme.tertiary, thickness = 4.dp,
-                        modifier = Modifier.padding(4.dp).pointerInput(Unit) {
-                            detectVerticalDragGestures { _, dragAmount ->
-                                transcriptHeight = (transcriptHeight + dragAmount.dp).coerceIn(
-                                    screenHeight * 0.15F,
-                                    screenHeight * 0.55F
-                                )
-                                summaryHeight = (summaryHeight - dragAmount.dp).coerceIn(
-                                    screenHeight * 0.15F,
-                                    screenHeight * 0.55F
-                                )
-                            }
-                        })
-                }
-
-                item {
-                    Column(
-                        modifier = Modifier.height(summaryHeight).padding(4.dp)
-                    ) {
-                        Text(
-                            text = "Summarized Notes",
-                            modifier = Modifier.padding(12.dp)
-                        )
-                        TextField(
-                            value = summarizedContent.joinToString(separator = ""),
-                            onValueChange = { },
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                }
-
-
-                item {
-                    OutlinedButton(
-                        modifier = Modifier.padding(start = 4.dp),
-                        onClick = {
-                            if (hasCameraPermission) {
-                                onCameraClick()
+                Column(
+                    modifier = Modifier.height(summaryHeight).padding(4.dp)
+                ) {
+                    Text(
+                        text = "Summarized Notes",
+                        modifier = Modifier.padding(12.dp)
+                    )
+                    LazyColumn {
+                        summarizedContent.forEach {
+                            if (it is String) {
+                                item {
+                                    BasicTextField(
+                                        value = it,
+                                        onValueChange = { },
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                }
                             } else {
-                                onCameraPermissionRequest()
+                                item {
+                                    Image(bitmap = (it as Bitmap).asImageBitmap(), contentDescription = null)
+                                }
                             }
+                        }
+                    }
+                }
+
+                OutlinedButton(
+                    modifier = Modifier.padding(start = 4.dp),
+                    onClick = {
+                        if (hasCameraPermission) {
+                            onCameraClick()
+                        } else {
+                            onCameraPermissionRequest()
+                        }
+                }) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.camera_icon),
+                        contentDescription = "Camera Icon",
+                        modifier = Modifier.size(ButtonDefaults.IconSize)
+                    )
+                    Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                    Text(text = "Add Image")
+                }
+                OutlinedButton(
+                    onClick = { onStopClick() },
+                    enabled = canStop,
+                    modifier = Modifier.padding(start = 4.dp)
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.stop_icon),
+                        contentDescription = "Stop Icon",
+                        modifier = Modifier.size(ButtonDefaults.IconSize)
+                    )
+                    Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                    Text(text = "Stop Recording")
+                }
+                OutlinedButton(
+                    enabled = canListen,
+                    modifier = Modifier.width(235.dp).padding(start = 4.dp),
+                    onClick = {
+                        ttsButtonText = if (!isSpeaking) {
+                            startTextToSpeech(summarizedContent.filterIsInstance<String>().joinToString(separator = ""))
+                            "Stop Reading Notes    "
+                        } else {
+                            stopTextToSpeech()
+                            "Read Summarized Notes"
+                        }
+                        isSpeaking = !isSpeaking
                     }) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.camera_icon),
-                            contentDescription = "Camera Icon",
-                            modifier = Modifier.size(ButtonDefaults.IconSize)
-                        )
-                        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-                        Text(text = "Add Image")
-                    }
-                    OutlinedButton(
-                        onClick = { onStopClick() },
-                        enabled = canStop,
-                        modifier = Modifier.padding(start = 4.dp)
-                    ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.stop_icon),
-                            contentDescription = "Stop Icon",
-                            modifier = Modifier.size(ButtonDefaults.IconSize)
-                        )
-                        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-                        Text(text = "Stop Recording")
-                    }
-                    OutlinedButton(
-                        enabled = canListen,
-                        modifier = Modifier.width(235.dp).padding(start = 4.dp),
-                        onClick = {
-                            ttsButtonText = if (!isSpeaking) {
-                                startTextToSpeech(summarizedContent.joinToString(separator = ""))
-                                "Stop Reading Notes    "
-                            } else {
-                                stopTextToSpeech()
-                                "Read Summarized Notes"
-                            }
-                            isSpeaking = !isSpeaking
-                        }) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.read_text_icon),
-                            contentDescription = "Voice Icon",
-                            modifier = Modifier.size(ButtonDefaults.IconSize)
-                        )
-                        Spacer(
-                            modifier = Modifier
-                                .size(ButtonDefaults.IconSpacing)
-                                .weight(1F)
-                        )
-                        Text(text = ttsButtonText)
-                    }
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.read_text_icon),
+                        contentDescription = "Voice Icon",
+                        modifier = Modifier.size(ButtonDefaults.IconSize)
+                    )
+                    Spacer(
+                        modifier = Modifier
+                            .size(ButtonDefaults.IconSpacing)
+                            .weight(1F)
+                    )
+                    Text(text = ttsButtonText)
                 }
 
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        OutlinedButton(onClick = {
-                            stopTextToSpeech()
-                            navController.navigate(Destination.SessionStartAndEndScreen.route)
-                        }) {
-                            Text(text = "Discard")
-                        }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedButton(onClick = {
+                        stopTextToSpeech()
+                        navController.navigate(Destination.SessionStartAndEndScreen.route)
+                    }) {
+                        Text(text = "Discard")
+                    }
 
-                        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                    Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
 
-                        OutlinedButton(enabled = !canStop, onClick = {
-                            stopTextToSpeech()
-                            onSaveClick()
-                        }) {
-                            Text(text = "Save")
-                        }
+                    OutlinedButton(enabled = !canStop, onClick = {
+                        stopTextToSpeech()
+                        onSaveClick()
+                    }) {
+                        Text(text = "Save")
                     }
                 }
             }

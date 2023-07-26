@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.lang.Integer.min
 import javax.inject.Inject
 
 
@@ -24,8 +25,8 @@ class LiveRecordingViewModel @Inject constructor(
     private val notesRepository: NotesRepository
 ) : ViewModel() {
 
-    private val mutableNoteText: MutableStateFlow<List<String>> = MutableStateFlow(emptyList())
-    val noteText: StateFlow<List<String>> = mutableNoteText
+    private val mutableSummaryAndImages: MutableStateFlow<List<Any>> = MutableStateFlow(emptyList())
+    val summaryAndImages: StateFlow<List<Any>> = mutableSummaryAndImages
 
     private val mutableTranscribedText: MutableStateFlow<List<String>> =
         MutableStateFlow(emptyList())
@@ -48,15 +49,37 @@ class LiveRecordingViewModel @Inject constructor(
                 mutableTranscribedText.update {
                     it + listOf(transcribedText)
                 }
+                liveRecordingRepository.transcript.add(transcribedText)
             }
         }
 
         viewModelScope.launch {
             liveRecordingRepository.summarizedNotesFlow.collect { summarizedNote ->
                 Log.d("VIEW MODEL", summarizedNote)
-                mutableNoteText.update {
-                    it + listOf(summarizedNote)
+                mutableSummaryAndImages.update {
+                    if (it.isNotEmpty()) {
+                        val last = it.last()
+                        it.dropLast(1) +
+                        if (last is String) {
+                            last + summarizedNote
+                        } else {
+                            summarizedNote
+                        }
+                    } else {
+                        listOf(summarizedNote)
+                    }
                 }
+                liveRecordingRepository.summary.add(summarizedNote)
+                liveRecordingRepository.summaryAndImages.add(summarizedNote)
+            }
+        }
+
+        viewModelScope.launch {
+            liveRecordingRepository.imageFlow.collect { bitmap ->
+                mutableSummaryAndImages.update {
+                    it + listOf(bitmap)
+                }
+                liveRecordingRepository.summaryAndImages.add(bitmap)
             }
         }
 
@@ -78,7 +101,7 @@ class LiveRecordingViewModel @Inject constructor(
     }
 
     fun resetNoteText() {
-        mutableNoteText.update {
+        mutableSummaryAndImages.update {
             emptyList()
         }
     }
@@ -104,16 +127,10 @@ class LiveRecordingViewModel @Inject constructor(
             Log.d("VIEW MODEL", "The prompt used was: $prompt")
             liveRecordingRepository.summarizeRecording(prompt)
         }
-        viewModelScope.launch {
-            liveRecordingRepository.collectSummaries()
-        }
-        viewModelScope.launch {
-            liveRecordingRepository.collectBareTranscript()
-        }
     }
 
     fun onClose() {
-        mutableNoteText.value = emptyList()
+        mutableSummaryAndImages.value = emptyList()
         mutableTranscribedText.value = emptyList()
     }
 

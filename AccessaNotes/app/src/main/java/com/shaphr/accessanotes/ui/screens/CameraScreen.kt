@@ -192,6 +192,12 @@ fun ImagePreviewScreen(
                 onClick = { isChecked: Boolean -> onOptionSelect(isChecked, ImageOption.SUMMARY) }
             )
             Divider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
+            OptionCheckbox(
+                isChecked = ImageOption.EMBED in selectedOptions,
+                text = "Embed the image directly",
+                onClick = { isChecked: Boolean -> onOptionSelect(isChecked, ImageOption.EMBED) }
+            )
+            Divider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
             Button(onClick = onFinish, modifier = Modifier.padding(8.dp)) {
                 Text(text = stringResource(id = R.string.camera_screen_finish))
             }
