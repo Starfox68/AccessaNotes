@@ -80,50 +80,36 @@ fun NoteRepositoryScreen(
     viewModel: NoteRepositoryViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
-    
-    var text by remember { mutableStateOf<String?>(null) }
+
     val signInRequestCode = 1
+
+    var noteToRemember: Note = Note("filler")
+
 
     val authResultLauncher =
         rememberLauncherForActivityResult(contract = AuthResultContract()) { task ->
             try {
                 val account = task?.getResult(ApiException::class.java)
                 if (account == null) {
-                    text = "Google sign in failed"
+                    Log.d("drive", "account is null")
                 } else {
                     val driveInstance = getDriveService(context)
                     if (driveInstance == null){
-                        text = "Drive sign in failed"
+                        Log.d("drive", "drive is null")
                     }else{
-                        Log.d("account", account.displayName!!)
-                        uploadFileToGDrive(context)
+                        uploadFileToGDrive(context, noteToRemember, viewModel)
                     }
-
                 }
             } catch (e: ApiException) {
-                text = "Google sign in failed"
+                Log.d("drive", "sign in failed")
             }
         }
 
     val notes = viewModel.notes.collectAsState().value
-    var isLoading by remember { mutableStateOf(false) }
+    val isLoading by remember { mutableStateOf(false) }
 
     var expanded by remember { mutableStateOf(false) }
-    val docConversionTypes = arrayOf("PDF", "DOCX", "TXT")
-
-    fun downloadClick(note: Note, type: String){
-
-        viewModel.downloadNote(note)
-
-        if (type == "download"){
-            Toast.makeText(context, "File Downloaded", Toast.LENGTH_LONG).show()
-            return
-        }
-
-        if (type == "share"){
-            authResultLauncher.launch(signInRequestCode)
-        }
-    }
+    val docConversionTypes = arrayOf("pdf", "docx", "txt")
 
     var selectedText by remember { mutableStateOf(docConversionTypes[0]) }
 
@@ -133,7 +119,6 @@ fun NoteRepositoryScreen(
                 ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = {expanded = !expanded } ) {
                     TextField(
                         value = selectedText,
-//                        onValueChange = {viewModel.setDocType(selectedText)},
                         onValueChange = { },
                         textStyle = MaterialTheme.typography.bodyMedium,
                         readOnly = true,
@@ -187,7 +172,8 @@ fun NoteRepositoryScreen(
                             Spacer(modifier = Modifier.weight(1f))
 
                             Button(
-                                onClick = { downloadClick(note, "download") },
+                                onClick = { viewModel.downloadNote(note)
+                                    Toast.makeText(context, "File Downloaded", Toast.LENGTH_LONG).show()},
                                 modifier = Modifier.width(65.dp) // Adjust the value to the desired width
                             ) {
                                 Icon(
@@ -205,7 +191,9 @@ fun NoteRepositoryScreen(
                                 loadingText = "Signing in...",
                                 isLoading = isLoading,
                                 icon = painterResource(id = R.drawable.ic_google_logo_small),
-                                onClick = { downloadClick(note, "share") }
+                                onClick = { viewModel.downloadNote(note)
+                                    noteToRemember = note
+                                authResultLauncher.launch(signInRequestCode)}
                             )
                         }
                     }
@@ -234,21 +222,29 @@ private fun getDriveService(context: Context): Drive? {
 }
 
 //reference https://www.section.io/engineering-education/backup-services-with-google-drive-api-in-android/
-fun uploadFileToGDrive(context: Context) {
+fun uploadFileToGDrive(context: Context, note: Note, viewModel: NoteRepositoryViewModel) {
     getDriveService(context)?.let { googleDriveService ->
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val localFileDirectory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
-                val actualFile = File("${localFileDirectory}/j.pdf")
+                val actualFile = File("${localFileDirectory}/${note.title}.${viewModel.docType.value}")
 
                 val gFile = com.google.api.services.drive.model.File()
                 gFile.name = actualFile.name
 
-                val fileContent = FileContent("application/pdf", actualFile)
+                var docType = "application/pdf"
+                if (viewModel.docType.value == "txt"){
+                    docType = "text/plain"
+                }else if (viewModel.docType.value == "docx"){
+                    docType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                }
+
+                val fileContent = FileContent(docType, actualFile)
                 googleDriveService.Files().create(gFile, fileContent).execute()
 
+                actualFile.delete()
+
             } catch (exception: Exception) {
-//                Log.d("Hello", "WE HAVE ERRORS")
                 exception.printStackTrace()
             }
         }

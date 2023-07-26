@@ -23,7 +23,7 @@ class NoteRepositoryViewModel @Inject constructor(
     private val mutableNotes = MutableStateFlow<List<Note>>(emptyList())
     val notes: StateFlow<List<Note>> = mutableNotes
 
-    private val mutableDocType: MutableStateFlow<String> = MutableStateFlow("PDF")
+    private val mutableDocType: MutableStateFlow<String> = MutableStateFlow("pdf")
     val docType: StateFlow<String> = mutableDocType
 
     // Track if tts currently speaking
@@ -57,15 +57,15 @@ class NoteRepositoryViewModel @Inject constructor(
     fun downloadNote(note: Note) {
         var fileManager: FileManagerAbstract? = null
         when (docType.value) {
-            "PDF" -> {
+            "pdf" -> {
                 // use FileManagerPDF
                 fileManager = FileManagerPDF()
             }
-            "TXT" -> {
+            "txt" -> {
                 // use FileManagerTXT
                 fileManager = FileManagerTXT()
             }
-            "DOCX" -> {
+            "docx" -> {
                 // use FileManagerDOCX
                 fileManager = FileManagerDOCX()
             }
