@@ -131,7 +131,7 @@ class NotesRepository @Inject constructor(private val application: Application) 
         val noteId = dao.insert(note).toInt()
         uiNote.items?.forEach { uiNoteItem ->
             val imagePath = if (uiNoteItem.imageTrue) saveBitmapToFile(uiNoteItem.bitmap!!) else null
-            val noteItem = NoteItem(uiNoteItem.id, noteId, uiNoteItem.imageTrue, uiNoteItem.content, imagePath, uiNoteItem.order)
+            val noteItem = NoteItem(noteId, uiNoteItem.imageTrue, uiNoteItem.content, imagePath, uiNoteItem.order)
             dao.insertNoteItem(noteItem)
         }
     }
@@ -141,7 +141,7 @@ class NotesRepository @Inject constructor(private val application: Application) 
         dao.update(note)
         uiNote.items?.forEach { uiNoteItem ->
             val imagePath = if (uiNoteItem.imageTrue) saveBitmapToFile(uiNoteItem.bitmap!!) else null
-            val noteItem = NoteItem(uiNoteItem.id, uiNote.id, uiNoteItem.imageTrue, uiNoteItem.content, imagePath, uiNoteItem.order)
+            val noteItem = NoteItem(uiNote.id, uiNoteItem.imageTrue, uiNoteItem.content, imagePath, uiNoteItem.order, uiNoteItem.id)
             dao.updateNoteItem(noteItem)
         }
     }

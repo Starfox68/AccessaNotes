@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.TextToSpeechClient
 import com.shaphr.accessanotes.data.repositories.LiveRecordingRepository
 import com.shaphr.accessanotes.data.repositories.NotesRepository
@@ -143,6 +144,7 @@ class LiveRecordingViewModel @Inject constructor(
         onClose()
         Log.d("TEST",  note.title + ", " + note.summarizeContent + ", " + note.date.toString() + ", " + note.id)
         navHostController.popBackStack()
+        navHostController.navigate(Destination.NoteRepositoryScreen.route)
     }
 
     fun startTextToSpeech(text: String) {

@@ -121,12 +121,14 @@ fun LiveRecordingScreenContent(
                     ) {
                         Text(
                             text = "Transcribed Text",
-                            modifier = Modifier.padding(12.dp)
+                            modifier = Modifier.padding(12.dp),
+                            style = MaterialTheme.typography.bodyMedium
                         )
                         TextField(
                             value = transcribedText.joinToString(separator = ""),
                             onValueChange = { },
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
+                            textStyle = MaterialTheme.typography.bodyMedium,
                         )
                     }
                 }
@@ -153,12 +155,14 @@ fun LiveRecordingScreenContent(
                     ) {
                         Text(
                             text = "Summarized Notes",
-                            modifier = Modifier.padding(12.dp)
+                            modifier = Modifier.padding(12.dp),
+                            style = MaterialTheme.typography.bodyMedium
                         )
                         TextField(
                             value = summarizedContent.joinToString(separator = ""),
                             onValueChange = { },
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
+                            textStyle = MaterialTheme.typography.bodyMedium
                         )
                     }
                 }
@@ -180,7 +184,7 @@ fun LiveRecordingScreenContent(
                             modifier = Modifier.size(ButtonDefaults.IconSize)
                         )
                         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-                        Text(text = "Add Image")
+                        Text(text = "Add Image", style = MaterialTheme.typography.bodyMedium)
                     }
                     OutlinedButton(
                         onClick = { onStopClick() },
@@ -193,7 +197,7 @@ fun LiveRecordingScreenContent(
                             modifier = Modifier.size(ButtonDefaults.IconSize)
                         )
                         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-                        Text(text = "Stop Recording")
+                        Text(text = "Stop Recording", style = MaterialTheme.typography.bodyMedium)
                     }
                     OutlinedButton(
                         enabled = canListen,
@@ -218,7 +222,7 @@ fun LiveRecordingScreenContent(
                                 .size(ButtonDefaults.IconSpacing)
                                 .weight(1F)
                         )
-                        Text(text = ttsButtonText)
+                        Text(text = ttsButtonText, style = MaterialTheme.typography.bodyMedium)
                     }
                 }
 
@@ -232,7 +236,7 @@ fun LiveRecordingScreenContent(
                             stopTextToSpeech()
                             navController.navigate(Destination.SessionStartAndEndScreen.route)
                         }) {
-                            Text(text = "Discard")
+                            Text(text = "Discard", style = MaterialTheme.typography.bodyMedium)
                         }
 
                         Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
@@ -241,7 +245,7 @@ fun LiveRecordingScreenContent(
                             stopTextToSpeech()
                             onSaveClick()
                         }) {
-                            Text(text = "Save")
+                            Text(text = "Save", style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }

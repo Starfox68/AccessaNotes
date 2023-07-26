@@ -29,7 +29,7 @@ fun StyleIcons(iconName: String){
         shape = Icons.Outlined.AccountCircle
     }
 
-    return Icon(shape, contentDescription = iconName, mod, Color.Black)
+    return Icon(shape, contentDescription = iconName, mod, Color(0xFF2E5399))
 }
 
 //Bottom Navigation Bar
@@ -42,19 +42,19 @@ fun BottomNavBar(navController: NavController) {
     NavigationBar(modifier = Modifier.defaultMinSize(50.dp, 90.dp)) {
         NavigationBarItem(
             icon = { StyleIcons("Home")},
-            label = {Text("All Notes")},
+            label = {Text("All Notes", color = Color(0xFF2E5399))},
             selected = selectedItem.value == Destination.NoteRepositoryScreen.route,
             onClick = { navController.navigate(Destination.NoteRepositoryScreen.route) }
         )
         NavigationBarItem(
             icon = { StyleIcons("Add")},
-            label = {Text("New Session")},
+            label = {Text("New Session", color = Color(0xFF2E5399))},
             selected = selectedItem.value == Destination.SessionStartAndEndScreen.route,
             onClick = { navController.navigate(Destination.SessionStartAndEndScreen.route)}
         )
         NavigationBarItem(
             icon = { StyleIcons("AccountCircle")},
-            label = {Text("Account")},
+            label = {Text("Account", color = Color(0xFF2E5399))},
             selected = selectedItem.value == Destination.AccountScreen.route,
             onClick = { navController.navigate(Destination.AccountScreen.route) }
         )

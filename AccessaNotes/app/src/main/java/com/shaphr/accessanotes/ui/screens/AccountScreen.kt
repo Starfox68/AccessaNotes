@@ -1,5 +1,6 @@
 package com.shaphr.accessanotes.ui.screens
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.clickable
@@ -26,6 +27,7 @@ import com.shaphr.accessanotes.AuthResultContract
 import com.shaphr.accessanotes.ui.components.TopScaffold
 import com.shaphr.accessanotes.ui.viewmodels.AccountSettingsViewModel
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun AccountScreen(
     navController: NavHostController,
@@ -38,7 +40,9 @@ fun AccountScreen(
             onFontChange = viewModel::onFontClick,
             onColourChange = viewModel::onColourClick,
             isColourBlind = viewModel.colourBlindFlow.collectAsState(initial = false).value,
-            isFontLarge = viewModel.fontFlow.collectAsState(initial = false).value
+            isFontLarge = viewModel.fontFlow.collectAsState(initial = false).value,
+            authenticateUser = viewModel::setAuthenticated,
+            authConnected = viewModel.authenticated.collectAsState(initial = false).value
         )
     }
 }
@@ -49,7 +53,9 @@ fun AccountScreenContent(
     onFontChange: (Boolean) -> Unit,
     onColourChange: (Boolean) -> Unit,
     isColourBlind: Boolean,
-    isFontLarge: Boolean
+    isFontLarge: Boolean,
+    authenticateUser: () -> Unit,
+    authConnected: Boolean
 ) {
 
     val context = LocalContext.current
@@ -61,6 +67,9 @@ fun AccountScreenContent(
                 val account = task?.getResult(ApiException::class.java)
                 if (account == null) {
                     Log.d("drive", "account is null")
+                }else{
+                    Log.d("HI", account.displayName!!)
+                    authenticateUser()
                 }
             } catch (e: ApiException) {
                 Log.d("drive", "sign in failed")
@@ -81,9 +90,13 @@ fun AccountScreenContent(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(20.dp, 0.dp, 10.dp, 0.dp)
         ) {
-            Text("Connect to Google Drive", style = MaterialTheme.typography.bodyMedium)
+            if (authConnected){
+                Text("Connected to Google Drive", style = MaterialTheme.typography.bodyMedium)
+            }else{
+                Text("Connect to Google Drive", style = MaterialTheme.typography.bodyMedium)
+            }
             Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = { authResultLauncher.launch(signInRequestCode) }) {
+            Button(onClick = { authResultLauncher.launch(signInRequestCode) }, enabled = !authConnected) {
                 Text("Connect", style = MaterialTheme.typography.labelMedium)
             }
         }
@@ -108,14 +121,15 @@ fun SettingSwitch(
     }
 }
 
-@Preview
-@Composable
-fun Preview() {
-    AccountScreenContent(
-        padding = PaddingValues(8.dp),
-        onFontChange = { },
-        onColourChange = { },
-        isColourBlind = false,
-        isFontLarge = true
-    )
-}
+//@Preview
+//@Composable
+//fun Preview() {
+//    AccountScreenContent(
+//        padding = PaddingValues(8.dp),
+//        onFontChange = { },
+//        onColourChange = { },
+//        isColourBlind = false,
+//        isFontLarge = true,
+//        authenticateUser = () -> Unit
+//    )
+//}
