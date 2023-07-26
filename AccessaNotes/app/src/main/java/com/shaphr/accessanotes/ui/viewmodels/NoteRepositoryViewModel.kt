@@ -6,14 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.shaphr.accessanotes.FileManagerDOCX
 import com.shaphr.accessanotes.FileManagerPDF
 import com.shaphr.accessanotes.FileManagerTXT
-import com.shaphr.accessanotes.TextToSpeechClient
 import com.shaphr.accessanotes.data.models.UiNote
 import com.shaphr.accessanotes.data.repositories.NotesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,7 +18,6 @@ import javax.inject.Inject
 class NoteRepositoryViewModel @Inject constructor(
     application: Application,
     private val notesRepository: NotesRepository,
-    private val textToSpeechClient: TextToSpeechClient
 ) : AndroidViewModel(application) {
 
     val notes: StateFlow<List<UiNote>> = notesRepository.notes
@@ -37,9 +33,6 @@ class NoteRepositoryViewModel @Inject constructor(
 
     private val mutableSelectedNotes = MutableStateFlow<List<Int>>(emptyList())
     val selectedNotes: StateFlow<List<Int>> = mutableSelectedNotes
-
-    var isSpeaking = false
-
     init {
 //        viewModelScope.launch {
 //            refreshNotes()
@@ -112,21 +105,6 @@ class NoteRepositoryViewModel @Inject constructor(
             mutableSelectedNotes.value = mutableSelectedNotes.value - id
         }
         mutableAllSelected.value = mutableSelectedNotes.value.size == notes.value.size
-    }
-
-    fun onTextToSpeech(text: String) {
-        if (!isSpeaking) {
-            textToSpeechClient.speak(text)
-        } else {
-            textToSpeechClient.stop()
-        }
-
-        isSpeaking = !isSpeaking
-    }
-    fun getNote(id: Int): Flow<UiNote?> {
-        return notes.map { noteList ->
-            noteList.firstOrNull { it.id == id }
-        }
     }
 }
 
