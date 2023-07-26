@@ -70,7 +70,6 @@ class LiveRecordingRepository @Inject constructor(
             transcript = if (transcript.isEmpty()) "" else transcript.reduce { acc: String, next: String ->
                 acc + next
             },
-            date = date,
         )
         summarizedNote.clear()
         transcript.clear()

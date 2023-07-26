@@ -124,7 +124,7 @@ fun SingleNoteScreen(
                         modifier = Modifier.padding(12.dp)
                     )
                     TextField(
-                        value = note?.transcript ?: "",
+                        value = note.value?.transcript ?: "",
                         onValueChange = { },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         modifier = Modifier
@@ -159,9 +159,9 @@ fun SingleNoteScreen(
                         modifier = Modifier.padding(12.dp)
                     )
                     TextField(
-                        value = note?.summarizeContent ?: "",
+                        value = note.value?.summarizeContent ?: "",
                         onValueChange = { newValue ->
-                            note?.summarizeContent = newValue
+                            note.value?.summarizeContent = newValue
                             viewModel.updateNote(note!!)
                         },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
