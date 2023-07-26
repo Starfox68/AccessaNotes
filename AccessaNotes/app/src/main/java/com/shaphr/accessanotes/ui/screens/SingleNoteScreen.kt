@@ -43,6 +43,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -69,7 +70,7 @@ fun SingleNoteScreen(
             Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
-                .background(Color.LightGray)
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
         ) {
             // Back button
             Icon(
@@ -87,20 +88,21 @@ fun SingleNoteScreen(
             Text(
                 text = note?.title ?: "default",
                 style = MaterialTheme.typography.bodyMedium,
+                fontSize = 20.sp,
                 modifier = Modifier
                     .padding(16.dp)
                     .align(Alignment.Center)
 
             )
             // Share icon
-            Icon(
-                Icons.Default.Share,
-                contentDescription = "Share",
-                tint = Color.Black,
-                modifier = Modifier
-                    .align(alignment = Alignment.TopEnd)
-                    .padding(16.dp)
-            )
+//            Icon(
+//                Icons.Default.Share,
+//                contentDescription = "Share",
+//                tint = Color.Black,
+//                modifier = Modifier
+//                    .align(alignment = Alignment.TopEnd)
+//                    .padding(16.dp)
+//            )
         }
 
         // Body
