@@ -2,7 +2,6 @@ package com.shaphr.accessanotes.ui.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.shaphr.accessanotes.FileManagerAbstract
 import com.shaphr.accessanotes.FileManagerDOCX
 import com.shaphr.accessanotes.FileManagerPDF
 import com.shaphr.accessanotes.FileManagerTXT
@@ -25,8 +24,11 @@ class NoteRepositoryViewModel @Inject constructor(
     private val mutableNotes = MutableStateFlow<List<Note>>(emptyList())
     val notes: StateFlow<List<Note>> = mutableNotes
 
-    private val mutableIsDialogOpen = MutableStateFlow(false)
-    val isDialogOpen: StateFlow<Boolean> = mutableIsDialogOpen
+    private val mutableFileFormat = MutableStateFlow(FileFormat.PDF)
+    val fileFormat = mutableFileFormat
+
+    private val mutableDialogState = MutableStateFlow(DialogState.CLOSED)
+    val dialogState: StateFlow<DialogState> = mutableDialogState
 
     private val mutableAllSelected = MutableStateFlow(false)
     val allSelected: StateFlow<Boolean> = mutableAllSelected
@@ -42,13 +44,13 @@ class NoteRepositoryViewModel @Inject constructor(
         }
     }
 
-    private fun downloadNote(fileOptions: FileOptions) {
-        val notes = getSelectedNotes(mutableSelectedNotes.value)
+    private fun downloadNote(fileFormat: FileFormat) {
+        val notes = getSelectedNotes()
 
-        val fileManager = when (fileOptions) {
-            FileOptions.PDF -> FileManagerPDF(getApplication())
-            FileOptions.DOCX -> FileManagerTXT(getApplication())
-            FileOptions.TXT -> FileManagerDOCX(getApplication())
+        val fileManager = when (fileFormat) {
+            FileFormat.PDF -> FileManagerPDF(getApplication())
+            FileFormat.DOCX -> FileManagerDOCX(getApplication())
+            FileFormat.TXT -> FileManagerTXT(getApplication())
         }
         notes.forEach { note ->
             println("downloadNote: ${note.title}")
@@ -56,27 +58,27 @@ class NoteRepositoryViewModel @Inject constructor(
         }
     }
 
-    private fun getSelectedNotes(ids: List<Int>): List<Note> {
+    fun getSelectedNotes(): List<Note> {
         return mutableNotes.value.filter {
-            it.id in ids
+            it.id in mutableSelectedNotes.value
         }
     }
 
+    fun showDialog(dialogState: DialogState) {
+        mutableDialogState.value = dialogState
+    }
+
     fun onDialogClose() {
-        mutableIsDialogOpen.value = false
+        mutableDialogState.value = DialogState.CLOSED
     }
 
-    fun onDialogConfirm(fileOptions: FileOptions) {
-        onDialogClose()
-        downloadNote(fileOptions)
-    }
-
-    fun onDownloadClick() {
-        mutableIsDialogOpen.value = true
+    fun onDialogConfirm(fileFormat: FileFormat) {
+        mutableFileFormat.value = fileFormat
+        downloadNote(fileFormat)
     }
 
     fun onDeleteClick() {
-        val notes = getSelectedNotes(mutableSelectedNotes.value)
+        val notes = getSelectedNotes()
         notes.forEach {
             notesRepository.deleteNote(it)
         }
@@ -124,8 +126,14 @@ class NoteRepositoryViewModel @Inject constructor(
     }
 }
 
-enum class FileOptions(val text: String) {
+enum class FileFormat(val text: String) {
     PDF("PDF"),
     DOCX("DOCX"),
     TXT("TXT")
+}
+
+enum class DialogState {
+    CLOSED,
+    SHARE_OPEN,
+    DOWNLOAD_OPEN
 }
