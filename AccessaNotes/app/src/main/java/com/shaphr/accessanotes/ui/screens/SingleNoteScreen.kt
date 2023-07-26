@@ -80,9 +80,9 @@ fun SingleNoteScreen(
         "Cinderella, torn between staying with her prince or escaping, leaves him a slipper as a clue (\"On the Steps of the Palace\"), and trades shoes with the baker's wife. The baker arrives with another cow; they now have all four items. A great crash is heard, and Jack's mother reports a dead giant in her backyard. Jack returns with a magic harp. The witch discovers the new cow is useless, and resurrects Milky White, who is fed the ingredients but fails to give milk. The witch explains Rapunzel's hair will not work, and the mysterious man offers corn silk instead; Milky White produces the potion. The witch reveals the mysterious man is the baker's father, and she drinks the potion. The mysterious man falls dead, the curse is broken, and the witch regains her youth and beauty.",
         "Cinderella's prince seeks the girl who fits the slipper; Cinderella's desperate stepsisters mutilate their feet (\"Careful My Toe\"). Cinderella succeeds and becomes his bride. Rapunzel bears twins and is found by her prince. The witch finds her, and attempts to claim her back, but the witch's powers have been lost in exchange for her youth and beauty. At Cinderella's wedding, her stepsisters are blinded by birds, and the baker's wife, now very pregnant, thanks Cinderella for her help (\"So Happy\" Prelude). Congratulating themselves on living \"happily ever after,\" the characters fail to notice another beanstalk growing."
     )
-    val bmp1 = Bitmap.createBitmap(300, 100, Bitmap.Config.ARGB_8888)
+    val bmp1 = Bitmap.createBitmap(1200, 400, Bitmap.Config.ARGB_8888)
     bmp1.eraseColor(-16711681)
-    val bmp2 = Bitmap.createBitmap(300, 100, Bitmap.Config.ARGB_8888)
+    val bmp2 = Bitmap.createBitmap(1200, 400, Bitmap.Config.ARGB_8888)
     bmp2.eraseColor(-65281)
     val content =
         text.slice(0..1) + listOf(bmp1) + text.slice(2..4) + listOf(bmp2) + text.slice(5..6)
@@ -99,7 +99,7 @@ fun SingleNoteScreen(
             Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
-                .background(Color.LightGray)
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
         ) {
             // Back button
             Icon(
@@ -114,20 +114,22 @@ fun SingleNoteScreen(
             Text(
                 text = note.value?.title ?: "default",
                 style = MaterialTheme.typography.bodyMedium,
+                fontSize = 20.sp,
+                color = Color.Black,
                 modifier = Modifier
                     .padding(16.dp)
                     .align(Alignment.Center)
 
             )
             // Share icon
-            Icon(
-                Icons.Default.Share,
-                contentDescription = "Share",
-                tint = Color.Black,
-                modifier = Modifier
-                    .align(alignment = Alignment.TopEnd)
-                    .padding(16.dp)
-            )
+//            Icon(
+//                Icons.Default.Share,
+//                contentDescription = "Share",
+//                tint = Color.Black,
+//                modifier = Modifier
+//                    .align(alignment = Alignment.TopEnd)
+//                    .padding(16.dp)
+//            )
         }
 
         // Body
@@ -165,11 +167,18 @@ fun SingleNoteScreen(
                             }
                         } else if (it is Bitmap) {
                             item {
-                                Image(
-                                    bitmap = it.asImageBitmap(),
-                                    contentDescription = "Image from notes",
-                                    modifier = Modifier.padding(4.dp)
-                                )
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Image(
+                                        bitmap = it.asImageBitmap(),
+                                        contentDescription = "Image from notes",
+                                        modifier = Modifier
+                                            .padding(6.dp)
+                                            .fillMaxWidth(0.8F)
+                                    )
+                                }
                             }
                         }
                     }
@@ -191,7 +200,8 @@ fun SingleNoteScreen(
                                     screenHeight * 0.6F
                                 )
                             }
-                        })
+                        }
+                )
             }
 
             item {
@@ -207,19 +217,35 @@ fun SingleNoteScreen(
                         .padding(4.dp)
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
                 ) {
-                    content.filterIsInstance<String>().forEach {
-                        item {
-                            BasicTextField(
-                                value = it,
-                                onValueChange = { },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 4.dp, end = 4.dp),
-                                textStyle = TextStyle.Default.copy(fontSize = 16.sp)
-                            )
+                    content.forEach {
+                        if (it is String) {
+                            item {
+                                BasicTextField(
+                                    value = it,
+                                    onValueChange = { },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 4.dp, end = 4.dp),
+                                    textStyle = TextStyle.Default.copy(fontSize = 16.sp)
+                                )
+                            }
+                        } else if (it is Bitmap) {
+                            item {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Image(
+                                        bitmap = it.asImageBitmap(),
+                                        contentDescription = "Image from notes",
+                                        modifier = Modifier
+                                            .padding(6.dp)
+                                            .fillMaxWidth(0.8F)
+                                    )
+                                }
+                            }
                         }
-
                     }
                 }
             }
