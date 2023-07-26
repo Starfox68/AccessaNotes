@@ -89,7 +89,7 @@ fun AccessaNotesTheme(
 fun MyAppDialog(onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Warning") },
+        title = { Text("Risk Acknowledgment") },
         text = { Text("By using our note transcription app powered by AI, you acknowledge the risk of potential addiction. This app is not a substitute for attentive listening in class or professional note-taking. We hold no responsibility for any emotional, physical, or other damages resulting from its usage. Users must exercise caution and discretion while using the app. By proceeding, you agree to these terms and conditions.") },
         confirmButton = {
             TextButton(onClick = onDismiss) {
