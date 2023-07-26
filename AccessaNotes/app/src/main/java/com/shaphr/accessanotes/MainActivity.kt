@@ -1,6 +1,7 @@
 package com.shaphr.accessanotes
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
@@ -8,8 +9,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -75,24 +80,40 @@ class MainActivity : ComponentActivity() {
             requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
         }
 
+        // Check if the popup has been shown before
         setContent {
-            val themeViewModel: ThemeViewModel = hiltViewModel()
 
-            AccessaNotesTheme(
-                isColourBlind = themeViewModel.colourFlow.collectAsState(initial = false).value,
-                isLargeFont = themeViewModel.fontFlow.collectAsState(initial = false).value,
-            ) {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+            if (!isPopupShown()) {
+                PopupDialog(onDismiss = { onPopupDismissed() })
+            } else {
+
+                val themeViewModel: ThemeViewModel = hiltViewModel()
+
+                AccessaNotesTheme(
+                    isColourBlind = themeViewModel.colourFlow.collectAsState(initial = false).value,
+                    isLargeFont = themeViewModel.fontFlow.collectAsState(initial = false).value,
                 ) {
-                    //main navigation controller
-                    val navController = rememberNavController()
-                    NavigationAppHost(navController = navController)
+                    // A surface container using the 'background' color from the theme
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        //main navigation controller
+                        val navController = rememberNavController()
+                        NavigationAppHost(navController = navController)
+                    }
                 }
             }
         }
+    }
+
+    private fun isPopupShown(): Boolean {
+        val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        return sharedPreferences.getBoolean("isPopupShown", false)
+    }
+    private fun onPopupDismissed() {
+        val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        sharedPreferences.edit().putBoolean("isPopupShown", true).apply()
     }
 
 //    override fun onDestroy() {
@@ -121,4 +142,21 @@ fun NavigationAppHost(navController: NavHostController) {
         }
         composable(Destination.CameraScreen.route) { CameraScreen(navController) }
     }
+}
+
+@Composable
+fun PopupDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = { },
+        title = { Text("Warning") },
+        text = { Text("Do not get addicted to this app.") },
+        confirmButton = {
+            Button(
+                onClick = { onDismiss() },
+                colors = ButtonDefaults.buttonColors()
+            ) {
+                Text("Okay")
+            }
+        }
+    )
 }
