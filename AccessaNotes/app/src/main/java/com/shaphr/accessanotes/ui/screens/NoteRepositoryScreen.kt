@@ -50,6 +50,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
 import com.google.api.client.http.FileContent
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.drive.Drive
@@ -94,6 +95,7 @@ fun NoteRepositoryScreen(
                     if (driveInstance == null){
                         text = "Drive sign in failed"
                     }else{
+                        Log.d("account", account.displayName!!)
                         uploadFileToGDrive(context)
                     }
 
@@ -217,7 +219,7 @@ fun NoteRepositoryScreen(
 private fun getDriveService(context: Context): Drive? {
     GoogleSignIn.getLastSignedInAccount(context)?.let { googleAccount ->
         val credential = GoogleAccountCredential.usingOAuth2(
-            context, listOf(DriveScopes.DRIVE_FILE)
+            context, listOf(DriveScopes.DRIVE_FILE, DriveScopes.DRIVE)
         )
         credential.selectedAccount = googleAccount.account!!
         return Drive.Builder(
@@ -236,13 +238,11 @@ fun uploadFileToGDrive(context: Context) {
     getDriveService(context)?.let { googleDriveService ->
         CoroutineScope(Dispatchers.IO).launch {
             try {
-
                 val localFileDirectory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
                 val actualFile = File("${localFileDirectory}/j.pdf")
 
                 val gFile = com.google.api.services.drive.model.File()
                 gFile.name = actualFile.name
-
 
                 val fileContent = FileContent("application/pdf", actualFile)
                 googleDriveService.Files().create(gFile, fileContent).execute()
