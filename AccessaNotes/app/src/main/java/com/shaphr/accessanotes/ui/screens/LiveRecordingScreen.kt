@@ -109,7 +109,7 @@ fun LiveRecordingScreenContent(
 
                 item {
                     Column(
-                        modifier = Modifier.height(transcriptHeight)
+                        modifier = Modifier.height(transcriptHeight).padding(4.dp)
                     ) {
                         Text(
                             text = "Transcribed Text",
@@ -125,7 +125,7 @@ fun LiveRecordingScreenContent(
 
                 item {
                     Divider(color = MaterialTheme.colorScheme.tertiary, thickness = 4.dp,
-                        modifier = Modifier.pointerInput(Unit) {
+                        modifier = Modifier.padding(4.dp).pointerInput(Unit) {
                             detectVerticalDragGestures { _, dragAmount ->
                                 transcriptHeight = (transcriptHeight + dragAmount.dp).coerceIn(
                                     screenHeight * 0.15F,
@@ -141,7 +141,7 @@ fun LiveRecordingScreenContent(
 
                 item {
                     Column(
-                        modifier = Modifier.height(summaryHeight)
+                        modifier = Modifier.height(summaryHeight).padding(4.dp)
                     ) {
                         Text(
                             text = "Summarized Notes",
@@ -157,12 +157,14 @@ fun LiveRecordingScreenContent(
 
 
                 item {
-                    OutlinedButton(onClick = {
-                        if (hasCameraPermission) {
-                            onCameraClick()
-                        } else {
-                            onCameraPermissionRequest()
-                        }
+                    OutlinedButton(
+                        modifier = Modifier.padding(start = 4.dp),
+                        onClick = {
+                            if (hasCameraPermission) {
+                                onCameraClick()
+                            } else {
+                                onCameraPermissionRequest()
+                            }
                     }) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.camera_icon),
@@ -173,7 +175,9 @@ fun LiveRecordingScreenContent(
                         Text(text = "Add Image")
                     }
                     OutlinedButton(
-                        onClick = { onStopClick() }, enabled = canStop
+                        onClick = { onStopClick() },
+                        enabled = canStop,
+                        modifier = Modifier.padding(start = 4.dp)
                     ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.stop_icon),
@@ -185,7 +189,7 @@ fun LiveRecordingScreenContent(
                     }
                     OutlinedButton(
                         enabled = canListen,
-                        modifier = Modifier.width(230.dp),
+                        modifier = Modifier.width(235.dp).padding(start = 4.dp),
                         onClick = {
                             ttsButtonText = if (!isSpeaking) {
                                 startTextToSpeech(summarizedContent.joinToString(separator = ""))

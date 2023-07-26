@@ -14,9 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
@@ -61,12 +59,11 @@ fun SingleNoteScreen(
 ) {
     val note = viewModel.getNote(noteID).collectAsState(initial = Note()).value
     var ttsButtonText by remember { mutableStateOf("Read Summarized Notes") }
+    val screenHeight = (LocalConfiguration.current.screenHeightDp).dp
+    var transcriptHeight by remember { mutableStateOf(screenHeight * 0.4F) }
+    var summaryHeight by remember { mutableStateOf(screenHeight * 0.4F) }
 
     Column(Modifier.fillMaxSize()) {
-        val screenHeight = (LocalConfiguration.current.screenHeightDp).dp
-        var transcriptHeight by remember { mutableStateOf(screenHeight * 0.4F) }
-        var summaryHeight by remember { mutableStateOf(screenHeight * 0.4F) }
-
         // Header
         Box(
             Modifier
@@ -112,7 +109,7 @@ fun SingleNoteScreen(
         ) {
             item {
                 Column(
-                    modifier = Modifier.height(transcriptHeight)
+                    modifier = Modifier.height(transcriptHeight).padding(4.dp)
                 ) {
                     Text(
                         text = "Transcribed Text",
@@ -131,7 +128,7 @@ fun SingleNoteScreen(
 
             item {
                 Divider(color = MaterialTheme.colorScheme.tertiary, thickness = 4.dp,
-                    modifier = Modifier.pointerInput(Unit) {
+                    modifier = Modifier.padding(4.dp).pointerInput(Unit) {
                         detectVerticalDragGestures { _, dragAmount ->
                             transcriptHeight = (transcriptHeight + dragAmount.dp).coerceIn(
                                 screenHeight * 0.15F,
@@ -147,7 +144,7 @@ fun SingleNoteScreen(
 
             item {
                 Column(
-                    modifier = Modifier.height(summaryHeight)
+                    modifier = Modifier.height(summaryHeight).padding(4.dp)
                 ) {
                     Text(
                         text = "Summarized Notes",
@@ -169,7 +166,7 @@ fun SingleNoteScreen(
 
             item {
                 OutlinedButton(
-                    modifier = Modifier.width(230.dp),
+                    modifier = Modifier.width(235.dp).padding(4.dp),
                     onClick = {
                         viewModel.onTextToSpeech(note?.summarizeContent ?: "No content to read")
                         ttsButtonText = if (viewModel.isSpeaking) {
