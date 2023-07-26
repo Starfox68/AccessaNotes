@@ -239,7 +239,7 @@ fun ShowStartButton(text: String, canStart: Boolean, onStartClick: () -> Unit){
         onClick = onStartClick,
         enabled = canStart
     ) {
-        Text(text)
+        Text(text, style = MaterialTheme.typography.bodyMedium)
     }
 }
 
@@ -251,6 +251,7 @@ fun ShowSessionTitle(title: String, setName: (String) -> Unit){
         onValueChange = {
             setName(it)
         },
+        textStyle = MaterialTheme.typography.bodyMedium,
         modifier = Modifier
             .fillMaxWidth()
             .testTag("textField1")
