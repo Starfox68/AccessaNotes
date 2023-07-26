@@ -63,10 +63,12 @@
 | 07/20/2023 |  | 1 |  |  | |  | DB merge and fixes |
 | 07/20/2023 |  |  |  | 1 | |  | UI styling |
 | 07/21/2023 |  |  |  | 4 | |  | Bottom Nav Bar + UI Styling |
+| 07/21/2023 | 4 | | | | | | Finish Camera functionality |
 | 07/22/2023 | | | | | 10 | | File Manager PDF/DOCX/TXT with Template + Pagination |
 | 07/22/2023 | | | | | 0.5 | | Start Recording on Button |
 | 07/22/2023 | | | | 6 | | | NoteRepository, LiveRecording, and AccountSetings UI |
 | 07/22/2023 | | | | 0.5 | | | Recording Notification for Pivot |
+| 07/22/2023 | 5 | | | | | | Connect database to UI / viewmodels, implement saving notes |
 | 07/22/2023 | | | | | | 3 | Docx file upload feature |
 | 07/22/2023 | | | | | | 1 | Fixed "start recording" bug |
 | 07/22/2023 | | | | | | 1 | Reset transcript on screen after session |
@@ -75,6 +77,7 @@
 | 07/23/2023 | | | | | | 1 | Add note discard functionality |
 | 07/23/2023 | | | | 5 | | | Fixed google sign-in + started google drive |
 | 07/23/2023 | | 1 | | | | | Note with image storing capability |
+| 07/22/2023 | 4 | | | | | | Implement settings screen |
 | 07/24/2023 | 2 |  2 | 2 | 2 |2 | 2 | Team sync |
 | 07/24/2023 | | | | | 1 | | TTS UI-Related Fixes and Improvements |
 | 07/24/2023 | | | | 5 | | | google drive file upload + dropdown |
