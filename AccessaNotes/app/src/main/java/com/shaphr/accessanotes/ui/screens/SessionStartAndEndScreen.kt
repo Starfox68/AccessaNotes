@@ -60,9 +60,12 @@ fun SessionStartAndEndScreen(navController: NavHostController, viewModel: StartA
         SessionStartScreen(
             padding = padding,
             onStartClick = {
-                val mediaPlayer = MediaPlayer.create(context, R.raw.recording_started)
-                mediaPlayer.setVolume(1F,1F)
-                mediaPlayer.start()
+                if (audioFile == Uri.EMPTY) {
+                    println("Audio file was not null")
+                    val mediaPlayer = MediaPlayer.create(context, R.raw.recording_started)
+                    mediaPlayer.setVolume(1F,1F)
+                    mediaPlayer.start()
+                }
 
                 println("Clicked Start")
                 println("File text: $fileText")
