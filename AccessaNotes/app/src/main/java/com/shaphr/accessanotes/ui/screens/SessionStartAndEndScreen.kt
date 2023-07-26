@@ -132,42 +132,9 @@ fun SessionStartScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Note Style Template:", style = MaterialTheme.typography.titleMedium)
-        DropdownMenu(
-            expanded = dropdown1Expanded,
-            onDismissRequest = { dropdown1Expanded = false },
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("dropdown1")
-        ) {
-//                    DropdownMenuItem(onClick = { /* Handle option 1 selection */ }) {
-//                        Text("Option 1")
-//                    }
-//                    DropdownMenuItem(onClick = { /* Handle option 2 selection */ }) {
-//                        Text("Option 2")
-//                    }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text("Export Format:", style = MaterialTheme.typography.titleMedium)
-        DropdownMenu(
-            expanded = dropdown2Expanded,
-            onDismissRequest = { dropdown2Expanded = false },
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("dropdown2")
-        ) {
-//                    DropdownMenuItem(onClick = { /* Handle option 1 selection */ }) {
-//                        Text("Option 1")
-//                    }
-//                    DropdownMenuItem(onClick = { /* Handle option 2 selection */ }) {
-//                        Text("Option 2")
-//                    }
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
         ShowUploadButton(viewModel)
+        Spacer(modifier = Modifier.height(16.dp))
         ShowStartButton(canStart, onStartClick)
     }
 }

@@ -12,7 +12,7 @@ import com.shaphr.accessanotes.R
 // Set of Material typography styles to start with
 val defaultTypography = Typography(
     bodyLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.regular)),
+        fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
