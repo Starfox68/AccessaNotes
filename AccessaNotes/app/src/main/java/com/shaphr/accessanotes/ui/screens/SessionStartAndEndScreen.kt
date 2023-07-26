@@ -45,12 +45,14 @@ import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.ui.components.TopScaffold
 import com.shaphr.accessanotes.ui.viewmodels.StartAndEndScreenViewModel
 import kotlinx.coroutines.launch
+import java.net.URLEncoder
 
 @Composable
 fun SessionStartAndEndScreen(navController: NavHostController, viewModel: StartAndEndScreenViewModel = hiltViewModel()) {
     val canStart = viewModel.canStart.collectAsState().value
     val title = viewModel.title.collectAsState().value
     var prompt = viewModel.prompt.collectAsState().value
+    var audioFile = viewModel.audioFile.collectAsState().value
     var fileText = viewModel.fileText.collectAsState().value
     val context = LocalContext.current
 
@@ -72,7 +74,7 @@ fun SessionStartAndEndScreen(navController: NavHostController, viewModel: StartA
                     prompt += "\n\nBut before I give you the transcript use the below text for preliminary context to improve your summary and incorporate it with same formatting:\n$fileText"
                 }
                 fileText = ""
-                navController.navigate(Destination.LiveRecordingScreen.createRoute(prompt))
+                navController.navigate(Destination.LiveRecordingScreen.createRoute(prompt, URLEncoder.encode(audioFile.toString(), "UTF-8")))
             },
             canStart = canStart,
             title = title,
@@ -147,6 +149,7 @@ fun ShowUploadMP3Button(viewModel: StartAndEndScreenViewModel) {
     val rememberLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
             selectedUri = it
+            viewModel.setAudioFile(it)
         }
     }
     var clickState by remember { mutableStateOf(false) }

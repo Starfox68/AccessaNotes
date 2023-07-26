@@ -34,9 +34,9 @@ import dagger.hilt.android.AndroidEntryPoint
 // UI screens with corresponding routes for navigation
 sealed class Destination(val route: String) {
     object NoteRepositoryScreen : Destination("noteRepositoryScreen")
-    object LiveRecordingScreen : Destination("liveRecordingScreen/{prompt}") {
-        fun createRoute(prompt: String): String {
-            return "liveRecordingScreen/$prompt"
+    object LiveRecordingScreen : Destination("liveRecordingScreen/{prompt}/{existingAudio}") {
+        fun createRoute(prompt: String, existingAudio: String): String {
+            return "liveRecordingScreen/$prompt/${existingAudio}"
         }
     }
     object SessionStartAndEndScreen : Destination("sessionStartAndEndScreen")

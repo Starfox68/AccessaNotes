@@ -1,6 +1,7 @@
 package com.shaphr.accessanotes.ui.screens
 
 import android.Manifest
+import android.net.Uri
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -47,6 +48,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.ui.viewmodels.LiveRecordingViewModel
+import java.net.URLDecoder
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -60,6 +62,12 @@ fun LiveRecordingScreen(
     val arguments = navBackStackEntry.arguments
     val prompt = arguments?.getString("prompt") ?: ""
     viewModel.updatePrompt(prompt)
+
+    val existingAudioStr = arguments?.getString("existingAudio")
+    println("existingAudioStr: $existingAudioStr")
+    val existingAudio = existingAudioStr?.let { Uri.parse(URLDecoder.decode(it, "UTF-8")) }
+    println("existingAudio: $existingAudio")
+    viewModel.setAudioExists(existingAudio)
 
     val canStop = viewModel.canStop.collectAsState().value
     val canListen = viewModel.canListen.collectAsState().value

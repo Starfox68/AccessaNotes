@@ -1,5 +1,6 @@
 package com.shaphr.accessanotes.data.repositories
 
+import android.net.Uri
 import com.shaphr.accessanotes.TranscriptionClient
 import com.shaphr.accessanotes.data.models.UiNote
 import com.shaphr.accessanotes.data.sources.SummarizedNoteSource
@@ -49,6 +50,10 @@ class LiveRecordingRepository @Inject constructor(
         summarizedNotesFlow.collect {
             summarizedNote.add(it)
         }
+    }
+
+    suspend fun callWhisper(uri: Uri) {
+        transcriptionClient.callWhisper(uri)
     }
 
     fun startRecording() = transcriptionClient.startRecording()

@@ -10,20 +10,9 @@ import com.shaphr.accessanotes.FileManagerPDF
 import com.shaphr.accessanotes.FileManagerTXT
 import com.shaphr.accessanotes.data.repositories.LiveRecordingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
-import java.io.File
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -38,6 +27,9 @@ class StartAndEndScreenViewModel @Inject constructor(
 
     private val mutablePrompt: MutableStateFlow<String> = MutableStateFlow("")
     val prompt: StateFlow<String> = mutablePrompt
+
+    private val mutableAudioFile: MutableStateFlow<Uri> = MutableStateFlow(Uri.EMPTY)
+    val audioFile: StateFlow<Uri> = mutableAudioFile
 
     private val mutableStart: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val canStart: StateFlow<Boolean> = mutableStart
@@ -79,6 +71,10 @@ class StartAndEndScreenViewModel @Inject constructor(
 
     fun setPrompt(text: String) {
         mutablePrompt.value = text
+    }
+
+    fun setAudioFile(uri: Uri) {
+        mutableAudioFile.value = uri
     }
 
     fun setTitle(text: String) {

@@ -1,5 +1,6 @@
 package com.shaphr.accessanotes.ui.viewmodels
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -37,6 +38,9 @@ class LiveRecordingViewModel @Inject constructor(
     private val mutableListen: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val canListen: StateFlow<Boolean> = mutableListen
 
+    private val mutableAudioExists: MutableStateFlow<Uri> = MutableStateFlow(Uri.EMPTY)
+    val audioExists: StateFlow<Uri> = mutableAudioExists
+
     // only initialized as an emergency default in case of failure, is  overwritten each time
     private var prompt: String = "Summarize the text"
 
@@ -67,7 +71,23 @@ class LiveRecordingViewModel @Inject constructor(
             mutableStop.update {
                 true
             }
-            liveRecordingRepository.startRecording()
+            println("audioExists")
+            println(audioExists)
+            println(audioExists.value)
+            if (audioExists.value != Uri.EMPTY) {
+                println("audioExists.value.isNotEmpty()")
+                liveRecordingRepository.callWhisper(audioExists.value)
+            } else {
+                liveRecordingRepository.startRecording()
+            }
+        }
+    }
+
+    fun setAudioExists(uri: Uri?) {
+        if (uri != null) {
+            mutableAudioExists.update {
+                uri
+            }
         }
     }
 

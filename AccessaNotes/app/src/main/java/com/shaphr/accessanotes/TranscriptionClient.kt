@@ -5,6 +5,7 @@ import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
 import android.os.Environment
 import android.widget.Toast
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -77,38 +78,56 @@ class TranscriptionClient @Inject constructor(
         recordingJob?.cancel()
     }
 
-    private fun saveRecordingToFile() {
-        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val audioFile = File(filePath)
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val fileNameWithDateTime = "${audioFile.nameWithoutExtension}_${timeStamp}.${audioFile.extension}"
-        val newFile = File(downloadsDir, fileNameWithDateTime)
-        audioFile.copyTo(newFile, overwrite = true)
-        println("Recording saved to ${newFile.absolutePath}")
-    }
+    suspend fun callWhisper(fileUri: Uri) {
+        println("Calling Whisper API...")
 
-    private fun isConnectedToNetwork(): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = connectivityManager.activeNetwork ?: return false
-        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
-        return when {
-            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-            // for other device how are able to connect with Ethernet
-            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-            // for check internet over Bluetooth
-            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) -> true
-            else -> false
+        val contentResolver = context.contentResolver
+        val inputStream = contentResolver.openInputStream(fileUri)
+        val requestBodyFile = inputStream?.let { inputStream ->
+            RequestBody.create(
+                "audio/mpeg".toMediaTypeOrNull(),
+                inputStream.readBytes()
+            )
+        }
+
+        if(requestBodyFile == null) {
+            println("Error reading file")
+            return
+        }
+
+        val requestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("file", "recording.mp3", requestBodyFile)
+            .addFormDataPart("model", "whisper-1")
+            .addFormDataPart("prompt", "The transcript is about OpenAI which makes technology like DALL·E, GPT-3, and ChatGPT with the hope of one day building an AGI system that benefits all of humanity.")
+            .build()
+
+        val request = Request.Builder()
+            .url("https://api.openai.com/v1/audio/transcriptions")
+            .addHeader("Authorization", "Bearer ${BuildConfig.OPENAI_API_KEY}")
+            .post(requestBody)
+            .build()
+
+        val client = OkHttpClient()
+
+        val response = client.newCall(request).await()
+        if (response.isSuccessful) {
+            val resultText = response.body?.string() ?: ""
+            if (resultText == "") {
+                println("Error with calling Whisper: empty response body")
+            }
+
+            val json = JSONObject(resultText)
+            val text = json.optString("text", "")
+            transcription.emit(text)
+        } else {
+            println(response.message)
+            // Handle error response
+            println("Error with calling Whisper: status not 200")
         }
     }
 
-    private fun isConnectedToWifi(): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo = connectivityManager.activeNetworkInfo
-        return networkInfo != null && networkInfo.type == ConnectivityManager.TYPE_WIFI
-    }
-
-    private suspend fun callWhisper() {
+    suspend fun callWhisper(filePath: String = this.filePath) {
         println("Calling Whisper API...")
         val audioFile = File(filePath)
 
@@ -143,6 +162,37 @@ class TranscriptionClient @Inject constructor(
             println("Error with calling Whisper: status not 200")
         }
 
+    }
+
+    private fun saveRecordingToFile() {
+        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val audioFile = File(filePath)
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val fileNameWithDateTime = "${audioFile.nameWithoutExtension}_${timeStamp}.${audioFile.extension}"
+        val newFile = File(downloadsDir, fileNameWithDateTime)
+        audioFile.copyTo(newFile, overwrite = true)
+        println("Recording saved to ${newFile.absolutePath}")
+    }
+
+    private fun isConnectedToNetwork(): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+        return when {
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            // for other device how are able to connect with Ethernet
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+            // for check internet over Bluetooth
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) -> true
+            else -> false
+        }
+    }
+
+    private fun isConnectedToWifi(): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.type == ConnectivityManager.TYPE_WIFI
     }
 
     private fun showToast(message: String) {
