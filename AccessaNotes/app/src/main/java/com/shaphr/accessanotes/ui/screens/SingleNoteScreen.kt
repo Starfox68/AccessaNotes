@@ -48,14 +48,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.data.models.UiNote
-import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
+import com.shaphr.accessanotes.ui.viewmodels.SingleNoteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SingleNoteScreen(
     noteID: Int,
     navController: NavHostController,
-    viewModel: NoteRepositoryViewModel = hiltViewModel()
+    viewModel: SingleNoteViewModel = hiltViewModel()
 ) {
     val note = viewModel.getNote(noteID).collectAsState(initial = UiNote()).value
     var ttsButtonText by remember { mutableStateOf("Read Summarized Notes") }
@@ -78,7 +78,10 @@ fun SingleNoteScreen(
                 tint = Color.Black,
                 modifier = Modifier
                     .padding(16.dp)
-                    .clickable { navController.popBackStack() }
+                    .clickable {
+                        viewModel.updateNoteDB(note)
+                        navController.popBackStack()
+                    }
             )
             //Text
             Text(
@@ -153,7 +156,7 @@ fun SingleNoteScreen(
                     TextField(
                         value = note?.summarizeContent ?: "",
                         onValueChange = { newValue ->
-                            //
+                            viewModel.updateNote(noteID, newValue)
                         },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         modifier = Modifier

@@ -15,23 +15,39 @@ class SingleNoteViewModel @Inject constructor(
     private val notesRepository: NotesRepository,
     private val textToSpeechClient: TextToSpeechClient
 ) : ViewModel() {
-    val mutableNote: MutableStateFlow<List<UiNote>> = MutableStateFlow(emptyList())
+    val mutableNotes: MutableStateFlow<List<UiNote>> = MutableStateFlow(emptyList())
     var noteId: Int = 0
     var isSpeaking = false
 
     init {
-        mutableNote.value = notesRepository.notes.value
+        mutableNotes.value = notesRepository.notes.value
+    }
+
+    fun updateNote(noteID: Int, newContent: String) {
+        mutableNotes.value = mutableNotes.value.map { note ->
+            if (note.id == noteID) {
+                note.copy(summarizeContent = newContent)
+            } else {
+                note
+            }
+        }
+    }
+
+    fun updateNoteDB(note: UiNote?) {
+        if (note != null) {
+            notesRepository.updateNote(note)
+        }
     }
 
     fun onClose() {
-        mutableNote.value.firstOrNull { it.id == noteId }?.let {
+        mutableNotes.value.firstOrNull { it.id == noteId }?.let {
             notesRepository.updateNote(it)
         }
     }
 
     fun getNote(id: Int): Flow<UiNote?> {
         noteId = id
-        return mutableNote.map { noteList ->
+        return mutableNotes.map { noteList ->
             noteList.firstOrNull { it.id == id }
         }
     }
