@@ -1,6 +1,8 @@
 package com.shaphr.accessanotes.ui.screens
 
 import android.content.Context
+import android.content.Intent
+import android.os.Environment
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -41,21 +43,29 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.api.client.extensions.android.http.AndroidHttp
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException
+import com.google.api.client.http.FileContent
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 import com.shaphr.accessanotes.AuthResultContract
 import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.R
+import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.components.SignInButton
 import com.shaphr.accessanotes.ui.components.TopScaffold
 import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.File
 
 
 //search bar at the top of the screen if time permits
@@ -70,38 +80,37 @@ fun NoteRepositoryScreen(
     viewModel: NoteRepositoryViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
-    
-    var text by remember { mutableStateOf<String?>(null) }
+
     val signInRequestCode = 1
+
+    var noteToRemember: Note = Note("filler")
+
 
     val authResultLauncher =
         rememberLauncherForActivityResult(contract = AuthResultContract()) { task ->
             try {
                 val account = task?.getResult(ApiException::class.java)
                 if (account == null) {
-                    text = "Google sign in failed"
+                    Log.d("drive", "account is null")
                 } else {
                     val driveInstance = getDriveService(context)
                     if (driveInstance == null){
-                        text = "Drive sign in failed"
+                        Log.d("drive", "drive is null")
                     }else{
-                        uploadFileToGDrive(context)
-//                        Log.d("HI","You're in drive with this login:")
-//                        Log.d("HI", account.email!!)
-//                        Log.d("HI", account.displayName!!)
+                        uploadFileToGDrive(context, noteToRemember, viewModel)
                     }
-
                 }
             } catch (e: ApiException) {
-                text = "Google sign in failed"
+                Log.d("drive", "sign in failed")
             }
         }
 
     val notes = viewModel.notes.collectAsState().value
-    var isLoading by remember { mutableStateOf(false) }
+    val isLoading by remember { mutableStateOf(false) }
 
     var expanded by remember { mutableStateOf(false) }
-    val docConversionTypes = arrayOf("PDF", "DOCX", "TXT")
+    val docConversionTypes = arrayOf("pdf", "docx", "txt")
+
     var selectedText by remember { mutableStateOf(docConversionTypes[0]) }
 
     TopScaffold(text = "All Notes", navController = navController) { padding ->
@@ -110,7 +119,6 @@ fun NoteRepositoryScreen(
                 ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = {expanded = !expanded } ) {
                     TextField(
                         value = selectedText,
-//                        onValueChange = {viewModel.setDocType(selectedText)},
                         onValueChange = { },
                         textStyle = MaterialTheme.typography.bodyMedium,
                         readOnly = true,
@@ -164,10 +172,8 @@ fun NoteRepositoryScreen(
                             Spacer(modifier = Modifier.weight(1f))
 
                             Button(
-                                onClick = {
-                                    viewModel.downloadNote(note)
-                                    Toast.makeText(context, "File Downloaded", Toast.LENGTH_LONG).show()
-                                },
+                                onClick = { viewModel.downloadNote(note)
+                                    Toast.makeText(context, "File Downloaded", Toast.LENGTH_LONG).show()},
                                 modifier = Modifier.width(65.dp) // Adjust the value to the desired width
                             ) {
                                 Icon(
@@ -185,7 +191,9 @@ fun NoteRepositoryScreen(
                                 loadingText = "Signing in...",
                                 isLoading = isLoading,
                                 icon = painterResource(id = R.drawable.ic_google_logo_small),
-                                onClick = { authResultLauncher.launch(signInRequestCode) }
+                                onClick = { viewModel.downloadNote(note)
+                                    noteToRemember = note
+                                authResultLauncher.launch(signInRequestCode)}
                             )
                         }
                     }
@@ -199,7 +207,7 @@ fun NoteRepositoryScreen(
 private fun getDriveService(context: Context): Drive? {
     GoogleSignIn.getLastSignedInAccount(context)?.let { googleAccount ->
         val credential = GoogleAccountCredential.usingOAuth2(
-            context, listOf(DriveScopes.DRIVE_FILE)
+            context, listOf(DriveScopes.DRIVE_FILE, DriveScopes.DRIVE)
         )
         credential.selectedAccount = googleAccount.account!!
         return Drive.Builder(
@@ -214,20 +222,31 @@ private fun getDriveService(context: Context): Drive? {
 }
 
 //reference https://www.section.io/engineering-education/backup-services-with-google-drive-api-in-android/
-fun uploadFileToGDrive(context: Context) {
-    Log.d("Hi", "Uploading file")
-//    getDriveService(context)?.let { googleDriveService ->
-//        CoroutineScope(Dispatchers.IO).launch {
-//            try {
-//                val localFileDirectory = File(getExternalFilesDir("backup")!!.toURI())
-//                val actualFile = File("${localFileDirectory}/FILE_NAME_BACKUP")
-//                val gFile = com.google.api.services.drive.model.File()
-//                gFile.name = actualFile.name
-//                val fileContent = FileContent("text/plain", actualFile)
-//                googleDriveService.Files().create(gFile, fileContent).execute()
-//            } catch (exception: Exception) {
-//                exception.printStackTrace()
-//            }
-//        }
-//    }
+fun uploadFileToGDrive(context: Context, note: Note, viewModel: NoteRepositoryViewModel) {
+    getDriveService(context)?.let { googleDriveService ->
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val localFileDirectory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
+                val actualFile = File("${localFileDirectory}/${note.title}.${viewModel.docType.value}")
+
+                val gFile = com.google.api.services.drive.model.File()
+                gFile.name = actualFile.name
+
+                var docType = "application/pdf"
+                if (viewModel.docType.value == "txt"){
+                    docType = "text/plain"
+                }else if (viewModel.docType.value == "docx"){
+                    docType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                }
+
+                val fileContent = FileContent(docType, actualFile)
+                googleDriveService.Files().create(gFile, fileContent).execute()
+
+                actualFile.delete()
+
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
+        }
+    }
 }
