@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -134,8 +133,52 @@ fun SessionStartScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
         ShowUploadButton(viewModel)
+        ShowUploadMP3Button(viewModel)
+
         Spacer(modifier = Modifier.height(16.dp))
-        ShowStartButton(canStart, onStartClick)
+        ShowStartButton("Start", canStart, onStartClick)
+    }
+}
+
+@Composable
+fun ShowUploadMP3Button(viewModel: StartAndEndScreenViewModel) {
+    val context = LocalContext.current
+    var selectedUri by remember { mutableStateOf<Uri?>(null) }
+    val rememberLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            selectedUri = it
+        }
+    }
+    var clickState by remember { mutableStateOf(false) }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Button(
+            onClick = {
+                println("Clicked Upload MP3")
+                clickState = !clickState
+            }
+        ) {
+            Text("Upload Audio", style = MaterialTheme.typography.bodyMedium)
+        }
+        selectedUri?.let { uri ->
+            val filename = DocumentFile.fromSingleUri(context, uri)?.name
+            filename?.let {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(imageVector = Icons.Default.Check, contentDescription = "Uploaded")
+                    Text(it, Modifier.padding(start = 4.dp))
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(clickState) {
+        if (clickState) {
+            rememberLauncher.launch("audio/mpeg")
+        }
     }
 }
 
@@ -191,12 +234,12 @@ fun ShowUploadButton(viewModel: StartAndEndScreenViewModel) {
 }
 
 @Composable
-fun ShowStartButton(canStart: Boolean, onStartClick: () -> Unit){
+fun ShowStartButton(text: String, canStart: Boolean, onStartClick: () -> Unit){
     Button(
         onClick = onStartClick,
         enabled = canStart
     ) {
-        Text("Start")
+        Text(text)
     }
 }
 

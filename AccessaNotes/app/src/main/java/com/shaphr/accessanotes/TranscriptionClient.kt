@@ -3,6 +3,10 @@ package com.shaphr.accessanotes
 import android.content.Context
 import android.media.MediaPlayer
 import android.media.MediaRecorder
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Environment
+import android.widget.Toast
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +22,9 @@ import okhttp3.RequestBody
 import org.json.JSONObject
 import ru.gildor.coroutines.okhttp.await
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,7 +37,7 @@ class TranscriptionClient @Inject constructor(
     private var mediaRecorder: MediaRecorder? = null
     private var mediaPlayer: MediaPlayer? = null
     private val filePath: String by lazy {
-        context.getExternalFilesDir(null)?.absolutePath + "/transcript_recording.mp3"
+        context.getExternalFilesDir(null)?.absolutePath + "/AccessaNotes_recording.mp3"
     }
     private var recordingJob: Job? = null
 
@@ -61,8 +68,44 @@ class TranscriptionClient @Inject constructor(
             delay(1000)
             release()
         }
-        callWhisper()
+        if (isConnectedToWifi() || isConnectedToNetwork()) {
+            callWhisper()
+        } else {
+            showToast("You're Offline! Recording Downloaded...")
+            saveRecordingToFile()
+        }
         recordingJob?.cancel()
+    }
+
+    private fun saveRecordingToFile() {
+        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val audioFile = File(filePath)
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val fileNameWithDateTime = "${audioFile.nameWithoutExtension}_${timeStamp}.${audioFile.extension}"
+        val newFile = File(downloadsDir, fileNameWithDateTime)
+        audioFile.copyTo(newFile, overwrite = true)
+        println("Recording saved to ${newFile.absolutePath}")
+    }
+
+    private fun isConnectedToNetwork(): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+        return when {
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            // for other device how are able to connect with Ethernet
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+            // for check internet over Bluetooth
+            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) -> true
+            else -> false
+        }
+    }
+
+    private fun isConnectedToWifi(): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.type == ConnectivityManager.TYPE_WIFI
     }
 
     private suspend fun callWhisper() {
@@ -100,6 +143,10 @@ class TranscriptionClient @Inject constructor(
             println("Error with calling Whisper: status not 200")
         }
 
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
     private fun playRecording() {
