@@ -1,12 +1,19 @@
 package com.shaphr.accessanotes.ui.theme
 
 import android.app.Activity
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
@@ -54,6 +61,14 @@ fun AccessaNotesTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
+    val showDialog = remember { mutableStateOf(true) }
+    if (showDialog.value) {
+        MyAppDialog(
+            onDismiss = {
+                showDialog.value = false
+            }
+        )
+    }
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -67,5 +82,19 @@ fun AccessaNotesTheme(
         colorScheme = colorScheme,
         typography = if (isLargeFont) largeTypography else defaultTypography,
         content = content
+    )
+}
+
+@Composable
+fun MyAppDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Warning") },
+        text = { Text("By using our note transcription app powered by AI, you acknowledge the risk of potential addiction. This app is not a substitute for attentive listening in class or professional note-taking. We hold no responsibility for any emotional, physical, or other damages resulting from its usage. Users must exercise caution and discretion while using the app. By proceeding, you agree to these terms and conditions.") },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("OK")
+            }
+        }
     )
 }

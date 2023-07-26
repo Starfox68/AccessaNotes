@@ -111,7 +111,11 @@ fun NavigationAppHost(navController: NavHostController) {
             LiveRecordingScreen(navBackStackEntry, navController)
         }
         composable(Destination.AccountScreen.route) { AccountScreen(navController) }
-        composable(Destination.SessionStartAndEndScreen.route) { SessionStartAndEndScreen(navController) }
+        composable(Destination.SessionStartAndEndScreen.route) {
+            SessionStartAndEndScreen(
+                navController
+            )
+        }
         composable(Destination.SingleNoteScreen.route) { navBackStackEntry ->
             //get noteID from within the route
             val noteID = navBackStackEntry.arguments?.getString("noteID")?.toInt()

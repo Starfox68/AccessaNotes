@@ -63,10 +63,11 @@ class LiveRecordingRepository @Inject constructor(
     fun onFinish(): UiNote {
         val note = UiNote(
             title = title,
-            summarizeContent = summarizedNote.reduce { acc: String, next: String ->
+            date = date,
+            summarizeContent = if (summarizedNote.isEmpty()) "" else summarizedNote.reduce { acc: String, next: String ->
                 acc + next
             },
-            transcript = transcript.reduce { acc: String, next: String ->
+            transcript = if (transcript.isEmpty()) "" else transcript.reduce { acc: String, next: String ->
                 acc + next
             },
             date = date,
