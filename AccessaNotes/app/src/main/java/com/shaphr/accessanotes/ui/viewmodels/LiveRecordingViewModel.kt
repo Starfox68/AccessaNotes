@@ -77,7 +77,7 @@ class LiveRecordingViewModel @Inject constructor(
             println(audioExists.value)
 //            if (audioExists.value != Uri.EMPTY) {
 //                println("audioExists.value.isNotEmpty()")
-//                liveRecordingRepository.startRecording()
+//                liveRecordingRepository.callWhisper(audioExists.value)
 //            } else {
 //                liveRecordingRepository.startRecording()
 //            }
