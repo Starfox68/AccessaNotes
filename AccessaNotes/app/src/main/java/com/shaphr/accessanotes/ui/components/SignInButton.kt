@@ -32,16 +32,16 @@ fun SignInButton(
     text: String,
     loadingText: String = "Signing in...",
     icon: Painter,
-    isLoading: Boolean = false,
     shape: Shape = MaterialTheme.shapes.medium,
     borderColor: Color = Color.LightGray,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     progressIndicatorColor: Color = MaterialTheme.colorScheme.primary,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    clickable: Boolean
 ) {
     Surface(
         modifier = Modifier.clickable(
-            enabled = !isLoading,
+            enabled = clickable,
             onClick = onClick
         ),
         shape = shape,
@@ -72,16 +72,10 @@ fun SignInButton(
             )
             Spacer(modifier = Modifier.width(8.dp))
 
-            Text(text = if (isLoading) loadingText else text)
-            if (isLoading) {
-                Spacer(modifier = Modifier.width(16.dp))
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .height(16.dp)
-                        .width(16.dp),
-                    strokeWidth = 2.dp,
-                    color = progressIndicatorColor
-                )
+            if (clickable){
+                Text(text = text)
+            }else{
+                Text(text = text, color = Color.LightGray)
             }
         }
     }
@@ -94,8 +88,9 @@ fun SignInButtonPreview() {
     SignInButton(
         text = "Sign in with Google",
         loadingText = "Signing in...",
-        isLoading = false,
+//        isLoading = false,
         icon = painterResource(id = R.drawable.ic_google_logo),
-        onClick = { }
+        onClick = { },
+        clickable = true
     )
 }

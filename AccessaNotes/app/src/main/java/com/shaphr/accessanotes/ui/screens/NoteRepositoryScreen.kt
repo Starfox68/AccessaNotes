@@ -1,5 +1,6 @@
 package com.shaphr.accessanotes.ui.screens
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Environment
 import android.util.Log
@@ -77,6 +78,7 @@ import java.io.File
 //each note has title, date, and share button
 
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteRepositoryScreen(
@@ -152,13 +154,13 @@ fun NoteRepositoryScreen(
                     .padding(padding)
             ) {
                 OptionRow(
-                    isVisible = selectedNotes.isNotEmpty(),
+                    isVisible = true,
                     onDownloadClick = { viewModel.showDialog(DialogState.DOWNLOAD_OPEN) },
                     onDeleteClick = viewModel::onDeleteClick,
                     onShareClick = { viewModel.showDialog(DialogState.SHARE_OPEN) },
                     isAllSelected = viewModel.allSelected.collectAsState().value,
                     onAllSelect = viewModel::onAllSelect,
-                    isLoading = false
+                    isClickable = viewModel.selectedNotes.value.isNotEmpty()
                 )
                 LazyColumn(modifier = Modifier.padding(horizontal = 16.dp)) {
                     notes.forEach { note ->
@@ -189,7 +191,7 @@ fun OptionRow(
     onShareClick: () -> Unit,
     isAllSelected: Boolean,
     onAllSelect: (Boolean) -> Unit,
-    isLoading: Boolean,
+    isClickable: Boolean
 ) {
     Row(verticalAlignment = Alignment.Top, modifier = Modifier.padding(horizontal = 16.dp)) {
         AnimatedVisibility(visible = isVisible, enter = fadeIn(), exit = fadeOut()) {
@@ -197,17 +199,17 @@ fun OptionRow(
                 SignInButton(
                     text = "Share to Drive",
                     loadingText = "Signing in...",
-                    isLoading = isLoading,
                     icon = painterResource(id = R.drawable.ic_google_logo_small),
-                    onClick = onShareClick
+                    onClick = onShareClick,
+                    clickable = isClickable
                 )
-                IconButton(onClick = onDownloadClick) {
+                IconButton(onClick = onDownloadClick, enabled = isClickable) {
                     Icon(
                         Icons.Outlined.Download,
                         contentDescription = "Download"
                     )
                 }
-                IconButton(onClick = onDeleteClick) {
+                IconButton(onClick = onDeleteClick, enabled = isClickable) {
                     Icon(
                         Icons.Outlined.Delete,
                         contentDescription = "Delete"
