@@ -1,5 +1,7 @@
 package com.shaphr.accessanotes.ui.screens
 
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,10 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.google.android.gms.common.api.ApiException
+import com.shaphr.accessanotes.AuthResultContract
 import com.shaphr.accessanotes.ui.components.TopScaffold
 import com.shaphr.accessanotes.ui.viewmodels.AccountSettingsViewModel
 
@@ -46,6 +51,22 @@ fun AccountScreenContent(
     isColourBlind: Boolean,
     isFontLarge: Boolean
 ) {
+
+    val context = LocalContext.current
+    val signInRequestCode = 1
+
+    val authResultLauncher =
+        rememberLauncherForActivityResult(contract = AuthResultContract()) { task ->
+            try {
+                val account = task?.getResult(ApiException::class.java)
+                if (account == null) {
+                    Log.d("drive", "account is null")
+                }
+            } catch (e: ApiException) {
+                Log.d("drive", "sign in failed")
+            }
+        }
+
     Column(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier.padding(padding)
@@ -62,7 +83,7 @@ fun AccountScreenContent(
         ) {
             Text("Connect to Google Drive", style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = { authResultLauncher.launch(signInRequestCode) }) {
                 Text("Connect", style = MaterialTheme.typography.labelMedium)
             }
         }
