@@ -1,14 +1,12 @@
 package com.shaphr.accessanotes.ui.viewmodels
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.shaphr.accessanotes.FileManagerDOCX
 import com.shaphr.accessanotes.FileManagerPDF
 import com.shaphr.accessanotes.FileManagerTXT
 import com.shaphr.accessanotes.TextToSpeechClient
-import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.data.models.UiNote
 import com.shaphr.accessanotes.data.repositories.NotesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +24,7 @@ class NoteRepositoryViewModel @Inject constructor(
     private val textToSpeechClient: TextToSpeechClient
 ) : AndroidViewModel(application) {
 
-    val notes: Flow<List<UiNote>> = notesRepository.notes
+    val notes: StateFlow<List<UiNote>> = notesRepository.notes
 
     private val mutableFileFormat = MutableStateFlow(FileFormat.PDF)
     val fileFormat = mutableFileFormat
@@ -69,8 +67,8 @@ class NoteRepositoryViewModel @Inject constructor(
         }
     }
 
-    fun getSelectedNotes(): List<Note> {
-        return mutableNotes.value.filter {
+    fun getSelectedNotes(): List<UiNote> {
+        return notes.value.filter {
             it.id in mutableSelectedNotes.value
         }
     }
@@ -98,7 +96,7 @@ class NoteRepositoryViewModel @Inject constructor(
 
     fun onAllSelect(isAllSelected: Boolean) {
         if (isAllSelected) {
-            mutableSelectedNotes.value = mutableNotes.value.map {
+            mutableSelectedNotes.value = notes.value.map {
                 it.id
             }
         } else {
@@ -113,7 +111,7 @@ class NoteRepositoryViewModel @Inject constructor(
         } else {
             mutableSelectedNotes.value = mutableSelectedNotes.value - id
         }
-        mutableAllSelected.value = mutableSelectedNotes.value.size == mutableNotes.value.size
+        mutableAllSelected.value = mutableSelectedNotes.value.size == notes.value.size
     }
 
     fun onTextToSpeech(text: String) {
@@ -129,31 +127,6 @@ class NoteRepositoryViewModel @Inject constructor(
         return notes.map { noteList ->
             noteList.firstOrNull { it.id == id }
         }
-    }
-
-    fun downloadNote(note: UiNote) {
-        var fileManager: FileManagerAbstract? = null
-        println("docType.value: ${docType.value}")
-        when (docType.value) {
-            "PDF" -> {
-                // use FileManagerPDF
-                fileManager = FileManagerPDF(getApplication())
-            }
-            "TXT" -> {
-                // use FileManagerTXT
-                fileManager = FileManagerTXT(getApplication())
-            }
-            "DOCX" -> {
-                // use FileManagerDOCX
-                fileManager = FileManagerDOCX(getApplication())
-            }
-        }
-        println("downloadNote: ${note.title}")
-        fileManager?.exportNote(note.title, listOf(note.summarizeContent))
-    }
-
-    fun updateNote(note: UiNote) {
-        notesRepository.updateNote(note)
     }
 }
 

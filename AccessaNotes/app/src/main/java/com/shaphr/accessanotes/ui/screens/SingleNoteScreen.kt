@@ -27,7 +27,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,11 +44,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.shaphr.accessanotes.data.models.UiNote
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.shaphr.accessanotes.R
-import com.shaphr.accessanotes.data.database.Note
+import com.shaphr.accessanotes.data.models.UiNote
 import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,17 +57,11 @@ fun SingleNoteScreen(
     navController: NavHostController,
     viewModel: NoteRepositoryViewModel = hiltViewModel()
 ) {
-    val note = viewModel.getNote(noteID).collectAsState(initial = Note()).value
+    val note = viewModel.getNote(noteID).collectAsState(initial = UiNote()).value
     var ttsButtonText by remember { mutableStateOf("Read Summarized Notes") }
     val screenHeight = (LocalConfiguration.current.screenHeightDp).dp
     var transcriptHeight by remember { mutableStateOf(screenHeight * 0.4F) }
     var summaryHeight by remember { mutableStateOf(screenHeight * 0.4F) }
-
-    LaunchedEffect(noteID) {
-        viewModel.getNote(noteID).collect { value ->
-            note.value = value
-        }
-    }
 
     Column(Modifier.fillMaxSize()) {
         // Header
@@ -90,7 +82,7 @@ fun SingleNoteScreen(
             )
             //Text
             Text(
-                text = note.value?.title ?: "default",
+                text = note?.title ?: "default",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .padding(16.dp)
@@ -124,7 +116,7 @@ fun SingleNoteScreen(
                         modifier = Modifier.padding(12.dp)
                     )
                     TextField(
-                        value = note.value?.transcript ?: "",
+                        value = note?.transcript ?: "",
                         onValueChange = { },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         modifier = Modifier
@@ -159,10 +151,9 @@ fun SingleNoteScreen(
                         modifier = Modifier.padding(12.dp)
                     )
                     TextField(
-                        value = note.value?.summarizeContent ?: "",
+                        value = note?.summarizeContent ?: "",
                         onValueChange = { newValue ->
-                            note.value?.summarizeContent = newValue
-                            viewModel.updateNote(note!!)
+                            //
                         },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         modifier = Modifier

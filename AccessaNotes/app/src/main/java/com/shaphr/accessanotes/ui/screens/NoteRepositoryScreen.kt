@@ -36,7 +36,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -87,10 +86,9 @@ fun NoteRepositoryScreen(
 ) {
     val context = LocalContext.current
 
-    var text by remember { mutableStateOf<String?>(null) }
     val signInRequestCode = 1
 
-    val notes = viewModel.notes.collectAsState().value
+    val notes = viewModel.notes.collectAsState(initial = emptyList()).value
     val fileFormat = viewModel.fileFormat.collectAsState().value
     val dialogState = viewModel.dialogState.collectAsState().value
     val selectedNotes = viewModel.selectedNotes.collectAsState().value
@@ -108,10 +106,6 @@ fun NoteRepositoryScreen(
                 Log.d("drive", "sign in failed")
             }
         }
-
-    val notes by viewModel.notes.collectAsState(initial = listOf())
-
-    var isLoading by remember { mutableStateOf(false) }
 
     if (viewModel.dialogState.collectAsState().value != DialogState.CLOSED) {
         FileFormatDialog(
@@ -225,7 +219,7 @@ fun OptionRow(
 
 @Composable
 fun NoteCard(
-    note: Note,
+    note: UiNote,
     isSelected: Boolean,
     onSelect: (Boolean, Int) -> Unit,
     onClick: () -> Unit
@@ -336,7 +330,7 @@ private fun getDriveService(context: Context): Drive? {
 }
 
 //reference https://www.section.io/engineering-education/backup-services-with-google-drive-api-in-android/
-fun uploadFilesToGDrive(context: Context, notes: List<Note>, fileFormat: FileFormat) {
+fun uploadFilesToGDrive(context: Context, notes: List<UiNote>, fileFormat: FileFormat) {
     getDriveService(context)?.let { googleDriveService ->
         val docType = when (fileFormat) {
             FileFormat.DOCX -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
