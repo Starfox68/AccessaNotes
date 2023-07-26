@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -132,43 +131,54 @@ fun SessionStartScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text("Note Style Template:", style = MaterialTheme.typography.titleMedium)
-        DropdownMenu(
-            expanded = dropdown1Expanded,
-            onDismissRequest = { dropdown1Expanded = false },
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("dropdown1")
-        ) {
-//                    DropdownMenuItem(onClick = { /* Handle option 1 selection */ }) {
-//                        Text("Option 1")
-//                    }
-//                    DropdownMenuItem(onClick = { /* Handle option 2 selection */ }) {
-//                        Text("Option 2")
-//                    }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text("Export Format:", style = MaterialTheme.typography.titleMedium)
-        DropdownMenu(
-            expanded = dropdown2Expanded,
-            onDismissRequest = { dropdown2Expanded = false },
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("dropdown2")
-        ) {
-//                    DropdownMenuItem(onClick = { /* Handle option 1 selection */ }) {
-//                        Text("Option 1")
-//                    }
-//                    DropdownMenuItem(onClick = { /* Handle option 2 selection */ }) {
-//                        Text("Option 2")
-//                    }
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
         ShowUploadButton(viewModel)
-        ShowStartButton(canStart, onStartClick)
+        ShowUploadMP3Button(viewModel)
+
+        Spacer(modifier = Modifier.height(16.dp))
+        ShowStartButton("Start", canStart, onStartClick)
+    }
+}
+
+@Composable
+fun ShowUploadMP3Button(viewModel: StartAndEndScreenViewModel) {
+    val context = LocalContext.current
+    var selectedUri by remember { mutableStateOf<Uri?>(null) }
+    val rememberLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            selectedUri = it
+        }
+    }
+    var clickState by remember { mutableStateOf(false) }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Button(
+            onClick = {
+                println("Clicked Upload MP3")
+                clickState = !clickState
+            }
+        ) {
+            Text("Upload Audio", style = MaterialTheme.typography.bodyMedium)
+        }
+        selectedUri?.let { uri ->
+            val filename = DocumentFile.fromSingleUri(context, uri)?.name
+            filename?.let {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(imageVector = Icons.Default.Check, contentDescription = "Uploaded")
+                    Text(it, Modifier.padding(start = 4.dp))
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(clickState) {
+        if (clickState) {
+            rememberLauncher.launch("audio/mpeg")
+        }
     }
 }
 
@@ -224,12 +234,12 @@ fun ShowUploadButton(viewModel: StartAndEndScreenViewModel) {
 }
 
 @Composable
-fun ShowStartButton(canStart: Boolean, onStartClick: () -> Unit){
+fun ShowStartButton(text: String, canStart: Boolean, onStartClick: () -> Unit){
     Button(
         onClick = onStartClick,
         enabled = canStart
     ) {
-        Text("Start")
+        Text(text)
     }
 }
 
