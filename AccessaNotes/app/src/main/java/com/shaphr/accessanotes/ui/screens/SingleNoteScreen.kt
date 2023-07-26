@@ -1,5 +1,7 @@
 package com.shaphr.accessanotes.ui.screens
 
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -35,14 +38,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -50,7 +56,6 @@ import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.data.models.UiNote
 import com.shaphr.accessanotes.ui.viewmodels.SingleNoteViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SingleNoteScreen(
     noteID: Int,
@@ -60,8 +65,8 @@ fun SingleNoteScreen(
     val note = viewModel.getNote(noteID).collectAsState(initial = UiNote()).value
     var ttsButtonText by remember { mutableStateOf("Read Summarized Notes") }
     val screenHeight = (LocalConfiguration.current.screenHeightDp).dp
-    var transcriptHeight by remember { mutableStateOf(screenHeight * 0.4F) }
-    var summaryHeight by remember { mutableStateOf(screenHeight * 0.4F) }
+    var transcriptHeight by remember { mutableStateOf(screenHeight * 0.35F) }
+    var summaryHeight by remember { mutableStateOf(screenHeight * 0.35F) }
 
     Column(Modifier.fillMaxSize()) {
         // Header
@@ -69,7 +74,7 @@ fun SingleNoteScreen(
             Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
-                .background(Color.LightGray)
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
         ) {
             // Back button
             Icon(
@@ -87,20 +92,22 @@ fun SingleNoteScreen(
             Text(
                 text = note?.title ?: "default",
                 style = MaterialTheme.typography.bodyMedium,
+                fontSize = 20.sp,
+                color = Color.Black,
                 modifier = Modifier
                     .padding(16.dp)
                     .align(Alignment.Center)
 
             )
             // Share icon
-            Icon(
-                Icons.Default.Share,
-                contentDescription = "Share",
-                tint = Color.Black,
-                modifier = Modifier
-                    .align(alignment = Alignment.TopEnd)
-                    .padding(16.dp)
-            )
+//            Icon(
+//                Icons.Default.Share,
+//                contentDescription = "Share",
+//                tint = Color.Black,
+//                modifier = Modifier
+//                    .align(alignment = Alignment.TopEnd)
+//                    .padding(16.dp)
+//            )
         }
 
         // Body
@@ -111,66 +118,108 @@ fun SingleNoteScreen(
                 .background(Color.White)
         ) {
             item {
-                Column(
-                    modifier = Modifier.height(transcriptHeight).padding(4.dp)
+                Text(
+                    text = "Transcribed Text",
+                    modifier = Modifier.padding(12.dp),
+                    fontSize = 16.sp
+                )
+
+                LazyColumn(
+                    modifier = Modifier
+                        .height(transcriptHeight)
+                        .padding(4.dp)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
                 ) {
-                    Text(
-                        text = "Transcribed Text",
-                        modifier = Modifier.padding(12.dp)
-                    )
-                    TextField(
-                        value = note?.transcript ?: "",
-                        onValueChange = { },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                        modifier = Modifier
-                            .height(transcriptHeight)
-                            .fillMaxWidth()
-                    )
+                    item {
+                        BasicTextField(
+                            value = note?.transcript ?: "",
+                            onValueChange = { },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 4.dp, end = 4.dp),
+                            textStyle = TextStyle.Default.copy(fontSize = 16.sp)
+                        )
+                    }
                 }
             }
 
             item {
                 Divider(color = MaterialTheme.colorScheme.tertiary, thickness = 4.dp,
-                    modifier = Modifier.padding(4.dp).pointerInput(Unit) {
-                        detectVerticalDragGestures { _, dragAmount ->
-                            transcriptHeight = (transcriptHeight + dragAmount.dp).coerceIn(
-                                screenHeight * 0.15F,
-                                screenHeight * 0.65F
-                            )
-                            summaryHeight = (summaryHeight - dragAmount.dp).coerceIn(
-                                screenHeight * 0.15F,
-                                screenHeight * 0.65F
-                            )
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .pointerInput(Unit) {
+                            detectVerticalDragGestures { _, dragAmount ->
+                                transcriptHeight = (transcriptHeight + dragAmount.dp).coerceIn(
+                                    screenHeight * 0.1F,
+                                    screenHeight * 0.6F
+                                )
+                                summaryHeight = (summaryHeight - dragAmount.dp).coerceIn(
+                                    screenHeight * 0.1F,
+                                    screenHeight * 0.6F
+                                )
+                            }
                         }
-                    })
+                )
             }
 
             item {
-                Column(
-                    modifier = Modifier.height(summaryHeight).padding(4.dp)
+                Text(
+                    text = "Summarized Notes",
+                    modifier = Modifier.padding(12.dp),
+                    fontSize = 16.sp
+                )
+
+                LazyColumn(
+                    modifier = Modifier
+                        .height(summaryHeight)
+                        .padding(4.dp)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
                 ) {
-                    Text(
-                        text = "Summarized Notes",
-                        modifier = Modifier.padding(12.dp)
-                    )
-                    TextField(
-                        value = note?.summarizeContent ?: "",
-                        onValueChange = { newValue ->
-                            viewModel.updateNote(noteID, newValue)
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                        modifier = Modifier
-                            .height(summaryHeight)
-                            .fillMaxWidth()
-                    )
+                    note?.items?.forEachIndexed { index, it ->
+                        if (it.content != null) {
+                            item {
+                                BasicTextField(
+                                    value = it.content,
+                                    onValueChange = { newValue ->
+                                        viewModel.updateNote(noteID, index, newValue)
+                                    },
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 4.dp, end = 4.dp),
+                                    textStyle = TextStyle.Default.copy(fontSize = 16.sp)
+                                )
+                            }
+                        } else if (it.bitmap != null) {
+                            item {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Image(
+                                        bitmap = it.bitmap.asImageBitmap(),
+                                        contentDescription = "Image from notes",
+                                        modifier = Modifier
+                                            .padding(6.dp)
+                                            .fillMaxWidth(0.8F)
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
             item {
                 OutlinedButton(
-                    modifier = Modifier.width(235.dp).padding(4.dp),
+                    modifier = Modifier
+                        .width(235.dp)
+                        .padding(4.dp),
                     onClick = {
-                        viewModel.onTextToSpeech(note?.summarizeContent ?: "No content to read")
+                        viewModel.onTextToSpeech(
+                            note?.items?.joinToString { uiNoteItem -> uiNoteItem.content ?: "" }
+                                ?: "No content to read")
                         ttsButtonText = if (viewModel.isSpeaking) {
                             "Stop Reading Notes    "
                         } else {

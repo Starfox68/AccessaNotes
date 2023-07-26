@@ -3,6 +3,7 @@ package com.shaphr.accessanotes.ui.viewmodels
 import androidx.lifecycle.ViewModel
 import com.shaphr.accessanotes.TextToSpeechClient
 import com.shaphr.accessanotes.data.models.UiNote
+import com.shaphr.accessanotes.data.models.UiNoteItem
 import com.shaphr.accessanotes.data.repositories.NotesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -23,10 +24,18 @@ class SingleNoteViewModel @Inject constructor(
         mutableNotes.value = notesRepository.notes.value
     }
 
-    fun updateNote(noteID: Int, newContent: String) {
+    fun updateNote(noteID: Int, itemIdx: Int, newContent: String) {
         mutableNotes.value = mutableNotes.value.map { note ->
             if (note.id == noteID) {
-                note.copy(summarizeContent = newContent)
+                val newItems = mutableListOf<UiNoteItem>()
+                note.items?.forEachIndexed { index, uiNoteItem ->
+                    if (index == itemIdx) {
+                        newItems.add(uiNoteItem.copy(content = newContent))
+                    } else {
+                        newItems.add(uiNoteItem)
+                    }
+                }
+                note.copy(items = newItems)
             } else {
                 note
             }
