@@ -28,13 +28,19 @@ class NoteRepositoryViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
 
     val notes: Flow<List<UiNote>> = notesRepository.notes
+
     private val mutableDocType: MutableStateFlow<String> = MutableStateFlow("PDF")
     val docType: StateFlow<String> = mutableDocType
 
     var isSpeaking = false
 
     init {
-        refreshNotes()
+//        viewModelScope.launch {
+//            refreshNotes()
+//            notes.collect { noteList ->
+//                println("Number of notes: ${noteList.size}")
+//            }
+//        }
     }
 
     private fun refreshNotes() = viewModelScope.launch {

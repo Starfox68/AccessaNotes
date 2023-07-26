@@ -33,7 +33,7 @@ interface NoteDataAccess {
     @Delete(entity = NoteItem::class)
     suspend fun deleteNoteItem(noteItem: NoteItem)
 
-    @Query("SELECT * FROM `note_items` WHERE note_id = :noteId ORDER BY item_order ASC")
-    fun getNoteItems(noteId: Int): Flow<List<NoteItem>>
+    @Query("SELECT * FROM `note_items` ORDER BY item_order ASC")
+    fun getNoteItems(): Flow<List<NoteItem>>
 
 }
