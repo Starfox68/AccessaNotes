@@ -5,24 +5,36 @@ import android.content.Intent
 import android.os.Environment
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.Circle
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,7 +46,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -48,10 +62,12 @@ import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 import com.shaphr.accessanotes.AuthResultContract
+import com.shaphr.accessanotes.Destination
 import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.ui.components.SignInButton
 import com.shaphr.accessanotes.ui.components.TopScaffold
+import com.shaphr.accessanotes.ui.viewmodels.FileOptions
 import com.shaphr.accessanotes.ui.viewmodels.NoteRepositoryViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -71,106 +87,63 @@ fun NoteRepositoryScreen(
     viewModel: NoteRepositoryViewModel = hiltViewModel(),
 ) {
     val notes = viewModel.notes.collectAsState().value
-    var isLoading by remember { mutableStateOf(false) }
-
-    var expanded by remember { mutableStateOf(false) }
-    val docConversionTypes = arrayOf("PDF", "DOCX", "TXT")
-    var selectedText by remember { mutableStateOf(docConversionTypes[0]) }
-
     val selectedNotes = viewModel.selectedNotes.collectAsState().value
 
+    if (viewModel.isDialogOpen.collectAsState().value) {
+        FileFormatDialog(
+            onDismiss = viewModel::onDialogClose,
+            onConfirm = viewModel::onDialogConfirm
+        )
+    }
+
     TopScaffold(text = "All Notes", navController = navController) { padding ->
-        LazyColumn(modifier = Modifier.padding(padding)) {
-//            item{
-//                ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = {expanded = !expanded } ) {
-//                    TextField(
-//                        value = selectedText,
-////                        onValueChange = {viewModel.setDocType(selectedText)},
-//                        onValueChange = { },
-//                        textStyle = MaterialTheme.typography.bodyMedium,
-//                        readOnly = true,
-//                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-//                        modifier = Modifier.menuAnchor()
-//                    )
-//
-//                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-//                        docConversionTypes.forEach { docType ->
-//                            DropdownMenuItem(
-//                                text = { Text(docType, style = MaterialTheme.typography.labelMedium) },
-//                                onClick = {
-//                                    viewModel.setDocType(docType)
-//                                    selectedText = docType
-//                                    expanded = false
-//
-//                                }
-//                            )
-//
-//                        }
-//
-//                    }
-//
-//                }
-//            }
-            notes.forEach { note ->
-                item(note.id) {
-                    NoteCard (
-                        note = note,
-                        isSelected = note.id in selectedNotes,
-                        onSelect = viewModel::onNoteSelect
+        Divider(modifier = Modifier.padding(16.dp))
+        if (notes.isEmpty()) {
+            Box(
+                contentAlignment = Alignment.Center, modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                Column {
+                    Image(
+                        painter = painterResource(id = R.drawable.confusedman),
+                        contentDescription = "No Notes",
+                        modifier = Modifier.padding(bottom = 16.dp)
                     )
+                    Text("It looks like you have no notes. Create a session to get started", textAlign = TextAlign.Center)
                 }
-//                    val paddingModifier = Modifier
-//                        .padding(10.dp)
-//                        .fillMaxWidth()
-//                        .defaultMinSize(20.dp, 50.dp)
-//                        .height(IntrinsicSize.Min)
-//                        .clickable {
-//                            Log.d("TEST", "id is ${note.id}")
-//                            navController.navigate(
-//                                Destination.SingleNoteScreen.createRoute(
-//                                    note.id
-//                                )
-//                            )
-//                        }
-//                    Card(shape = RoundedCornerShape(5.dp), modifier = paddingModifier, elevation = CardDefaults.cardElevation(4.dp)) {
-//                        Row(verticalAlignment = Alignment.CenterVertically) {
-//                            Column(modifier = Modifier.padding(10.dp,0.dp,0.dp,0.dp)) {
-//                                Text(note.title, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
-//                                Text(note.date.toString(), style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
-//                            }
-//                            Spacer(modifier = Modifier.width(25.dp))
-//                            Divider(modifier = Modifier
-//                                .fillMaxHeight()
-//                                .width(1.dp))
-//                            Spacer(modifier = Modifier.weight(1f))
-//
-//                            Button(
-//                                onClick = {
-//                                    viewModel.downloadNote(note)
-//                                    Toast.makeText(context, "File Downloaded", Toast.LENGTH_LONG).show()
-//                                },
-//                                modifier = Modifier.width(65.dp) // Adjust the value to the desired width
-//                            ) {
-//                                Icon(
-//                                    painterResource(id = R.drawable.baseline_file_download_black_24dp),
-//                                    contentDescription = "Download Icon"
-//                                )
-//                                Spacer(modifier = Modifier.width(6.dp))
-////                                    Text("Download")
-//                            }
-//
-//                            Spacer(modifier = Modifier.weight(1f))
-//
-//                            SignInButton(
-//                                text = "Share to Drive",
-//                                loadingText = "Signing in...",
-//                                isLoading = isLoading,
-//                                icon = painterResource(id = R.drawable.ic_google_logo_small),
-//                                onClick = { authResultLauncher.launch(signInRequestCode) }
-//                            )
-//                        }
-//                    }
-//                }
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+            ) {
+                OptionRow(
+                    isVisible = selectedNotes.isNotEmpty(),
+                    onDownloadClick = viewModel::onDownloadClick,
+                    onDeleteClick = viewModel::onDeleteClick,
+                    onShareClick = {},
+                    isAllSelected = viewModel.allSelected.collectAsState().value,
+                    onAllSelect = viewModel::onAllSelect,
+                    isLoading = false
+                )
+                LazyColumn(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    notes.forEach { note ->
+                        item(note.id) {
+                            NoteCard(
+                                note = note,
+                                isSelected = note.id in selectedNotes,
+                                onSelect = viewModel::onNoteSelect,
+                                onClick = {
+                                    navController.navigate(
+                                        Destination.SingleNoteScreen.createRoute(note.id)
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -178,7 +151,12 @@ fun NoteRepositoryScreen(
 
 @Composable
 fun OptionRow(
+    isVisible: Boolean,
     onDownloadClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onShareClick: () -> Unit,
+    isAllSelected: Boolean,
+    onAllSelect: (Boolean) -> Unit,
     isLoading: Boolean,
 ) {
     val context = LocalContext.current
@@ -208,20 +186,33 @@ fun OptionRow(
             }
         }
 
-    Row {
-        IconButton(onClick = onDownloadClick, modifier = Modifier.padding(16.dp)) {
-            Icon(
-                painterResource(id = R.drawable.baseline_file_download_black_24dp),
-                contentDescription = "Download Icon"
-            )
+    Row(verticalAlignment = Alignment.Top, modifier = Modifier.padding(horizontal = 16.dp)) {
+        AnimatedVisibility(visible = isVisible, enter = fadeIn(), exit = fadeOut()) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                SignInButton(
+                    text = "Share to Drive",
+                    loadingText = "Signing in...",
+                    isLoading = isLoading,
+                    icon = painterResource(id = R.drawable.ic_google_logo_small),
+                    onClick = onShareClick
+                )
+                IconButton(onClick = onDownloadClick) {
+                    Icon(
+                        Icons.Outlined.Download,
+                        contentDescription = "Download"
+                    )
+                }
+                IconButton(onClick = onDeleteClick) {
+                    Icon(
+                        Icons.Outlined.Delete,
+                        contentDescription = "Delete"
+                    )
+                }
+
+            }
         }
-        SignInButton(
-            text = "Share to Drive",
-            loadingText = "Signing in...",
-            isLoading = isLoading,
-            icon = painterResource(id = R.drawable.ic_google_logo_small),
-            onClick = { authResultLauncher.launch(signInRequestCode) }
-        )
+        Spacer(modifier = Modifier.weight(1f))
+        Checkbox(checked = isAllSelected, onCheckedChange = onAllSelect)
     }
 }
 
@@ -230,18 +221,18 @@ fun NoteCard(
     note: Note,
     isSelected: Boolean,
     onSelect: (Boolean, Int) -> Unit,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(5.dp),
-        elevation = if (isSelected) CardDefaults.cardElevation(10.dp) else CardDefaults.cardElevation(),
+        elevation = CardDefaults.cardElevation(5.dp),
         modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(vertical = 8.dp)
             .fillMaxWidth()
             .clickable(onClick = onClick)
     ) {
         Row(
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(note.title, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
@@ -252,11 +243,68 @@ fun NoteCard(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { onSelect(!isSelected, note.id)}, modifier = Modifier.padding(4.dp)) {
-                Icon(
-                    if (isSelected) Icons.Outlined.CheckCircle else Icons.Outlined.Circle,
-                    contentDescription = null,
+            Checkbox(
+                checked = isSelected,
+                onCheckedChange = { selected -> onSelect(selected, note.id) })
+        }
+    }
+}
+
+@ExperimentalMaterial3Api
+@Composable
+fun FileFormatDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (FileOptions) -> Unit
+) {
+    val options = listOf(FileOptions.PDF, FileOptions.DOCX, FileOptions.TXT)
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(options[0]) }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+    ) {
+        Surface(
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Select a file format",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 12.dp)
                 )
+                Column(
+                    modifier = Modifier.selectableGroup()
+                ) {
+                    Divider()
+                    options.forEach {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Text(it.text, style = MaterialTheme.typography.bodyMedium)
+                            Spacer(modifier = Modifier.weight(1f))
+                            RadioButton(
+                                selected = it == selectedOption,
+                                onClick = { onOptionSelected(it) })
+                        }
+                        Divider()
+                    }
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 8.dp)
+                ) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel", style = MaterialTheme.typography.bodyMedium)
+                    }
+                    TextButton(onClick = { onConfirm(selectedOption) }) {
+                        Text("Confirm", style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
             }
         }
     }
