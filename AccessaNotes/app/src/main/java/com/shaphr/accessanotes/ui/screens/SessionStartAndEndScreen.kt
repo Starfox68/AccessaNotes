@@ -77,8 +77,12 @@ fun SessionStartAndEndScreen(navController: NavHostController, viewModel: StartA
                     prompt += "\n\nBut before I give you the transcript use the below text for preliminary context to improve your summary and incorporate it with same formatting:\n$fileText"
                 }
                 fileText = ""
-                //URLEncoder.encode(audioFile.toString(), "UTF-8")
-                navController.navigate(Destination.LiveRecordingScreen.createRoute(prompt, "1"))
+                val uriStr = URLEncoder.encode(audioFile.toString(), "UTF-8")
+                if (uriStr != "" || uriStr != null) {
+                    navController.navigate(Destination.LiveRecordingScreen.createRoute(prompt, uriStr))
+                } else {
+                    navController.navigate(Destination.LiveRecordingScreen.createRoute(prompt, "0"))
+                }
             },
             canStart = canStart,
             title = title,

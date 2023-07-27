@@ -64,10 +64,10 @@ fun LiveRecordingScreen(
     viewModel.updatePrompt(prompt)
 
     val existingAudioStr = arguments?.getString("existingAudio")
-    println("existingAudioStr: $existingAudioStr")
-    val existingAudio = existingAudioStr?.let { Uri.parse(URLDecoder.decode(it, "UTF-8")) }
-    println("existingAudio: $existingAudio")
-    viewModel.setAudioExists(existingAudio)
+   if (existingAudioStr != "0") {
+       val existingAudio = existingAudioStr?.let { Uri.parse(URLDecoder.decode(it, "UTF-8")) }
+       viewModel.setAudioExists(existingAudio)
+   }
 
     val canStop = viewModel.canStop.collectAsState().value
     val canListen = viewModel.canListen.collectAsState().value
