@@ -88,6 +88,8 @@
 | 07/24/2023 | | | | | | 6 | FileManager Template Pattern for Importing Files |
 | 07/24/2023 | | 5 | | | | | NoteImage testing and completion |
 | 07/25/2023 | | | | | 0.5 | | D6 Outline |
+| 07/25/2023 | | | | | | 2 | Note Edit Bug Fix |
+| 07/25/2023 | | | | | | 4 | Offline Mode Implementation |
 | 07/25/2023 | 2 | 2 | 2 | 2 | 2 | 2 | Team sync |
 | 07/25/2023 | | | | | 3 | | Transcript/Summary Dynamic Height + Transcript to Single Note |
 | 07/25/2023 | | | | 5.5 | | | Google Drive Works |
