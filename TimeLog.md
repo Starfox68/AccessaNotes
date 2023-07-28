@@ -73,11 +73,11 @@
 | 07/22/2023 | | | | | | 1 | Fixed "start recording" bug |
 | 07/22/2023 | | | | | | 1 | Reset transcript on screen after session |
 | 07/22/2023 | | | | | | 1 | Fix app crash bug with multiple stops |
+| 07/22/2023 | 4 | | | | | | Implement settings screen |
 | 07/22/2023 | | | | | | 1 | Note summarization bug fix and TTS enable/disable functionality |
 | 07/23/2023 | | | | | | 1 | Add note discard functionality |
 | 07/23/2023 | | | | 5 | | | Fixed google sign-in + started google drive |
 | 07/23/2023 | | 1 | | | | | Note with image storing capability |
-| 07/22/2023 | 4 | | | | | | Implement settings screen |
 | 07/24/2023 | 2 | 2 | 2 | 2 | 2 | 2 | Team sync |
 | 07/24/2023 | | | | | 1 | | TTS UI-Related Fixes and Improvements |
 | 07/24/2023 | | | | 5 | | | google drive file upload + dropdown |
@@ -87,6 +87,8 @@
 | 07/24/2023 | | 2 | | | | | NoteImage db implementation |
 | 07/24/2023 | | | | | | 6 | FileManager Template Pattern for Importing Files |
 | 07/24/2023 | | 5 | | | | | NoteImage testing and completion |
+| 07/24/2023 | 5 | | | | | | Finish Camera Functionality / Strategy Pattern |
+| 07/25/2023 | 6 | | | | | | Refactor Note repository screen |
 | 07/25/2023 | | | | | 0.5 | | D6 Outline |
 | 07/25/2023 | | | | | | 2 | Note Edit Bug Fix |
 | 07/25/2023 | | | | | | 4 | Offline Mode Implementation |
