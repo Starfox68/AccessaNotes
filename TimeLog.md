@@ -97,4 +97,5 @@
 | 07/25/2023 | | | | 5.5 | | | Google Drive Works |
 | 07/25/2023 | | 4 | | |  | | Note image bug fix and image itegration |
 | 07/26/2023 | 7.5 | 7.5 | 7.5 | 7.5 | 7.5 | 7.5 | Team Integrations Meeting + Demo |
-| 07/27/2023 | 4 | 4 | 4 | 4 | 4 | 4 | D6 - Architecture and Design Report |
+| 07/27/2023 | | | | | 2 | | D6 - Architecture and Design Report |
+| 07/28/2023 | 4 | 4 | 4 | 4 | 4 | 4 | D6 - Architecture and Design Report |
