@@ -4,10 +4,8 @@ package com.shaphr.accessanotes.data.repositories
 import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.data.database.NoteDataAccess
 import com.shaphr.accessanotes.data.database.NoteDatabase
-import com.shaphr.accessanotes.data.database.NoteItem
 import com.shaphr.accessanotes.data.models.UiNote
 import com.shaphr.accessanotes.data.models.UiNoteItem
 import kotlinx.coroutines.CoroutineScope
@@ -22,39 +20,36 @@ import java.io.FileOutputStream
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.shaphr.accessanotes.data.database.Note
+import com.shaphr.accessanotes.data.database.NoteItem
 
 @Singleton
 class NotesRepository @Inject constructor(private val application: Application) {
+    // This is the I/O dispatcher scope for coroutines
     private val ioScope = CoroutineScope(Dispatchers.IO)
+
+    // Data Access Object for the notes
     private val dao: NoteDataAccess
+
+    // Create an instance of the NoteDatabase and get the NoteDataAccess
     init {
-        // initiate database access
         dao = NoteDatabase.getDatabase(application).getNoteDataAccess()
     }
 
+    // MutableStateFlow is a state-holder observable that emits updates to its collectors in a conflation-safe way.
+    // Here it is initialized with an empty list of UiNote.
     private val _notes = MutableStateFlow<List<UiNote>>(emptyList())
+
+    // StateFlow is a read-only version of MutableStateFlow, this is exposed for consumers to listen to the note updates
     val notes: StateFlow<List<UiNote>> = _notes
+
     init {
         ioScope.launch {
             refreshNotes()
-//            val uiNotes = dao.getNotes()
-//                .flatMapConcat { notes ->
-//                    println("Number of notes from dao.getNotes: ${notes.size}")
-//                    flowsOfNotesAndItems(notes)
-//                }
-//                .map { (note, noteItems) ->
-//                    println("Creating UiNote for note id: ${note.id}")
-//                    createUiNote(note, noteItems)
-//                }
-////                .toList()
-//                .collect {
-//                    _notes.value = _notes.value + it
-//                }
-////            println("Number of UiNotes created: ${uiNotes.size}")
-////            _notes.value = uiNotes
         }
     }
 
+    // Function to refresh the list of notes
     suspend fun refreshNotes() {
         dao.getNotes().combine(dao.getNoteItems()) { notes, noteItems ->
             val notesAndItems = notes.map { note ->
@@ -66,38 +61,11 @@ class NotesRepository @Inject constructor(private val application: Application) 
         }.collect {
             _notes.value = it
         }
-
-//        val uiNotes = dao.getNotes()
-//            .flatMapConcat { notes ->
-//                println("Number of notes from dao.getNotes: ${notes.size}")
-//                flowsOfNotesAndItems(notes)
-//            }
-//            .map { (note, noteItems) ->
-//                println("Creating UiNote for note id: ${note.id}")
-//                createUiNote(note, noteItems)
-//            }
-//
-////            .toList()
-//            .collect {
-//                _notes.value = _notes.value + it
-//            }
-//        println("Number of UiNotes created: ${uiNotes.size}")
-//        _notes.value = uiNotes
     }
 
-//    private fun flowsOfNotesAndItems(notes: List<Note>): Flow<Pair<Note, List<NoteItem>>> = flow {
-//        for (note in notes) {
-//            emitAll(
-//                dao.getNoteItems(note.id)
-//                    .map { noteItems ->
-//                        println("Number of note items for note id ${note.id}: ${noteItems.size}")
-//                        note to noteItems
-//                    }
-//            )
-//        }
-//    }
-
+    // Function to convert note data into a UI friendly model
     private fun createUiNote(notes: List<Pair<Note, List<NoteItem>>>): List<UiNote> {
+        // Mapping from the database Note model to the UI model
         return notes.map { noteData ->
             val note = noteData.first
             val noteItems = noteData.second
@@ -118,8 +86,8 @@ class NotesRepository @Inject constructor(private val application: Application) 
         }
     }
 
+    // Function to save a new note
     fun setNote(uiNote: UiNote) = ioScope.launch {
-        println("came to set note")
         val note = Note(uiNote.title, uiNote.summarizeContent, uiNote.transcript, uiNote.date)
         val noteId = dao.insert(note).toInt()
         uiNote.items?.forEach { uiNoteItem ->
@@ -129,6 +97,7 @@ class NotesRepository @Inject constructor(private val application: Application) 
         }
     }
 
+    // Function to update an existing note
     fun updateNote(uiNote: UiNote) = ioScope.launch {
         val note = Note(uiNote.title, uiNote.summarizeContent, uiNote.transcript, uiNote.date, uiNote.id)
         dao.update(note)
@@ -139,10 +108,13 @@ class NotesRepository @Inject constructor(private val application: Application) 
         }
     }
 
+    // Function to delete a note
     fun deleteNote(uiNote: UiNote) = ioScope.launch {
         val note = Note(uiNote.title, uiNote.summarizeContent, uiNote.transcript, uiNote.date, uiNote.id)
         dao.delete(note)
     }
+
+    // Function to save a bitmap image to a file and returns the file path
 
     private fun saveBitmapToFile(bitmap: Bitmap): String {
         val filename = "${System.currentTimeMillis()}.jpg"
@@ -167,5 +139,5 @@ class NotesRepository @Inject constructor(private val application: Application) 
         return BitmapFactory.decodeFile(path)
     }
 }
-
+// Pair of Note and its corresponding List of NoteItem
 typealias NoteWithItems = Pair<Note, List<NoteItem>>
