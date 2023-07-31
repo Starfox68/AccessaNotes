@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
+//View model for overall app theme storing font and colour settings
 @HiltViewModel
 class ThemeViewModel @Inject constructor(
     private val accountSettingsRepository: AccountSettingsRepository

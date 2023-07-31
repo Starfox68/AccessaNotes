@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.shaphr.accessanotes.Destination
 
+//return icon depending on the tab name
 @Composable
 fun StyleIcons(iconName: String){
     val mod = Modifier.defaultMinSize(40.dp, 40.dp)
@@ -35,10 +36,11 @@ fun StyleIcons(iconName: String){
 //Bottom Navigation Bar
 @Composable
 fun BottomNavBar(navController: NavController) {
+    //show current screen as the selected item
     val curScreen = navController.currentBackStackEntry!!.destination.route!!
-
     val selectedItem = remember { mutableStateOf(curScreen) }
 
+    //Nav bar with 3 items and custom route's
     NavigationBar(modifier = Modifier.defaultMinSize(50.dp, 90.dp)) {
         NavigationBarItem(
             icon = { StyleIcons("Home")},

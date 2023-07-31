@@ -25,19 +25,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.shaphr.accessanotes.R
 
+//Google auth sign-in button
 @Composable
 fun SignInButton(
     text: String,
-    loadingText: String = "Signing in...",
     icon: Painter,
     shape: Shape = MaterialTheme.shapes.medium,
     borderColor: Color = Color.LightGray,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
-    progressIndicatorColor: Color = MaterialTheme.colorScheme.primary,
     onClick: () -> Unit,
     clickable: Boolean
 ) {
     Surface(
+        //pass in onClick when the button is clickable
         modifier = Modifier.clickable(
             enabled = clickable,
             onClick = onClick
@@ -46,6 +46,7 @@ fun SignInButton(
         border = BorderStroke(width = 1.dp, color = borderColor),
         color = backgroundColor
     ) {
+        //Align icon and text horizontally
         Row(
             modifier = Modifier
                 .padding(
@@ -54,6 +55,7 @@ fun SignInButton(
                     top = 12.dp,
                     bottom = 12.dp
                 )
+                //animate loading symbol
                 .animateContentSize(
                     animationSpec = tween(
                         durationMillis = 300,
@@ -70,6 +72,7 @@ fun SignInButton(
             )
             Spacer(modifier = Modifier.width(8.dp))
 
+            //grey out button when it's not clickable
             if (clickable){
                 Text(text = text)
             }else{
@@ -79,14 +82,12 @@ fun SignInButton(
     }
 }
 
-
+//Preview for sign-in button
 @Composable
 @Preview
 fun SignInButtonPreview() {
     SignInButton(
         text = "Sign in with Google",
-        loadingText = "Signing in...",
-//        isLoading = false,
         icon = painterResource(id = R.drawable.ic_google_logo),
         onClick = { },
         clickable = true

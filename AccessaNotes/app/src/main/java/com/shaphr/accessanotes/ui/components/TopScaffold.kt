@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
+//Scaffold layout for most screens
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopScaffold(
@@ -24,8 +25,10 @@ fun TopScaffold(
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold (
+        //use topBar for title of the screen
         topBar = {
             Row(
+                //Align text vertically and horizontally
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
@@ -39,7 +42,9 @@ fun TopScaffold(
                 )
             }
         },
+        //pass in composable as content for the screen
         content = content,
+        //standard bottom nav bar across all screens
         bottomBar = {
             BottomNavBar(navController)
         }

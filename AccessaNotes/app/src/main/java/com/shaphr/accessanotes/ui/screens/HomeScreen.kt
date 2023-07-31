@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shaphr.accessanotes.ui.viewmodels.User
 
+//Home Screen user sees when they launch the app
+//Display user name and user email
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(user: User) {

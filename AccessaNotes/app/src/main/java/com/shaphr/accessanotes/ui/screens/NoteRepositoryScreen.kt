@@ -71,12 +71,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
-
-//search bar at the top of the screen if time permits
-
-//each note has title, date, and share button
-
-
+//Screen for showing all saved user notes
 @SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,22 +79,25 @@ fun NoteRepositoryScreen(
     navController: NavHostController,
     viewModel: NoteRepositoryViewModel = hiltViewModel(),
 ) {
-    val context = LocalContext.current
-
-    val signInRequestCode = 1
-
+    //collect values from the viewModel as needed
     val notes = viewModel.notes.collectAsState(initial = emptyList()).value
     val fileFormat = viewModel.fileFormat.collectAsState().value
     val dialogState = viewModel.dialogState.collectAsState().value
     val selectedNotes = viewModel.selectedNotes.collectAsState().value
 
+    //Google sign-in + google auth launcher
+    val context = LocalContext.current
+    val signInRequestCode = 1
+
     val authResultLauncher =
         rememberLauncherForActivityResult(contract = AuthResultContract()) { task ->
             try {
+                //launch account sign-in
                 val account = task?.getResult(ApiException::class.java)
                 if (account == null) {
                     Log.d("drive", "account is null")
                 } else {
+                    //launch drive Auth and upload file
                     uploadFilesToGDrive(context, viewModel.getSelectedNotes(), fileFormat)
                 }
             } catch (e: ApiException) {
@@ -107,6 +105,7 @@ fun NoteRepositoryScreen(
             }
         }
 
+    //show file format pop-up after user clicks the button
     if (viewModel.dialogState.collectAsState().value != DialogState.CLOSED) {
         FileFormatDialog(
             onDismiss = viewModel::onDialogClose,
@@ -120,8 +119,10 @@ fun NoteRepositoryScreen(
         )
     }
 
+    //use scaffold layout for screen
     TopScaffold(text = "All Notes", navController = navController) { padding ->
         Divider(modifier = Modifier.padding(16.dp))
+        //show image of confused man if there are no saved notes
         if (notes.isEmpty()) {
             Box(
                 contentAlignment = Alignment.Center, modifier = Modifier
@@ -142,11 +143,13 @@ fun NoteRepositoryScreen(
                 }
             }
         } else {
+            //Show notes
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
             ) {
+                //Top row for sharing, deleting, and checkbox functionality
                 OptionRow(
                     isVisible = true,
                     onDownloadClick = { viewModel.showDialog(DialogState.DOWNLOAD_OPEN) },
@@ -156,13 +159,16 @@ fun NoteRepositoryScreen(
                     onAllSelect = viewModel::onAllSelect,
                     isClickable = viewModel.selectedNotes.value.isNotEmpty()
                 )
+                //render each note as a card aligned vertically
                 LazyColumn(modifier = Modifier.padding(horizontal = 16.dp)) {
                     notes.forEach { note ->
                         item(note.id) {
+                            //custom note component
                             NoteCard(
                                 note = note,
                                 isSelected = note.id in selectedNotes,
                                 onSelect = viewModel::onNoteSelect,
+                                //create route for note and navigate to it
                                 onClick = {
                                     navController.navigate(
                                         Destination.SingleNoteScreen.createRoute(note.id)
@@ -177,6 +183,8 @@ fun NoteRepositoryScreen(
     }
 }
 
+//Custom row component which has:
+// google drive sharing button, delete button, download button, and checkbox to select all notes
 @Composable
 fun OptionRow(
     isVisible: Boolean,
@@ -188,11 +196,11 @@ fun OptionRow(
     isClickable: Boolean
 ) {
     Row(verticalAlignment = Alignment.Top, modifier = Modifier.padding(horizontal = 16.dp)) {
+        //animate row to fade in or out when it's not selected
         AnimatedVisibility(visible = isVisible, enter = fadeIn(), exit = fadeOut()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 SignInButton(
                     text = "Share to Drive",
-                    loadingText = "Signing in...",
                     icon = painterResource(id = R.drawable.ic_google_logo_small),
                     onClick = onShareClick,
                     clickable = isClickable
@@ -217,6 +225,7 @@ fun OptionRow(
     }
 }
 
+//render notes as cards with functionality for selecting and clicking on notes
 @Composable
 fun NoteCard(
     note: UiNote,
@@ -232,10 +241,12 @@ fun NoteCard(
             .fillMaxWidth()
             .clickable(onClick = onClick)
     ) {
+        //align all content horizontally in the note
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
+                //display title and date one above the other
                 Text(note.title, style = MaterialTheme.typography.bodyMedium, color = Color.Black)
                 Text(
                     note.date.toString(),
@@ -244,6 +255,7 @@ fun NoteCard(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
+            //check box for selecting note
             Checkbox(
                 checked = isSelected,
                 onCheckedChange = { selected -> onSelect(selected, note.id) })
@@ -251,15 +263,18 @@ fun NoteCard(
     }
 }
 
+//Pop-up for selecting file format to download
 @ExperimentalMaterial3Api
 @Composable
 fun FileFormatDialog(
     onDismiss: () -> Unit,
     onConfirm: (FileFormat) -> Unit
 ) {
+    //types of supported files
     val options = listOf(FileFormat.PDF, FileFormat.DOCX, FileFormat.TXT)
     val (selectedOption, onOptionSelected) = remember { mutableStateOf(options[0]) }
 
+    //Show dialogue if no options selected
     Dialog(
         onDismissRequest = onDismiss,
     ) {
@@ -278,6 +293,7 @@ fun FileFormatDialog(
                     modifier = Modifier.selectableGroup()
                 ) {
                     Divider()
+                    //List of file formats which can be clicked
                     options.forEach {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -294,6 +310,7 @@ fun FileFormatDialog(
                         Divider()
                     }
                 }
+                //Cancel and confirm buttons for pop-up
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.padding(top = 8.dp)
@@ -312,12 +329,16 @@ fun FileFormatDialog(
 }
 
 //reference https://www.section.io/engineering-education/backup-services-with-google-drive-api-in-android/
+//function for making a new drive instance, given a signed-in google account
 private fun getDriveService(context: Context): Drive? {
+    //get last signed in google account
     GoogleSignIn.getLastSignedInAccount(context)?.let { googleAccount ->
+        //get credentials with correct scopes
         val credential = GoogleAccountCredential.usingOAuth2(
             context, listOf(DriveScopes.DRIVE_FILE, DriveScopes.DRIVE)
         )
         credential.selectedAccount = googleAccount.account!!
+        //create drive instance
         return Drive.Builder(
             AndroidHttp.newCompatibleTransport(),
             JacksonFactory.getDefaultInstance(),
@@ -326,31 +347,40 @@ private fun getDriveService(context: Context): Drive? {
             .setApplicationName(R.string.app_name.toString())
             .build()
     }
+    //return null if it fails
     return null
 }
 
 //reference https://www.section.io/engineering-education/backup-services-with-google-drive-api-in-android/
+//function for uploading file to drive given a drive instance
 fun uploadFilesToGDrive(context: Context, notes: List<UiNote>, fileFormat: FileFormat) {
+    //get drive instance
     getDriveService(context)?.let { googleDriveService ->
+        //format file depending on file type
         val docType = when (fileFormat) {
             FileFormat.DOCX -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             FileFormat.PDF -> "application/pdf"
             FileFormat.TXT -> "text/plain"
         }
+        //go through notes in case multiple were selected
         for (note in notes) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
+                    //find local file in downloads folder
                     val localFileDirectory =
                         File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath)
                     val actualFile =
                         File("${localFileDirectory}/${note.title}.${fileFormat.text.lowercase()}")
 
+                    //create google file version of local file
                     val gFile = com.google.api.services.drive.model.File()
                     gFile.name = actualFile.name
 
+                    //upload file to drive
                     val fileContent = FileContent(docType, actualFile)
                     googleDriveService.Files().create(gFile, fileContent).execute()
 
+                    //delete file from downloads folder
                     actualFile.delete()
                 } catch (exception: Exception) {
                     exception.printStackTrace()

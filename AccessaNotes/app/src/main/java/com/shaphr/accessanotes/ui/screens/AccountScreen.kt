@@ -26,6 +26,7 @@ import com.shaphr.accessanotes.AuthResultContract
 import com.shaphr.accessanotes.ui.components.TopScaffold
 import com.shaphr.accessanotes.ui.viewmodels.AccountSettingsViewModel
 
+//Wrapper for user account settings
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun AccountScreen(
@@ -33,6 +34,8 @@ fun AccountScreen(
 ) {
     val viewModel: AccountSettingsViewModel = hiltViewModel()
 
+    //Pass in screen content to the scaffold
+    //collect values and functions from the view model
     TopScaffold(text = "Account Settings", navController = navController) { padding ->
         AccountScreenContent(
             padding,
@@ -46,6 +49,7 @@ fun AccountScreen(
     }
 }
 
+//User account settings screen
 @Composable
 fun AccountScreenContent(
     padding: PaddingValues,
@@ -57,6 +61,7 @@ fun AccountScreenContent(
     authConnected: Boolean
 ) {
 
+    //google sign-in auth + google drive authenticator
     val context = LocalContext.current
     val signInRequestCode = 1
 
@@ -75,16 +80,19 @@ fun AccountScreenContent(
             }
         }
 
+    //Vertically Align buttons for changing user settings
     Column(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier.padding(padding)
     ) {
+        //Custom component for text and switch together
         SettingSwitch(text = "Enable Large Fonts", isEnabled = isFontLarge, onClick = onFontChange)
         SettingSwitch(
             text = "Enable Colourblind Mode",
             isEnabled = isColourBlind,
             onClick = onColourChange
         )
+        //Change text and button depending on if the user is signed in or not
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(20.dp, 0.dp, 10.dp, 0.dp)
@@ -102,6 +110,7 @@ fun AccountScreenContent(
     }
 }
 
+//Custom component for text and a slider switch beside it
 @Composable
 fun SettingSwitch(
     text: String,
@@ -119,16 +128,3 @@ fun SettingSwitch(
         Switch(checked = isEnabled, onCheckedChange = onClick)
     }
 }
-
-//@Preview
-//@Composable
-//fun Preview() {
-//    AccountScreenContent(
-//        padding = PaddingValues(8.dp),
-//        onFontChange = { },
-//        onColourChange = { },
-//        isColourBlind = false,
-//        isFontLarge = true,
-//        authenticateUser = () -> Unit
-//    )
-//}

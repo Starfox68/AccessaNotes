@@ -16,7 +16,7 @@ fun TopNav(titleText: String) {
     TopAppBar(
         title = { Text(titleText) },
         actions = {
-            IconButton(onClick = { /* TODO */ }){
+            IconButton(onClick = { }){
                 Icon(imageVector = Icons.Default.Settings, null)
             }
         }

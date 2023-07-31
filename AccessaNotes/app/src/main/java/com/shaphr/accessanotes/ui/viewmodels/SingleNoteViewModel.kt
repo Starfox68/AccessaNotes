@@ -19,13 +19,17 @@ class SingleNoteViewModel @Inject constructor(
     var noteId: Int = 0
     var isSpeaking = false
 
+    //get list of notes from the note repository
     init {
         mutableNotes.value = notesRepository.notes.value
     }
 
+    //update the content of a note when the user changes the text on screen
     fun updateNote(noteID: Int, newContent: String) {
+        //find correct note
         mutableNotes.value = mutableNotes.value.map { note ->
             if (note.id == noteID) {
+                //update content
                 note.copy(summarizeContent = newContent)
             } else {
                 note
@@ -33,18 +37,14 @@ class SingleNoteViewModel @Inject constructor(
         }
     }
 
+    //update note in the note repository
     fun updateNoteDB(note: UiNote?) {
         if (note != null) {
             notesRepository.updateNote(note)
         }
     }
 
-    fun onClose() {
-        mutableNotes.value.firstOrNull { it.id == noteId }?.let {
-            notesRepository.updateNote(it)
-        }
-    }
-
+    //get note based on ID
     fun getNote(id: Int): Flow<UiNote?> {
         noteId = id
         return mutableNotes.map { noteList ->
@@ -52,6 +52,7 @@ class SingleNoteViewModel @Inject constructor(
         }
     }
 
+    //start text to speech client
     fun onTextToSpeech(text: String) {
         if (!isSpeaking) {
             textToSpeechClient.speak(text)

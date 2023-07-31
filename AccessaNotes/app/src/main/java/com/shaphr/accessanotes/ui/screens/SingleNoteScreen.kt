@@ -50,6 +50,7 @@ import com.shaphr.accessanotes.R
 import com.shaphr.accessanotes.data.models.UiNote
 import com.shaphr.accessanotes.ui.viewmodels.SingleNoteViewModel
 
+//Screen to display a single note
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SingleNoteScreen(
@@ -57,12 +58,14 @@ fun SingleNoteScreen(
     navController: NavHostController,
     viewModel: SingleNoteViewModel = hiltViewModel()
 ) {
+    //collect note information from the view model
     val note = viewModel.getNote(noteID).collectAsState(initial = UiNote()).value
     var ttsButtonText by remember { mutableStateOf("Read Summarized Notes") }
     val screenHeight = (LocalConfiguration.current.screenHeightDp).dp
     var transcriptHeight by remember { mutableStateOf(screenHeight * 0.4F) }
     var summaryHeight by remember { mutableStateOf(screenHeight * 0.4F) }
 
+    //Align all content vertically
     Column(Modifier.fillMaxSize()) {
         // Header
         Box(
@@ -83,7 +86,7 @@ fun SingleNoteScreen(
                         navController.popBackStack()
                     }
             )
-            //Text
+            //Title of the note
             Text(
                 text = note?.title ?: "default",
                 style = MaterialTheme.typography.bodyMedium,
@@ -93,24 +96,16 @@ fun SingleNoteScreen(
                     .align(Alignment.Center)
 
             )
-            // Share icon
-//            Icon(
-//                Icons.Default.Share,
-//                contentDescription = "Share",
-//                tint = Color.Black,
-//                modifier = Modifier
-//                    .align(alignment = Alignment.TopEnd)
-//                    .padding(16.dp)
-//            )
         }
 
-        // Body
+        // Content of the note
         LazyColumn(
             Modifier
                 .fillMaxWidth()
                 .weight(1f)
                 .background(Color.White)
         ) {
+            //title and body for transcribed text
             item {
                 Column(
                     modifier = Modifier.height(transcriptHeight).padding(4.dp)
@@ -129,7 +124,7 @@ fun SingleNoteScreen(
                     )
                 }
             }
-
+            //adjustable divider between transcribed text and summarized text
             item {
                 Divider(color = MaterialTheme.colorScheme.tertiary, thickness = 4.dp,
                     modifier = Modifier.padding(4.dp).pointerInput(Unit) {
@@ -145,7 +140,7 @@ fun SingleNoteScreen(
                         }
                     })
             }
-
+            //title and body for summarized text
             item {
                 Column(
                     modifier = Modifier.height(summaryHeight).padding(4.dp)
@@ -167,10 +162,12 @@ fun SingleNoteScreen(
                 }
             }
 
+            //Button for text-to-speech
             item {
                 OutlinedButton(
                     modifier = Modifier.width(235.dp).padding(4.dp),
                     onClick = {
+                        //call view model
                         viewModel.onTextToSpeech(note?.summarizeContent ?: "No content to read")
                         ttsButtonText = if (viewModel.isSpeaking) {
                             "Stop Reading Notes    "

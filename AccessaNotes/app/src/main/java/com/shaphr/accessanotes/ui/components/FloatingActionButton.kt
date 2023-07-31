@@ -21,6 +21,7 @@ import com.shaphr.accessanotes.Destination
 fun FloatingActionButton(navController: NavHostController){
     Box(modifier = Modifier.fillMaxSize()){
         ExtendedFloatingActionButton(
+            //styling
             modifier = Modifier
                 .padding(20.dp)
                 //align in the bottom right corner

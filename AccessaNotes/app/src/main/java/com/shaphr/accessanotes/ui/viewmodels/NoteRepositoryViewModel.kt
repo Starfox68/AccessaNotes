@@ -33,14 +33,7 @@ class NoteRepositoryViewModel @Inject constructor(
 
     private val mutableSelectedNotes = MutableStateFlow<List<Int>>(emptyList())
     val selectedNotes: StateFlow<List<Int>> = mutableSelectedNotes
-    init {
-//        viewModelScope.launch {
-//            refreshNotes()
-//            notes.collect { noteList ->
-//                println("Number of notes: ${noteList.size}")
-//            }
-//        }
-    }
+    init {}
 
     private fun refreshNotes() = viewModelScope.launch {
         notesRepository.refreshNotes()
