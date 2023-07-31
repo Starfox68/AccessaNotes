@@ -1,13 +1,10 @@
 package com.shaphr.accessanotes.data.database
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import java.io.Serializable
-import java.util.Date
-import androidx.room.*
-import kotlinx.serialization.json.JsonNames
-import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.util.*
-import androidx.room.TypeConverter
 
 @Entity(
     tableName = "Note",

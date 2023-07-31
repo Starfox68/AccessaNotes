@@ -2,10 +2,6 @@ package com.shaphr.accessanotes.data.database
 
 import android.content.Context
 import androidx.room.*
-import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
-
-import androidx.room.TypeConverter
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId

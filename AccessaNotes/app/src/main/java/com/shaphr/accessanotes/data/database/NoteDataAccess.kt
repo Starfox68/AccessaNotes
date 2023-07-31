@@ -1,9 +1,7 @@
 package com.shaphr.accessanotes.data.database
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-import java.text.SimpleDateFormat
 import java.util.*
 
 @Dao

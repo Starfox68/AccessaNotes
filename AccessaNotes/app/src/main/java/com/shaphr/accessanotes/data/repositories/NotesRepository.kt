@@ -2,33 +2,26 @@ package com.shaphr.accessanotes.data.repositories
 
 
 import android.app.Application
-import androidx.lifecycle.LiveData
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.shaphr.accessanotes.data.database.Note
 import com.shaphr.accessanotes.data.database.NoteDataAccess
 import com.shaphr.accessanotes.data.database.NoteDatabase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Singleton
-import android.graphics.Bitmap
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import android.graphics.BitmapFactory
 import com.shaphr.accessanotes.data.database.NoteItem
 import com.shaphr.accessanotes.data.models.UiNote
 import com.shaphr.accessanotes.data.models.UiNoteItem
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class NotesRepository @Inject constructor(private val application: Application) {

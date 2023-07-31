@@ -1,6 +1,5 @@
 package com.shaphr.accessanotes.ui.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.shaphr.accessanotes.data.repositories.AccountSettingsRepository

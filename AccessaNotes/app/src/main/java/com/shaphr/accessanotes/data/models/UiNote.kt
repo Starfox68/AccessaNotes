@@ -2,7 +2,6 @@ package com.shaphr.accessanotes.data.models
 
 import android.graphics.Bitmap
 import java.time.LocalDate
-import java.util.Date
 
 data class UiNote(
     val title: String = "",

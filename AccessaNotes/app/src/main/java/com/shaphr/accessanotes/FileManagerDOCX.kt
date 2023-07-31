@@ -5,14 +5,13 @@ import android.graphics.Bitmap
 import android.net.Uri
 import org.apache.poi.util.Units
 import org.apache.poi.wp.usermodel.HeaderFooterType
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
-import dagger.hilt.android.AndroidEntryPoint
-import org.apache.poi.xwpf.extractor.XWPFWordExtractor
 import javax.inject.Inject
 
 class FileManagerDOCX @Inject constructor(application: Application) : FileManagerAbstract() {

@@ -1,8 +1,6 @@
 package com.shaphr.accessanotes.ui.theme
 
 import android.app.Activity
-import android.content.Context
-import android.content.SharedPreferences
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
