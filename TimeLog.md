@@ -1,3 +1,4 @@
+
 | Date | Henry | Shonn | Ayushi | Parth | Raymond | Hossein | Task |
 |---|---|---|---|---|---|---|---|
 | 05/26/2023 | 1 |0.75   | 1  | 1 | 1 | 1 | Project brainstorming and planning | 
@@ -78,6 +79,7 @@
 | 07/23/2023 | | | | | | 1 | Add note discard functionality |
 | 07/23/2023 | | | | 5 | | | Fixed google sign-in + started google drive |
 | 07/23/2023 | | 1 | | | | | Note with image storing capability |
+| 07/23/2023 | | | 1 | | | | Note Repository Screen UI |
 | 07/24/2023 | 2 | 2 | 2 | 2 | 2 | 2 | Team sync |
 | 07/24/2023 | | | | | 1 | | TTS UI-Related Fixes and Improvements |
 | 07/24/2023 | | | | 5 | | | google drive file upload + dropdown |
@@ -88,6 +90,7 @@
 | 07/24/2023 | | | | | | 6 | FileManager Template Pattern for Importing Files |
 | 07/24/2023 | | 5 | | | | | NoteImage testing and completion |
 | 07/24/2023 | 5 | | | | | | Finish Camera Functionality / Strategy Pattern |
+| 07/24/2023 | | | 3 | | | | App icon, Google logo dizing, Add font|
 | 07/25/2023 | 6 | | | | | | Refactor Note repository screen |
 | 07/25/2023 | | | | | 0.5 | | D6 Outline |
 | 07/25/2023 | | | | | | 2 | Note Edit Bug Fix |
@@ -96,13 +99,15 @@
 | 07/25/2023 | | | | | 3 | | Transcript/Summary Dynamic Height + Transcript to Single Note |
 | 07/25/2023 | | | | 5.5 | | | Google Drive Works |
 | 07/25/2023 | | 4 | | |  | | Note image bug fix and image itegration |
+| 07/25/2023 | | | 3 | |  | | Create dismissable popup |
+| 07/25/2023 | | | 3 | |  | | UI Bug Fixes |
 | 07/26/2023 | 7.5 | 7.5 | 7.5 | 7.5 | 7.5 | 7.5 | Team Integrations Meeting + Demo |
+| 07/26/2023 | | | 1 | |  | | UI Changes |
 | 07/27/2023 | | | | | 2 | | D6 - Architecture and Design Report |
 | 07/28/2023 | 4 | 4 | 4 | 4 | 4 | 4 | D6 - Architecture and Design Report |
 | 07/28/2023 | | 1.5 | | 1.5 | | 1.5 | Updated Comments and Imports |
 | 07/30/2023 | | | | | 1 | | Final Status Report |
 | 07/31/2023 | | | | | 1 | | Add Comments |
 | 07/31/2023 | | | | | | 1.5 | Final Status Report |
+| 07/31/2023 | | | 1.5 | | | | Final Status Report |
 | 07/31/2023 | 1 | 1 | 1 | 1 | 1 | 1 | Final Team Sync |
-
-
