@@ -42,9 +42,12 @@ class TranscriptionClient @Inject constructor(
     }
     private var recordingJob: Job? = null
 
+    // Function to start audio recording
     fun startRecording() {
         println("Starting recording...")
         println("Audio File path: $filePath")
+
+        // Configure MediaRecorder and start recording
         mediaRecorder = MediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
@@ -54,6 +57,7 @@ class TranscriptionClient @Inject constructor(
             start()
         }
 
+        // Schedule the recording job to stop after 5 minutes (300000 milliseconds) and restart recording
         recordingJob = CoroutineScope(Dispatchers.IO).launch {
             delay(300000) // 5 minutes
             stopRecording()
@@ -62,6 +66,7 @@ class TranscriptionClient @Inject constructor(
         }
     }
 
+    // Function to stop audio recording
     suspend fun stopRecording() {
         println("Stopping recording...")
         mediaRecorder?.apply {
@@ -69,18 +74,22 @@ class TranscriptionClient @Inject constructor(
             delay(1000)
             release()
         }
+
+        // Check if the device is connected to a network
         if (isConnectedToWifi() || isConnectedToNetwork()) {
-            callWhisper()
+            callWhisper() // Call the Whisper API for transcription
         } else {
             showToast("You're Offline! Recording Downloaded...")
-            saveRecordingToFile()
+            saveRecordingToFile() // Save the recording locally if the device is offline
         }
-        recordingJob?.cancel()
+        recordingJob?.cancel() // Cancel the recording job
     }
 
+    // Function to call the Whisper API for transcription using a provided file URI
     suspend fun callWhisper(fileUri: Uri) {
         println("Calling Whisper API...")
 
+        // Read the audio file from the provided URI
         val contentResolver = context.contentResolver
         val inputStream = contentResolver.openInputStream(fileUri)
         val requestBodyFile = inputStream?.let { inputStream ->
@@ -90,18 +99,23 @@ class TranscriptionClient @Inject constructor(
             )
         }
 
-        if(requestBodyFile == null) {
+        // Check if the audio file was successfully read
+        if (requestBodyFile == null) {
             println("Error reading file")
             return
         }
 
+        // Build the request body with audio file, model, and prompt
         val requestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart("file", "recording.mp3", requestBodyFile)
             .addFormDataPart("model", "whisper-1")
-            .addFormDataPart("prompt", "The transcript is about OpenAI which makes technology like DALL·E, GPT-3, and ChatGPT with the hope of one day building an AGI system that benefits all of humanity.")
+            .addFormDataPart(
+                "prompt", "The transcript is about OpenAI which makes technology like DALL·E, GPT-3, and ChatGPT with the hope of one day building an AGI system that benefits all of humanity."
+            )
             .build()
 
+        // Create the HTTP request with the Whisper API endpoint and necessary headers
         val request = Request.Builder()
             .url("https://api.openai.com/v1/audio/transcriptions")
             .addHeader("Authorization", "Bearer ${BuildConfig.OPENAI_API_KEY}")
@@ -110,7 +124,10 @@ class TranscriptionClient @Inject constructor(
 
         val client = OkHttpClient()
 
+        // Execute the API call asynchronously
         val response = client.newCall(request).await()
+
+        // Handle the API response
         if (response.isSuccessful) {
             val resultText = response.body?.string() ?: ""
             if (resultText == "") {
@@ -119,7 +136,7 @@ class TranscriptionClient @Inject constructor(
 
             val json = JSONObject(resultText)
             val text = json.optString("text", "")
-            transcription.emit(text)
+            transcription.emit(text) // Emit the transcription result
         } else {
             println(response.message)
             // Handle error response
@@ -127,17 +144,26 @@ class TranscriptionClient @Inject constructor(
         }
     }
 
+    // Function to call the Whisper API for transcription using the file path of the recording
     suspend fun callWhisper(filePath: String = this.filePath) {
         println("Calling Whisper API...")
+
+        // Read the audio file from the provided file path
         val audioFile = File(filePath)
 
+        // Build the request body with audio file, model, and prompt
         val requestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart("file", "recording.mp3", RequestBody.create("audio/mpeg".toMediaTypeOrNull(), audioFile))
-            .addFormDataPart("model", "whisper-1")
-            .addFormDataPart("prompt", "The transcript is about OpenAI which makes technology like DALL·E, GPT-3, and ChatGPT with the hope of one day building an AGI system that benefits all of humanity.")
+            .addFormDataPart(
+                "model", "whisper-1"
+            )
+            .addFormDataPart(
+                "prompt", "The transcript is about OpenAI which makes technology like DALL·E, GPT-3, and ChatGPT with the hope of one day building an AGI system that benefits all of humanity."
+            )
             .build()
 
+        // Create the HTTP request with the Whisper API endpoint and necessary headers
         val request = Request.Builder()
             .url("https://api.openai.com/v1/audio/transcriptions")
             .addHeader("Authorization", "Bearer ${BuildConfig.OPENAI_API_KEY}")
@@ -146,7 +172,10 @@ class TranscriptionClient @Inject constructor(
 
         val client = OkHttpClient()
 
+        // Execute the API call asynchronously
         val response = client.newCall(request).await()
+
+        // Handle the API response
         if (response.isSuccessful) {
             val resultText = response.body?.string() ?: ""
             if (resultText == "") {
@@ -155,7 +184,7 @@ class TranscriptionClient @Inject constructor(
 
             val json = JSONObject(resultText)
             val text = json.optString("text", "")
-            transcription.emit(text)
+            transcription.emit(text) // Emit the transcription result
         } else {
             println(response.message)
             // Handle error response
@@ -164,6 +193,7 @@ class TranscriptionClient @Inject constructor(
 
     }
 
+    // Function to save the recording to a file in the device's Download directory
     private fun saveRecordingToFile() {
         val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         val audioFile = File(filePath)
@@ -174,6 +204,7 @@ class TranscriptionClient @Inject constructor(
         println("Recording saved to ${newFile.absolutePath}")
     }
 
+    // Function to check if the device is connected to any network
     private fun isConnectedToNetwork(): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val activeNetwork = connectivityManager.activeNetwork ?: return false
@@ -189,16 +220,19 @@ class TranscriptionClient @Inject constructor(
         }
     }
 
+    // Function to check if the device is connected to a Wi-Fi network
     private fun isConnectedToWifi(): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
         return networkInfo != null && networkInfo.type == ConnectivityManager.TYPE_WIFI
     }
 
+    // Function to show a toast message regarding the recording
     private fun showToast(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
+    // Function to play the recorded audio
     private fun playRecording() {
         println("Playing recording...")
         mediaPlayer = MediaPlayer().apply {
