@@ -24,10 +24,11 @@ abstract class FileManagerAbstract {
         writeDoc(title, doc)
     }
 
-    // abstract functions for importing a file
+    // Abstract functions for importing a file
     protected abstract fun getFile(uri: Uri): Any
     protected abstract suspend fun readFile(file: Any): String
 
+    // Abstract functions for exporting a file
     // Content must be list of strings/bitmap images
     protected abstract fun createDoc(title: String, content: List<Any>): Any
     protected abstract fun writeDoc(title: String, doc: Any)

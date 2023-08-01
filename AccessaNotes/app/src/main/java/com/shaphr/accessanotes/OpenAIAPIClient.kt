@@ -19,6 +19,7 @@ class OpenAIAPIClient @Inject constructor() {
 
     @OptIn(BetaOpenAI::class)
     fun summarize(prompt: String, transcript: String): Flow<ChatCompletionChunk> {
+        // Prompt contains request to summarize
         val msg = "$prompt\n\nHere is the transcript:\n$transcript"
         val request = ChatCompletionRequest(
             model = ModelId(modelName),
@@ -31,6 +32,6 @@ class OpenAIAPIClient @Inject constructor() {
         )
 
         println("This is the msg: $msg")
-        return openAIClient.chatCompletions(request)
+        return openAIClient.chatCompletions(request) // Return response as a stream
     }
 }

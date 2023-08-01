@@ -60,8 +60,10 @@ fun SingleNoteScreen(
 ) {
     //collect note information from the view model
     val note = viewModel.getNote(noteID).collectAsState(initial = UiNote()).value
+    // Update text depending on if currently speaking
     var ttsButtonText by remember { mutableStateOf("Read Summarized Notes") }
     val screenHeight = (LocalConfiguration.current.screenHeightDp).dp
+    // Can be altered dynamically through UI input
     var transcriptHeight by remember { mutableStateOf(screenHeight * 0.4F) }
     var summaryHeight by remember { mutableStateOf(screenHeight * 0.4F) }
 
@@ -128,6 +130,7 @@ fun SingleNoteScreen(
             item {
                 Divider(color = MaterialTheme.colorScheme.tertiary, thickness = 4.dp,
                     modifier = Modifier.padding(4.dp).pointerInput(Unit) {
+                        // Update heights based on user drag input
                         detectVerticalDragGestures { _, dragAmount ->
                             transcriptHeight = (transcriptHeight + dragAmount.dp).coerceIn(
                                 screenHeight * 0.15F,

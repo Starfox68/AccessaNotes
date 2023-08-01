@@ -105,9 +105,11 @@ fun LiveRecordingScreenContent(
     onCameraPermissionRequest: () -> Unit,
     onCameraClick: () -> Unit,
 ) {
+    // Update text depending on if currently speaking
     var ttsButtonText by remember { mutableStateOf("Read Summarized Notes") }
     var isSpeaking = false
     val screenHeight = (LocalConfiguration.current.screenHeightDp).dp
+    // Can be altered dynamically through UI input
     var transcriptHeight by remember { mutableStateOf(screenHeight * 0.35F) }
     var summaryHeight by remember { mutableStateOf(screenHeight * 0.35F) }
 
@@ -136,6 +138,7 @@ fun LiveRecordingScreenContent(
                 item {
                     Divider(color = MaterialTheme.colorScheme.tertiary, thickness = 4.dp,
                         modifier = Modifier.padding(4.dp).pointerInput(Unit) {
+                            // Update heights based on user drag input
                             detectVerticalDragGestures { _, dragAmount ->
                                 transcriptHeight = (transcriptHeight + dragAmount.dp).coerceIn(
                                     screenHeight * 0.15F,
