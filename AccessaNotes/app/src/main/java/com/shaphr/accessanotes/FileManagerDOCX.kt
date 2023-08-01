@@ -18,12 +18,15 @@ class FileManagerDOCX @Inject constructor(application: Application) : FileManage
     private val contentResolver = application.contentResolver
 
     override fun getFile(uri: Uri): Any {
+        // Get file from URI by opening an input stream and creating a XWPFDocument for the DOCX file
         val inputStream = contentResolver.openInputStream(uri)
         return XWPFDocument(inputStream)
     }
     override suspend fun readFile(file: Any): String {
         println("Reading DOCX file...")
+        // Read file as XWPFDocument representing a DOCX file
         val xwpfWordExtractor = XWPFWordExtractor(file as XWPFDocument)
+        // Extract and return text
         val text = xwpfWordExtractor.text
         xwpfWordExtractor.close()
         return text

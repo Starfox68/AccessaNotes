@@ -13,6 +13,7 @@ class FileManagerTXT @Inject constructor(application: Application) : FileManager
 
     @SuppressLint("Recycle")
     override fun getFile(uri: Uri): Any {
+        // Get input stream from file URI and return it
         val inputStream = contentResolver.openInputStream(uri)
         if (inputStream != null) {
             return inputStream
@@ -20,8 +21,10 @@ class FileManagerTXT @Inject constructor(application: Application) : FileManager
         throw IOException("Could not open file")
     }
 
+    // Assumes file is a text file, promise fulfilled and checked in instantiation during upload
     override suspend fun readFile(file: Any): String {
         println("Reading text file...")
+        // Read text from input stream as is and return it
         return (file as InputStream).bufferedReader().use { it.readText() }
     }
     override fun createDoc(title: String, content: List<Any>): Any {

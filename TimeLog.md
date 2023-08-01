@@ -99,6 +99,10 @@
 | 07/26/2023 | 7.5 | 7.5 | 7.5 | 7.5 | 7.5 | 7.5 | Team Integrations Meeting + Demo |
 | 07/27/2023 | | | | | 2 | | D6 - Architecture and Design Report |
 | 07/28/2023 | 4 | 4 | 4 | 4 | 4 | 4 | D6 - Architecture and Design Report |
-| 07/28/2023 | | 1.5 | | 1.5 | | | Updated Comments and Imports |
+| 07/28/2023 | | 1.5 | | 1.5 | | 1.5 | Updated Comments and Imports |
 | 07/30/2023 | | | | | 1 | | Final Status Report |
 | 07/31/2023 | | | | | 1 | | Add Comments |
+| 07/31/2023 | | | | | | 1.5 | Final Status Report |
+| 07/31/2023 | 1 | 1 | 1 | 1 | 1 | 1 | Final Team Sync |
+
+

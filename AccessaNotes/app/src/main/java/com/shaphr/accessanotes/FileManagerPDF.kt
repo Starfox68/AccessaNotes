@@ -31,6 +31,7 @@ class FileManagerPDF @Inject constructor(application: Application) : FileManager
     private val margins = 1 * psPerInch
 
     override fun getFile(uri: Uri): File {
+        // Get the File object from the Uri
         val file = getFileFromUri(uri)
         if (file != null) {
             return file
@@ -38,16 +39,20 @@ class FileManagerPDF @Inject constructor(application: Application) : FileManager
         throw IOException("File not found")
     }
 
+    // NOTE: We are using PDF.co as a service for extracting PDF text as built in Android libraries are not sufficient in support
     override suspend fun readFile(file: Any): String {
         println("Reading PDF file...")
+        // First we must upload the PDF file to PDF.co and get the URL of where it is stored in the response
         val url: String? = uploadPdfFile(file as File)
         if (url != null) {
+            // Then we can use the URL to get the text from the PDF file using PDF.co
             val text = getPDFText(url)
             return text!!
         }
         throw IOException("File not found")
     }
 
+    // Helper function to retrieve a File object from the given Uri using the context's cache directory
     private fun getFileFromUri(uri: Uri): File? {
         val file = File(context.cacheDir, "temp_file.pdf")
 
@@ -64,6 +69,7 @@ class FileManagerPDF @Inject constructor(application: Application) : FileManager
         return null
     }
 
+    // Coroutine function to upload the PDF file to the specified URL from pdf.co
     private suspend fun uploadPdfFile(file: File): String? {
         println("Uploading PDF file...")
         val url = "https://api.pdf.co/v1/file/upload"
@@ -71,6 +77,7 @@ class FileManagerPDF @Inject constructor(application: Application) : FileManager
 
         return withContext(Dispatchers.Default) {
             try {
+                // Create the multipart request body with the PDF file
                 val requestBody = MultipartBody.Builder()
                     .setType(MultipartBody.FORM)
                     .addFormDataPart(
@@ -80,6 +87,7 @@ class FileManagerPDF @Inject constructor(application: Application) : FileManager
                     )
                     .build()
 
+                // Build the HTTP request with the API key and the request body
                 val request = Request.Builder()
                     .url(url)
                     .header("x-api-key", apiKey)
@@ -92,36 +100,39 @@ class FileManagerPDF @Inject constructor(application: Application) : FileManager
                 }
 
                 if (response.isSuccessful) {
+                    // If the response is successful, extract the URL from the JSON response and return it
                     val responseBody = response.body?.string()
                     val jsonResponse = responseBody?.let { JSONObject(it) }
                     val fileUrl = jsonResponse?.getString("url")
-                    // Call getPDFText function with the extracted URL
                     fileUrl
                 } else {
-                    // Handle the error
+                    // Handle the error if the response is not successful
                     println("Error from response: ${response.code} ${response.message}")
                     null
                 }
             } catch (e: Exception) {
-                // Handle the exception
+                // Handle exceptions that may occur during the API call
                 println("Error: ${e.message}")
                 null
             }
         }
     }
 
+    // Coroutine function to get the text content of the PDF using pdf.co
     private suspend fun getPDFText(url: String): String? {
         val apiUrl = "https://api.pdf.co/v1/pdf/convert/to/text-simple"
         val apiKey = "mhmohebbi@gmail.com_17073ef6740486dd9a58fdfcb2d377ab6e07bc45894b6e3d167526053d91031133df7b3b"
 
         return withContext(Dispatchers.IO) {
             try {
+                // Create the JSON request body with the PDF URL and other parameters
                 val requestBody = JSONObject().apply {
                     put("url", url)
                     put("inline", true)
                     put("async", false)
                 }
 
+                // Build the HTTP request with the API key and the JSON request body
                 val request = Request.Builder()
                     .url(apiUrl)
                     .header("Content-Type", "application/json")
@@ -133,16 +144,17 @@ class FileManagerPDF @Inject constructor(application: Application) : FileManager
                 val response = client.newCall(request).execute()
 
                 if (response.isSuccessful) {
+                    // If the response is successful, extract the text content from the JSON response and return it
                     val responseBody = response.body?.string()
                     val jsonResponse = responseBody?.let { JSONObject(it) }
-                    return@withContext jsonResponse?.getString("body")
+                    return@withContext jsonResponse?.getString("body") // The text content is in the "body" field
                 } else {
-                    // Handle the error
+                    // Handle the error if the response is not successful
                     println("Error: ${response.code} ${response.message}")
                     return@withContext null
                 }
             } catch (e: Exception) {
-                // Handle the exception
+                // Handle exceptions that may occur during the API call
                 println("Error: ${e.message}")
                 return@withContext null
             }
