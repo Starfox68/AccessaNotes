@@ -151,6 +151,7 @@ class FileManagerPDF @Inject constructor(application: Application) : FileManager
 
 
     private fun getPDFPaints(): Triple<TextPaint, TextPaint, TextPaint> {
+        // Formatting for each part
         val titlePaint = TextPaint()
         titlePaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         titlePaint.textSize = titleSize.toFloat()
@@ -186,6 +187,7 @@ class FileManagerPDF @Inject constructor(application: Application) : FileManager
 
     override fun createDoc(title: String, content: List<Any>): Any {
         val (titlePaint, bodyPaint, disclaimerPaint) = getPDFPaints()
+        // Static layout for disclaimer header
         val disclaimerLayout = StaticLayout.Builder.obtain(
             disclaimer, 0, disclaimer.length, disclaimerPaint, pageWidth - 2 * margins
         ).setLineSpacing(2F, 1F).build()
@@ -201,19 +203,22 @@ class FileManagerPDF @Inject constructor(application: Application) : FileManager
 
         // Draw text below title
         canvas.translate(1F * margins, 1.5F * margins + titlePaint.textSize)
-        var curHeight = 1.5F * margins + titlePaint.textSize
+        var curHeight = 1.5F * margins + titlePaint.textSize // Current height of page
         content.forEach {
             var height = 0F
             var layout: StaticLayout? = null
             if (it is String) {
+                // Create static layout for text if string
                 layout = StaticLayout.Builder.obtain(
                     it, 0, it.length, bodyPaint, pageWidth - 2 * margins
                 ).setLineSpacing(2F, 1F).build()
                 height = layout.height.toFloat()
             } else if (it is Bitmap) {
+                // Set to image height
                 height = imageHeight
             }
 
+            // Make new page if new content will not fit on existing one based on height
             if (curHeight + height >= pageHeight - 2 * margins) {
                 doc.finishPage(page)
                 page = makePDFPage(doc, nextPageNum, disclaimerLayout)
@@ -224,12 +229,14 @@ class FileManagerPDF @Inject constructor(application: Application) : FileManager
                 curHeight = 0.2F
             }
 
+            // Draw layout with text or bitmap based on type
             if (it is String) {
                 layout?.draw(canvas)
             } else if (it is Bitmap) {
                 canvas.drawBitmap(it, (pageWidth - imageWidth) / 2 - margins, 0F, null)
             }
 
+            // Move canvas to position for next item and update current height
             canvas.translate(0F, height + bodyPaint.textSize)
             curHeight += height + bodyPaint.textSize
         }

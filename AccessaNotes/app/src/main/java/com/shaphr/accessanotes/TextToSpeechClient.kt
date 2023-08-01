@@ -9,6 +9,7 @@ import javax.inject.Singleton
 
 @Singleton
 class TextToSpeechClient @Inject constructor(@ApplicationContext private val context: Context) {
+    // Class should be created with engine before use
     private var tts: TextToSpeech = TextToSpeech(context) {
         if (it == TextToSpeech.SUCCESS) {
             println("Created TTS engine")

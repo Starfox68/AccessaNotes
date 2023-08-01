@@ -53,12 +53,14 @@ class FileManagerDOCX @Inject constructor(application: Application) : FileManage
             val bodyRun = paragraph.createRun()
 
             if (it is String) {
+                // Write text if string
                 bodyRun.fontSize = bodySize
                 bodyRun.setText(it)
 
             } else if (it is Bitmap) {
+                // Add image if bitmap
                 paragraph.alignment = ParagraphAlignment.CENTER
-                // Write bitmap to temp file so that we can open FileInputStream
+                // Write bitmap to temp file so that we can open it as FileInputStream
                 FileOutputStream("$filePath/temp.jpeg").use { out ->
                     it.compress(Bitmap.CompressFormat.JPEG, 100, out)
                 }
